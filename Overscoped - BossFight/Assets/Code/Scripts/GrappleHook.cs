@@ -34,7 +34,10 @@ public class GrappleHook : MonoBehaviour
     public float m_landMoveAcceleration = 5.0f;
 
     [Tooltip("The distance the grapple hook will travel before cancelling.")]
-    public float m_breakDistance = 20.0f;
+    public float m_grapplebreakDistance = 20.0f;
+
+    [Tooltip("The distance the pull hook must be extended beyond the initial rope length on impact to decouple the target object.")]
+    public float m_pullBreakDistance = 8.0f;
 
     [Tooltip("Whether or not the player will be restricted a spherical volume with the rope length as the radius when grappling.")]
     public bool m_restrictToRopeLength = true;
@@ -44,6 +47,7 @@ public class GrappleHook : MonoBehaviour
     private PlayerController m_controller;
     private Hook m_graphookScript;
     private Hook m_pullHookScript;
+    private GradientColorKey[] m_colorKeys;
     private Vector3 m_grapplePoint;
     private Vector3 m_pullTension;
     private float m_grapRopeLength;
@@ -59,6 +63,11 @@ public class GrappleHook : MonoBehaviour
 
         m_graphookScript = m_grappleHook.GetComponent<Hook>();
         m_pullHookScript = m_pullHook.GetComponent<Hook>();
+
+        m_colorKeys = new GradientColorKey[m_pullLine.colorGradient.colorKeys.Length];
+
+        for (int i = 0; i < m_pullLine.colorGradient.colorKeys.Length; ++i)
+            m_colorKeys[i] = m_pullLine.colorGradient.colorKeys[i];
 
         m_grappleHook.SetActive(false);
 
@@ -91,6 +100,11 @@ public class GrappleHook : MonoBehaviour
 
             m_pullHook.transform.position = m_pullNode.position;
             m_pullHook.transform.rotation = m_pullNode.parent.rotation;
+
+            // Revert hook color back to original.
+            m_pullLine.colorGradient.SetKeys(m_colorKeys, m_pullLine.colorGradient.alphaKeys);
+            m_pullLine.startColor = m_colorKeys[0].color;
+            m_pullLine.endColor = m_colorKeys[0].color;
 
             m_pullHookActive = true;
         }
@@ -133,7 +147,7 @@ public class GrappleHook : MonoBehaviour
                 m_grapRopeLenCalculated = false;
 
                 // Cancel since the rope is now too long.
-                if (m_grapRopeLength >= m_breakDistance * m_breakDistance)
+                if (m_grapRopeLength >= m_grapplebreakDistance * m_grapplebreakDistance)
                 {
                     m_controller.FreeOverride();
                     m_grappleHook.SetActive(false);
@@ -169,7 +183,7 @@ public class GrappleHook : MonoBehaviour
                 m_pullRopeLength = (m_pullHook.transform.position - transform.position).sqrMagnitude;
 
                 // Cancel since the rope is now too long.
-                if(m_pullRopeLength > m_breakDistance * m_breakDistance)
+                if(m_pullRopeLength > m_grapplebreakDistance * m_grapplebreakDistance)
                 {
                     m_pullHook.SetActive(false);
 
@@ -249,6 +263,7 @@ public class GrappleHook : MonoBehaviour
     {
         Vector3 netForce = Vector3.zero;
 
+        // Movement during grapple landing phase.
         if (Input.GetKey(KeyCode.W))
             netForce += controller.LookForward() * m_landMoveAcceleration * Time.deltaTime;
         if (Input.GetKey(KeyCode.A))
@@ -258,10 +273,12 @@ public class GrappleHook : MonoBehaviour
         if (Input.GetKey(KeyCode.D))
             netForce += controller.LookRight() * m_landMoveAcceleration * Time.deltaTime;
 
+        // Add gravity.
         netForce += Physics.gravity * Time.deltaTime;
 
         Vector3 velocity = controller.GetVelocity();
 
+        // Drag
         if(velocity.sqrMagnitude < 1.0f)
         {
             velocity.x -= velocity.x * 5.0f * Time.deltaTime;
@@ -274,6 +291,7 @@ public class GrappleHook : MonoBehaviour
             velocity.z -= velNor.z * 5.0f * Time.deltaTime;
         }
 
+        // Free override on landing.
         if (controller.IsGrounded())
         {
             controller.FreeOverride();
@@ -288,31 +306,26 @@ public class GrappleHook : MonoBehaviour
 
         Vector3 objDiff = transform.position - m_pullHook.transform.position;
         Vector3 objDir = objDiff.normalized;
-        float mag = objDiff.sqrMagnitude;
+        float ropeDistSqr = objDiff.sqrMagnitude; // Current rope length squared.
 
-        float damage = 0.0f;
+        // Distance beyond initial rope distance on impact the rope must be pulled to to decouple the pull object. (Squared)
+        float breakDistSqr = m_pullBreakDistance * m_pullBreakDistance;
 
-        if (mag > m_breakDistance * m_breakDistance)
+        float distBeyondThreshold = ropeDistSqr - m_pullRopeLength; // Distance beyond inital rope length.
+        float tension = distBeyondThreshold / breakDistSqr; // Tension value used to sample the color gradient and detect when the pull object should decouple.
+
+        Color ropeColor = m_pullLine.colorGradient.Evaluate(Mathf.Clamp(tension, 0.0f, 1.0f));
+
+        // Set color to sampled color.
+        m_pullLine.startColor = ropeColor;
+        m_pullLine.endColor = ropeColor;
+
+        if (tension >= 1.0f)
         {
-            damage += Mathf.Infinity;
-        }
-        else if (mag > m_pullRopeLength)
-        {
-            damage += mag - m_pullRopeLength;
-
-            // Tension force.
-            //float tensionVal = (damage / (m_breakDistance * m_breakDistance));
-            float tensionVal = (mag / (m_breakDistance * m_breakDistance));
-            Debug.Log(tensionVal);
-
-            m_controller.SetVelocity(m_controller.GetVelocity() + (objDir * -tensionVal * 1.0f));
-        }
-
-        pullObj.Damage(objDir, damage * Time.deltaTime);
-
-        // Release hook.
-        if (!pullObj.IsCoupled())
-        {
+            // Object is decoupled.s
+            pullObj.Decouple(objDir);
+        
+            // Free the pull hook.
             m_pullHookActive = false;
             m_pullHookScript.UnLodge();
         }

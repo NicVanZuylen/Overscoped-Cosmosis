@@ -76,8 +76,6 @@ public class PlayerController : MonoBehaviour
 
     public Vector3 WASDAcceleration(float acceleration)
     {
-        Debug.Log(m_surfaceRight);
-
         Debug.DrawLine(transform.position, transform.position + (m_surfaceRight * 3.0f), Color.red);
         Debug.DrawLine(transform.position, transform.position + (m_surfaceUp * 3.0f), Color.green);
         Debug.DrawLine(transform.position, transform.position + (m_surfaceForward * 3.0f), Color.blue);
@@ -199,6 +197,21 @@ public class PlayerController : MonoBehaviour
         return dir;
     }
 
+    void CalculateSurfaceTransform(ControllerColliderHit hit)
+    {
+        m_surfaceUp = hit.normal;
+        m_surfaceForward = Vector3.Cross(m_cameraTransform.right, m_surfaceUp);
+        m_surfaceRight = Vector3.Cross(m_surfaceUp, m_surfaceForward);
+    }
+
+    void CalculateSurfaceTransform(RaycastHit hit)
+    {
+        m_surfaceUp = hit.normal;
+        m_surfaceForward = Vector3.Cross(m_cameraTransform.right, m_surfaceUp);
+        m_surfaceRight = Vector3.Cross(m_surfaceUp, m_surfaceForward);
+    }
+
+    /*
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         Collider collider = hit.collider;
@@ -206,15 +219,12 @@ public class PlayerController : MonoBehaviour
         if(collider != null && hit.point.y < transform.position.y) // Object must be the surface the player is standing on.
         {
             // Get surface-relative movement vectors.
-            m_surfaceUp = hit.normal;
-            m_surfaceForward = Vector3.Cross(m_cameraTransform.right, m_surfaceUp);
-            m_surfaceRight = Vector3.Cross(m_surfaceUp, m_surfaceForward);
-
-            //m_groundDetectionBox.transform.rotation = hit.collider.transform.rotation;
+            CalculateSurfaceTransform(hit);
 
             m_onGround = true;
         }
     }
+    */
 
     void Update()
     {
@@ -246,8 +256,33 @@ public class PlayerController : MonoBehaviour
         Vector3 m_netForce = Vector3.zero;
 
         // ------------------------------------------------------------------------------------------------------
+        // Checking if grounded
+
+        Ray sphereRay = new Ray(transform.position, -transform.up);
+        RaycastHit hit = new RaycastHit();
+        float sphereRadius = m_controller.radius * 0.5f;
+
+        // Sphere case down to the nearest surface below. Sphere cast is ignored if not falling.
+        if (m_velocity.y <= 0.0f || m_onGround)
+        {
+            bool sphereCastHit = Physics.SphereCast(sphereRay, sphereRadius, out hit);
+            m_onGround = sphereCastHit && hit.distance < m_controller.height * 0.5f;
+
+            // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
+            // So to be sure its updated we update it using the sphere case hit.
+            if (sphereCastHit)
+                CalculateSurfaceTransform(hit);
+
+            Debug.DrawLine(sphereRay.origin, hit.point);
+        }
+        else
+            m_onGround = false;
+
+        // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
+        m_onGround |= m_controller.isGrounded;
+
+        // ------------------------------------------------------------------------------------------------------
         // Jumping
-        m_onGround = m_controller.isGrounded;// || m_boxDetectedGround;
 
         if (Input.GetKeyDown(KeyCode.Space) && m_onGround)
         {
@@ -267,18 +302,6 @@ public class PlayerController : MonoBehaviour
             {
                 m_netForce += Drag(m_groundDrag);
             }
-
-            /*
-            // Snap to surface.
-            Ray downRay = new Ray(transform.position, -m_surfaceUp);
-            RaycastHit rayHit = new RaycastHit();
-            Debug.DrawLine(transform.position, transform.position - (m_surfaceUp * 3.0f), Color.cyan);
-            if(Physics.Raycast(downRay, out rayHit, 5.0f))
-            {
-                Vector3 newPos = rayHit.point + (m_surfaceUp * (m_controller.height * 0.5f));
-                m_controller.Move(newPos - transform.position);
-            }
-            */
         }
         else
         {
@@ -287,7 +310,12 @@ public class PlayerController : MonoBehaviour
 
             m_surfaceRight = m_cameraTransform.right;
             m_surfaceUp = transform.up;
-            m_surfaceForward = m_cameraTransform.forward;
+
+            Vector3 forwardVec = m_cameraTransform.forward;
+            forwardVec.y = 0.0f; // The Y component needs to be removed since it can mess with drag.
+            forwardVec.Normalize();
+
+            m_surfaceForward = forwardVec;
 
             m_netForce += Drag(m_airDrag);
         }

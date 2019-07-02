@@ -43,6 +43,8 @@ public class Hook : MonoBehaviour
     {
         if(!m_lodged)
         {
+            Debug.Log(other.tag);
+
             if (other.tag == "PullObj")
             {
                 m_pullObj = other.GetComponent<PullObject>();

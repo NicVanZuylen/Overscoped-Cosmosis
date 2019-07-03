@@ -15,14 +15,14 @@ public class Hook : MonoBehaviour
     // Public:
 
     public CharacterController m_playerController;
-    public float flySpeed = 5.0f;
+    public float m_fFlySpeed = 5.0f;
 
     // Private:
 
     private SphereCollider m_collider;
     private PullObject m_pullObj;
     private EHookPullMode m_pullType;
-    private bool m_lodged;
+    private bool m_bLodged;
 
     void Awake()
     {
@@ -30,18 +30,18 @@ public class Hook : MonoBehaviour
         Physics.IgnoreCollision(m_collider, m_playerController, true);
 
         m_pullType = EHookPullMode.PULL_FLY_TOWARDS;
-        m_lodged = false;
+        m_bLodged = false;
     }
 
     void Update()
     {
-        if (!m_lodged)
-            transform.Translate(transform.forward * flySpeed * Time.deltaTime, Space.World);
+        if (!m_bLodged)
+            transform.Translate(transform.forward * m_fFlySpeed * Time.deltaTime, Space.World);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(!m_lodged)
+        if(!m_bLodged)
         {
             if (other.tag == "PullObj")
             {
@@ -54,7 +54,7 @@ public class Hook : MonoBehaviour
                 m_pullType = EHookPullMode.PULL_FLY_TOWARDS;
         }
 
-        m_lodged = true;
+        m_bLodged = true;
     }
 
     public PullObject HookedObject()
@@ -69,18 +69,18 @@ public class Hook : MonoBehaviour
 
     public bool IsLodged()
     {
-        return m_lodged;
+        return m_bLodged;
     }
 
     public void UnLodge()
     {
         gameObject.SetActive(false);
         transform.parent = null;
-        m_lodged = false;
+        m_bLodged = false;
     }
 
     private void OnEnable()
     {
-        m_lodged = false;
+        m_bLodged = false;
     }
 }

@@ -96,7 +96,7 @@ namespace BTreeEditor
 
     public class Node
     {
-        public static bool bLayoutChange = false;
+        public static bool m_bLayoutChange = false;
 
         public const float fNodeWidth = 256.0f;
         public const float fNodeHeight = 300.0f;
@@ -105,7 +105,7 @@ namespace BTreeEditor
         public List<Node> m_children;
         public Stack<Node> m_deletedChildren;
 
-        static NodeData nodeClipboard = null;
+        static NodeData m_nodeClipboard = null;
 
         ENodeType m_eType;
         Node m_parent;
@@ -192,7 +192,7 @@ namespace BTreeEditor
             }
 
             // Paste...
-            if (nodeClipboard != null)
+            if (m_nodeClipboard != null)
             {
                 contextMenu.AddSeparator("");
                 contextMenu.AddItem(new GUIContent("Paste"), false, node.NodePasteCallback);
@@ -250,13 +250,13 @@ namespace BTreeEditor
 
         public void NodeCopyCallback()
         {
-            nodeClipboard = new NodeData(this);
+            m_nodeClipboard = new NodeData(this);
         }
 
         public void NodePasteCallback()
         {
             BTreeEditor.AddAction(new BTreeEditAction(EActionType.ACTION_PASTE_NODE, this));
-            AddChild(new Node(nodeClipboard));
+            AddChild(new Node(m_nodeClipboard));
         }
 
         public void DeleteCallback()
@@ -275,7 +275,7 @@ namespace BTreeEditor
 
             // Process this node...
             Vector2 v2ScaleOffset = new Vector2((fNodeWidth - m_v2VisualDimensions.x) * -0.5f, 0.0f);
-            Rect nodeRect = new Rect(m_rect.position - v2ScaleOffset + BTreeEditor.v2GlobalViewOffset, m_v2VisualDimensions);
+            Rect nodeRect = new Rect(m_rect.position - v2ScaleOffset + BTreeEditor.m_v2GlobalViewOffset, m_v2VisualDimensions);
             switch (e.type)
             {
                 case EventType.MouseDown:
@@ -448,14 +448,14 @@ namespace BTreeEditor
         {
             node.m_parent = this;
             m_children.Add(node);
-            bLayoutChange = true;
+            m_bLayoutChange = true;
         }
 
         public void InsertChild(int nIndex, Node node)
         {
             node.m_parent = this;
             m_children.Insert(nIndex, node);
-            bLayoutChange = true;
+            m_bLayoutChange = true;
         }
 
         public void RemoveChild(Node childNode)
@@ -464,7 +464,7 @@ namespace BTreeEditor
             {
                 childNode.m_parent = null;
                 m_children.Remove(childNode);
-                bLayoutChange = true;
+                m_bLayoutChange = true;
             }
         }
 
@@ -476,7 +476,7 @@ namespace BTreeEditor
 
                 m_children[childIndex].m_parent = null;
                 m_children.RemoveAt(childIndex);
-                bLayoutChange = true;
+                m_bLayoutChange = true;
             }
         }
 
@@ -491,7 +491,7 @@ namespace BTreeEditor
             int index = m_children.IndexOf(child);
             m_children.Remove(child);
             m_children.Insert(index - 1, child);
-            bLayoutChange = true;
+            m_bLayoutChange = true;
         }
 
         public void ShiftChildRight(Node child)
@@ -499,7 +499,7 @@ namespace BTreeEditor
             int index = m_children.IndexOf(child);
             m_children.Remove(child);
             m_children.Insert(index + 1, child);
-            bLayoutChange = true;
+            m_bLayoutChange = true;
         }
 
         // ---------------------------------------------------------------------------------
@@ -513,7 +513,7 @@ namespace BTreeEditor
 
             // Draw this node's window...
             Vector2 v2ScaleOffset = new Vector2((fNodeWidth - m_v2VisualDimensions.x) * -0.5f, 0.0f);
-            Vector2 v2FinalPos = m_rect.position - v2ScaleOffset + BTreeEditor.v2GlobalViewOffset;
+            Vector2 v2FinalPos = m_rect.position - v2ScaleOffset + BTreeEditor.m_v2GlobalViewOffset;
 
             Rect nodeRect = new Rect(v2FinalPos, m_v2VisualDimensions);
 
@@ -550,7 +550,7 @@ namespace BTreeEditor
 
                 Vector2 v2EndPos = v2FinalPos + new Vector2(m_v2VisualDimensions.x * 0.5f, 0.0f);
 
-                Handles.DrawLine(v2StartPos + BTreeEditor.v2GlobalViewOffset, v2EndPos);
+                Handles.DrawLine(v2StartPos + BTreeEditor.m_v2GlobalViewOffset, v2EndPos);
             }
 
             // Draw children...
@@ -621,7 +621,7 @@ namespace BTreeEditor
         Vector2 m_v2LastMousePos;
         private float m_fZoomFactor = 1.0f;
 
-        public static Vector2 v2GlobalViewOffset;
+        public static Vector2 m_v2GlobalViewOffset;
 
         // Undo
         bool m_bControlDown;
@@ -691,7 +691,7 @@ namespace BTreeEditor
             {
                 m_baseNode = new Node(ENodeType.NODE_COMPOSITE_SELECTOR, null, "Base");
                 m_v2LastMousePos = Vector2.zero;
-                v2GlobalViewOffset = Vector2.zero;
+                m_v2GlobalViewOffset = Vector2.zero;
             }
         }
 
@@ -771,8 +771,8 @@ namespace BTreeEditor
 
                     if (e.button == 2) // Drag view vector.
                     {
-                        v2GlobalViewOffset += v2MouseDelta;
-                        Node.bLayoutChange = true;
+                        m_v2GlobalViewOffset += v2MouseDelta;
+                        Node.m_bLayoutChange = true;
                     }
                     break;
 
@@ -785,10 +785,10 @@ namespace BTreeEditor
                     m_fZoomFactor = Mathf.Clamp(m_fZoomFactor, 0.5f, 5.0f);
 
                     // Adjust view position to account for scale difference.
-                    v2GlobalViewOffset.x += (fLastZoomFactor - m_fZoomFactor) * (0.5f * m_fDefaultScale);
-                    v2GlobalViewOffset.y += (fLastZoomFactor - m_fZoomFactor) * (Node.fNodeHeight);
+                    m_v2GlobalViewOffset.x += (fLastZoomFactor - m_fZoomFactor) * (0.5f * m_fDefaultScale);
+                    m_v2GlobalViewOffset.y += (fLastZoomFactor - m_fZoomFactor) * (Node.fNodeHeight);
 
-                    Node.bLayoutChange = true;
+                    Node.m_bLayoutChange = true;
 
                     break;
             }
@@ -840,7 +840,7 @@ namespace BTreeEditor
                     break;
             }
 
-            Node.bLayoutChange = true;
+            Node.m_bLayoutChange = true;
         }
 
         private void OnGUI()
@@ -892,10 +892,10 @@ namespace BTreeEditor
                 }
             }
 
-            if (Node.bLayoutChange)
+            if (Node.m_bLayoutChange)
             {
                 Repaint();
-                Node.bLayoutChange = false;
+                Node.m_bLayoutChange = false;
             }
         }
 

@@ -687,12 +687,28 @@ namespace BTreeEditor
         // On enable...
         private void OnEnable()
         {
-            if(m_baseNode == null)
+            if (m_baseNode == null)
             {
                 m_baseNode = new Node(ENodeType.NODE_COMPOSITE_SELECTOR, null, "Base");
+
+                RestoreTemp();
+
                 m_v2LastMousePos = Vector2.zero;
                 m_v2GlobalViewOffset = Vector2.zero;
             }
+        }
+
+        private void OnDisable()
+        {
+            // Save to temp file.
+            if (m_baseNode != null)
+                Save(Application.dataPath + "/BTreeTemp.xml");
+        }
+
+        public static void RestoreTemp()
+        {
+            Debug.Log("Behaviour Tree Editor: Restoring Temp Data.");
+            m_baseNode = new Node(Load(Application.dataPath + "/BTreeTemp.xml"));
         }
 
         // Show window...
@@ -845,6 +861,9 @@ namespace BTreeEditor
 
         private void OnGUI()
         {
+            if (m_baseNode == null)
+                return;
+
             m_baseNode.ProcessEvents(Event.current);
 
             ProcessEvents(Event.current);
@@ -925,11 +944,11 @@ namespace BTreeEditor
 
         private static NodeData Load(string path)
         {
-            // Create an XML reader.
-            XmlSerializer reader = new XmlSerializer(typeof(NodeData));
-
             try
             {
+                // Create an XML reader.
+                XmlSerializer reader = new XmlSerializer(typeof(NodeData));
+
                 // Open file...
                 FileStream file = File.Open(path, FileMode.Open);
 

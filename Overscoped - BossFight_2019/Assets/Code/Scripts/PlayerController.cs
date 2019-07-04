@@ -23,6 +23,9 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Movement drag when on the ground.")]
     public float m_fGroundDrag = 50.0f;
 
+    [Tooltip("Movement drag when on the ground and still under momentum from flight.")]
+    public float m_fMomentumDrag = 5.0f;
+
     [Tooltip("Movement drag while in the air.")]
     public float m_fAirDrag = 5.0f;
 
@@ -62,6 +65,10 @@ public class PlayerController : MonoBehaviour
         m_collider = GetComponent<CapsuleCollider>();
         m_cameraTransform = GetComponentInChildren<Camera>().transform;
         m_v3RespawnPosition = transform.position;
+
+        m_v3SurfaceUp = transform.up;
+        m_v3SurfaceForward = transform.forward;
+        m_v3SurfaceRight = transform.right;
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -107,7 +114,7 @@ public class PlayerController : MonoBehaviour
         if (bMoved)
             v3NetForce = v3NetForce.normalized * acceleration;
 
-        return v3NetForce;
+        return v3NetForce * Time.deltaTime;
     }
 
     public bool IsGrounded()
@@ -133,7 +140,23 @@ public class PlayerController : MonoBehaviour
 
         Vector3 v3DragVector = (fForwardComponent * m_v3SurfaceForward) + (fLateralComponent * m_v3SurfaceRight);
 
-        return -v3DragVector.normalized * fDrag * Time.deltaTime;
+        if(v3DragVector.sqrMagnitude > 1.0f)
+            return -v3DragVector.normalized * fDrag * Time.deltaTime;
+        else
+            return -v3DragVector * fDrag * Time.deltaTime;
+    }
+
+    public Vector3 Drag(float fDrag, Vector3 v3Velocity)
+    {
+        float fForwardComponent = Vector3.Dot(v3Velocity, m_v3SurfaceForward);
+        float fLateralComponent = Vector3.Dot(v3Velocity, m_v3SurfaceRight);
+
+        Vector3 v3DragVector = (fForwardComponent * m_v3SurfaceForward) + (fLateralComponent * m_v3SurfaceRight);
+
+        if (v3DragVector.sqrMagnitude > 1.0f)
+            return -v3DragVector.normalized * fDrag * Time.deltaTime;
+        else
+            return -v3DragVector * fDrag * Time.deltaTime;
     }
 
     public Vector3 GetVelocity()
@@ -236,7 +259,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        Vector3 m_netForce = Vector3.zero;
+        Vector3 v3NetForce = Vector3.zero;
 
         // ------------------------------------------------------------------------------------------------------
         // Checking if grounded
@@ -249,7 +272,8 @@ public class PlayerController : MonoBehaviour
         if (m_v3Velocity.y <= 0.0f || m_bOnGround)
         {
             bool bSphereCastHit = Physics.SphereCast(sphereRay, fSphereRadius, out hit);
-            m_bOnGround = bSphereCastHit && hit.distance < m_controller.height * 0.5f;
+            m_bOnGround = bSphereCastHit && hit.distance < (m_controller.height * 0.5f);
+            //m_bOnGround = bSphereCastHit && hit.distance < (m_controller.height * 2.0f);
 
             // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
             // So to be sure its updated we update it using the sphere case hit.
@@ -267,7 +291,7 @@ public class PlayerController : MonoBehaviour
             m_bOnGround = false;
 
         // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
-        m_bOnGround |= m_controller.isGrounded;
+        //m_bOnGround |= m_controller.isGrounded;
 
         // ------------------------------------------------------------------------------------------------------
         // Jumping
@@ -283,43 +307,48 @@ public class PlayerController : MonoBehaviour
 
         if(m_bOnGround)
         {
-            Vector3 outAcceleration = WASDAcceleration(m_fGroundAcceleration);
-            m_netForce += outAcceleration;
+            Vector3 v3OutAcceleration = WASDAcceleration(m_fGroundAcceleration);
+            v3NetForce += v3OutAcceleration;
 
-            if(outAcceleration.sqrMagnitude < 0.01f) // Drag
+            if (v3NetForce.sqrMagnitude < 0.01f)
             {
-                m_netForce += Drag(m_fGroundDrag);
+                v3NetForce += Drag(m_fGroundDrag);
             }
         }
         else
         {
-            Vector3 outAcceleration = WASDAcceleration(m_fAirAcceleration);
-            m_netForce += outAcceleration;
+            Vector3 v3OutAcceleration = WASDAcceleration(m_fAirAcceleration);
+            v3NetForce += v3OutAcceleration;
 
             m_v3SurfaceRight = m_cameraTransform.right;
             m_v3SurfaceUp = transform.up;
 
-            Vector3 forwardVec = m_cameraTransform.forward;
-            forwardVec.y = 0.0f; // The Y component needs to be removed since it can mess with drag.
-            forwardVec.Normalize();
+            Vector3 v3ForwardVec = m_cameraTransform.forward;
+            v3ForwardVec.y = 0.0f; // The Y component needs to be removed since it can mess with drag.
+            v3ForwardVec.Normalize();
 
-            m_v3SurfaceForward = forwardVec;
+            m_v3SurfaceForward = v3ForwardVec;
 
-            m_netForce += Drag(m_fAirDrag);
+            v3NetForce += Drag(m_fAirDrag);
         }
 
         // ------------------------------------------------------------------------------------------------------
         // Gravity
 
         // Apply gravity
-        m_netForce += Physics.gravity * Time.deltaTime;
+        v3NetForce += Physics.gravity * Time.deltaTime;
 
         // Apply net force.
-        m_v3Velocity += m_netForce;
+        m_v3Velocity += v3NetForce;
 
         // Clamp velocity.
         if (m_bOnGround && m_v3Velocity.sqrMagnitude > m_fMaxSpeed * m_fMaxSpeed)
+        {
+            float fVelY = m_v3Velocity.y;
+        
             m_v3Velocity = m_v3Velocity.normalized * m_fMaxSpeed;
+            m_v3Velocity.y = fVelY;
+        }
         else if (m_v3Velocity.sqrMagnitude > m_fTerminalVelocity * m_fTerminalVelocity)
             m_v3Velocity = m_v3Velocity.normalized * m_fTerminalVelocity;
 

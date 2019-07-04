@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<NodeData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+  <m_name>Base</m_name>
+  <m_funcName>NO_FUNCTION</m_funcName>
+  <m_description />
+  <m_children>
+    <NodeData>
+      <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+      <m_name>ProcessAttacks</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description />
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+          <m_name>SlamProcess</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Process of querying if it is a suitable time to slam the player, and executing the animation.</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>PlayerGrounded</m_name>
+              <m_funcName>CondPlayerGrounded</m_funcName>
+              <m_description>Checks if the player is grounded.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>WithinRange</m_name>
+              <m_funcName>CondWithinSlamDistance</m_funcName>
+              <m_description>Tests if the player is within slamming range.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>Slam</m_name>
+              <m_funcName>ActPlaySlamAnim</m_funcName>
+              <m_description>Slam animation.</m_description>
+              <m_children />
+            </NodeData>
+          </m_children>
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+          <m_name>MeteorProcess</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Process of querying if it is a suitable time to summon a meteor on the player, and executing the animation.</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>PlayerGrounded</m_name>
+              <m_funcName>CondPlayerGrounded</m_funcName>
+              <m_description>Checks if the player is grounded.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>Meteor</m_name>
+              <m_funcName>ActPlayMeteorAnim</m_funcName>
+              <m_description>Meteor animation.</m_description>
+              <m_children />
+            </NodeData>
+          </m_children>
+        </NodeData>
+      </m_children>
+    </NodeData>
+  </m_children>
+</NodeData>

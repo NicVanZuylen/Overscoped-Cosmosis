@@ -3,133 +3,82 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviourTree;
 
+[RequireComponent(typeof(Animator))]
+
 public class BossBehaviour : MonoBehaviour
 {
+    [Tooltip("Player object reference.")]
     [SerializeField]
     private GameObject m_player = null;
-    private CompositeNode m_behaviourRoot;
+
+    [Tooltip("Distance in which the boss will attempt a slam attack.")]
+    [SerializeField]
+    private float m_fSlamDistance = 10.0f;
+
+    private PlayerController m_playerController;
     private Animator m_animator;
+    private CompositeNode m_bossTree;
 
-    public float m_fMeleeRange;
-    public float m_fThrowRange;
-    public float m_fMoveSpeed;
-
-    // Use this for initialization
-    void Awake ()
+    void Awake()
     {
-        m_behaviourRoot = BTreeEditor.BTreeEditor.LoadTree(Application.dataPath + "/BossTree.xml", this);
-
+        m_playerController = m_player.GetComponent<PlayerController>();
         m_animator = GetComponent<Animator>();
-    }
-	
-	// Update is called once per frame
-	void Update ()
-    {
-        m_animator.enabled = false;
-        m_animator.SetBool("swinging", false);
-        m_animator.SetBool("throwing", false);
 
-        if (m_behaviourRoot.Run() == ENodeResult.NODE_FAILURE)
-        {
-            Debug.Log("Fail!");
-        }
-        else
-            m_animator.enabled = true;
+        string treePath = Application.dataPath + "/Code/BossBehaviours/BossTree.xml";
+        m_bossTree = BTreeEditor.BTreeEditor.LoadTree(treePath, this);
     }
 
-    public ENodeResult CondPlayerNotBehind()
+    void Update()
     {
-        // Get direction to player and convert to Bector2.
-        Vector3 v3PlayerDir = m_player.transform.position - transform.position;
-        Vector2 v2PlayerDir = new Vector2(v3PlayerDir.x, v3PlayerDir.z);
-        v2PlayerDir.Normalize();
+        ResetAnimToIdle();
+        m_bossTree.Run();
+    }
 
-        // Get Vector2 look direction.
-        Vector2 v2LookDir = new Vector2(transform.forward.x, transform.forward.z);
+    // ----------------------------------------------------------------------------------------------
+    // Conditions
 
-        // Dot product.
-        if (Vector2.Dot(v2LookDir, v2PlayerDir) > 0.97f)
+    public ENodeResult CondWithinSlamDistance()
+    {
+        if ((m_player.transform.position - transform.position).sqrMagnitude <= m_fSlamDistance * m_fSlamDistance)
         {
             return ENodeResult.NODE_SUCCESS;
         }
 
-        Debug.Log("Player is behind the boss!");
-
         return ENodeResult.NODE_FAILURE;
     }
 
-    public ENodeResult CondWithinMeleeRange()
+    public ENodeResult CondPlayerGrounded()
     {
-        // Get distance to player...
-        float fDistToPlayer = (m_player.transform.position - transform.position).magnitude;
-
-        if (fDistToPlayer <= m_fMeleeRange)
+        if (m_playerController.IsGrounded())
             return ENodeResult.NODE_SUCCESS;
 
         return ENodeResult.NODE_FAILURE;
     }
 
-    public ENodeResult CondOutOfMeleeRange()
+    // ----------------------------------------------------------------------------------------------
+    // Actions
+
+    public ENodeResult ActPlaySlamAnim()
     {
-        if (CondWithinMeleeRange() == ENodeResult.NODE_FAILURE)
-            return ENodeResult.NODE_SUCCESS;
-
-        return ENodeResult.NODE_FAILURE;
-    }
-
-    public ENodeResult CondWithinThrowRange()
-    {
-        // Get distance to player...
-        float fDistToPlayer = (m_player.transform.position - transform.position).magnitude;
-
-        if (fDistToPlayer <= m_fThrowRange)
-            return ENodeResult.NODE_SUCCESS;
-
-        return ENodeResult.NODE_FAILURE;
-    }
-    public ENodeResult CondOutOfThrowRange()
-    {
-        if (CondWithinThrowRange() == ENodeResult.NODE_FAILURE)
-            return ENodeResult.NODE_SUCCESS;
-
-        return ENodeResult.NODE_FAILURE;
-    }
-
-    public ENodeResult ActMeleeAttack()
-    {
-        m_animator.SetBool("swinging", true);
+        if(m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) // Only transition from idle.
+            m_animator.SetInteger("AttackID", 1);
 
         return ENodeResult.NODE_SUCCESS;
     }
 
-    public ENodeResult ActThrowAttack()
+    public ENodeResult ActPlayMeteorAnim()
     {
-        m_animator.SetBool("throwing", true);
+        if (m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) // Only transition from idle.
+            m_animator.SetInteger("AttackID", 2);
 
         return ENodeResult.NODE_SUCCESS;
     }
 
-    public ENodeResult ActFacePlayer()
+    // ----------------------------------------------------------------------------------------------
+    // Misc
+
+    public void ResetAnimToIdle()
     {
-        Vector3 v3DirToPlayer = m_player.transform.position - transform.position;
-        v3DirToPlayer.y = 0.0f;
-        Quaternion targetRot = Quaternion.LookRotation(v3DirToPlayer, Vector3.up);
-
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 0.01f);
-
-        return ENodeResult.NODE_SUCCESS;
-    }
-
-    public ENodeResult ActMoveCloser()
-    {
-        // Get normalized direction vector to the player.
-        Vector3 v3DirToPlayer = m_player.transform.position - transform.position;
-        v3DirToPlayer.Normalize();
-        v3DirToPlayer.y = 0.0f;
-
-        // Translate close to the player.
-        transform.position = transform.position + (v3DirToPlayer * m_fMoveSpeed * Time.deltaTime);
-
-        return ENodeResult.NODE_SUCCESS;
+        m_animator.SetInteger("AttackID", 0);
     }
 }

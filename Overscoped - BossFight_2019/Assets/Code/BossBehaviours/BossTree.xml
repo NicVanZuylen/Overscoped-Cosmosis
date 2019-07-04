@@ -6,132 +6,58 @@
   <m_description />
   <m_children>
     <NodeData>
-      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-      <m_name>AttackMelee</m_name>
+      <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+      <m_name>New Node</m_name>
       <m_funcName>NO_FUNCTION</m_funcName>
-      <m_description>Attacks the player if the player is within range and not behind the AI.</m_description>
-      <m_children>
-        <NodeData>
-          <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
-          <m_name>TurnFacePlayer</m_name>
-          <m_funcName>NO_FUNCTION</m_funcName>
-          <m_description>Turns the boss to face the player if not facing them</m_description>
-          <m_children>
-            <NodeData>
-              <m_eType>NODE_CONDITION</m_eType>
-              <m_name>New Node</m_name>
-              <m_funcName>CondPlayerNotBehind</m_funcName>
-              <m_description />
-              <m_children />
-            </NodeData>
-            <NodeData>
-              <m_eType>NODE_ACTION</m_eType>
-              <m_name>TurnFacePlayer</m_name>
-              <m_funcName>ActFacePlayer</m_funcName>
-              <m_description />
-              <m_children />
-            </NodeData>
-          </m_children>
-        </NodeData>
-        <NodeData>
-          <m_eType>NODE_CONDITION</m_eType>
-          <m_name>New Node</m_name>
-          <m_funcName>CondPlayerNotBehind</m_funcName>
-          <m_description />
-          <m_children />
-        </NodeData>
-        <NodeData>
-          <m_eType>NODE_CONDITION</m_eType>
-          <m_name>Within Range</m_name>
-          <m_funcName>CondWithinMeleeRange</m_funcName>
-          <m_description>Detects if the player is within melee range.</m_description>
-          <m_children />
-        </NodeData>
-        <NodeData>
-          <m_eType>NODE_ACTION</m_eType>
-          <m_name>Attack</m_name>
-          <m_funcName>ActMeleeAttack</m_funcName>
-          <m_description>Use melee attack on player.</m_description>
-          <m_children />
-        </NodeData>
-      </m_children>
-    </NodeData>
-    <NodeData>
-      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-      <m_name>AttackRanged</m_name>
-      <m_funcName>NO_FUNCTION</m_funcName>
-      <m_description>Perform a throwing attack if the player is out of melee range.</m_description>
-      <m_children>
-        <NodeData>
-          <m_eType>NODE_CONDITION</m_eType>
-          <m_name>Out of Melee Range</m_name>
-          <m_funcName>CondOutOfMeleeRange</m_funcName>
-          <m_description>Detects if the player is outside of melee range.</m_description>
-          <m_children />
-        </NodeData>
-        <NodeData>
-          <m_eType>NODE_CONDITION</m_eType>
-          <m_name>In Throw Range</m_name>
-          <m_funcName>CondWithinThrowRange</m_funcName>
-          <m_description>Detects if the player is within throwing attack range.</m_description>
-          <m_children />
-        </NodeData>
-        <NodeData>
-          <m_eType>NODE_ACTION</m_eType>
-          <m_name>Attack</m_name>
-          <m_funcName>ActThrowAttack</m_funcName>
-          <m_description>Use throw attack on player.</m_description>
-          <m_children />
-        </NodeData>
-      </m_children>
-    </NodeData>
-    <NodeData>
-      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-      <m_name>MoveToAttack</m_name>
-      <m_funcName>NO_FUNCTION</m_funcName>
-      <m_description>Turn to face the player if the player is behind the boss.
-If the player is outside of throwing range, move closer to them.</m_description>
+      <m_description />
       <m_children>
         <NodeData>
           <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-          <m_name>MoveCloserPlayer</m_name>
+          <m_name>SlamProcess</m_name>
           <m_funcName>NO_FUNCTION</m_funcName>
-          <m_description>Move closer to the player if outside of throwing range.</m_description>
+          <m_description>Process of querying if it is a suitable time to slam the player, and executing the animation.</m_description>
           <m_children>
             <NodeData>
               <m_eType>NODE_CONDITION</m_eType>
-              <m_name>OutOfThrowRange</m_name>
-              <m_funcName>CondOutOfThrowRange</m_funcName>
-              <m_description>Detects if the player is outside of throwing range.</m_description>
+              <m_name>PlayerGrounded</m_name>
+              <m_funcName>CondPlayerGrounded</m_funcName>
+              <m_description>Checks if the player is grounded.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>WithinRange</m_name>
+              <m_funcName>CondWithinSlamDistance</m_funcName>
+              <m_description>Tests if the player is within slamming range.</m_description>
               <m_children />
             </NodeData>
             <NodeData>
               <m_eType>NODE_ACTION</m_eType>
-              <m_name>MoveCloserPlayer</m_name>
-              <m_funcName>ActMoveCloser</m_funcName>
-              <m_description>Move closer to the player.</m_description>
+              <m_name>Slam</m_name>
+              <m_funcName>ActPlaySlamAnim</m_funcName>
+              <m_description>Slam animation.</m_description>
               <m_children />
             </NodeData>
           </m_children>
         </NodeData>
         <NodeData>
           <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-          <m_name>MoveCloserPlayer</m_name>
+          <m_name>MeteorProcess</m_name>
           <m_funcName>NO_FUNCTION</m_funcName>
-          <m_description>Move closer to the player if outside of throwing range.</m_description>
+          <m_description>Process of querying if it is a suitable time to summon a meteor on the player, and executing the animation.</m_description>
           <m_children>
             <NodeData>
               <m_eType>NODE_CONDITION</m_eType>
-              <m_name>OutOfThrowRange</m_name>
-              <m_funcName>CondOutOfThrowRange</m_funcName>
-              <m_description>Detects if the player is outside of throwing range.</m_description>
+              <m_name>PlayerGrounded</m_name>
+              <m_funcName>CondPlayerGrounded</m_funcName>
+              <m_description>Checks if the player is grounded.</m_description>
               <m_children />
             </NodeData>
             <NodeData>
               <m_eType>NODE_ACTION</m_eType>
-              <m_name>MoveCloserPlayer</m_name>
-              <m_funcName>ActMoveCloser</m_funcName>
-              <m_description>Move closer to the player.</m_description>
+              <m_name>Meteor</m_name>
+              <m_funcName>ActPlayMeteorAnim</m_funcName>
+              <m_description>Meteor animation.</m_description>
               <m_children />
             </NodeData>
           </m_children>

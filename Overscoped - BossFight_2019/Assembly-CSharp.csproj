@@ -62,6 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Code\AnimBehaviours\ResetToIdle.cs" />
     <Compile Include="Assets\Code\Classes\BehaviourNode.cs" />
     <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
     <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
@@ -74,6 +75,8 @@
     <None Include="Assets\Code\BossBehaviours\BossTree.xml" />
     <None Include="Assets\3rd Party\tripolygon\UModeler\Materials\Basic\UModeler_UnlitVertexColorShader.shader" />
     <None Include="Assets\Materials\Shaders\Galaxy_Render.shader" />
+    <None Include="Assets\BTreeTemp.xml" />
+    <None Include="Assets\Code\BossBehaviours\BossTreeExample.xml" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

@@ -170,33 +170,6 @@ public class PlayerController : MonoBehaviour
             return -v3DragVector * fDrag * Time.deltaTime;
     }
 
-    public Vector3 DragMovement(float fDrag)
-    {
-        /*
-        Vector3 velNor;
-
-        if (m_velocity.magnitude > 1.0f)
-            velNor = m_velocity.normalized;
-        else // Special case where speed is less than one. Normalizing the velocity here would cause an increase in speed.
-            velNor = m_velocity;
-
-        return  -velNor * drag * Time.deltaTime;
-        */
-
-        float fForwardComponent = Vector3.Dot(m_v3MovementVelocity, m_v3SurfaceForward);
-        float fLateralComponent = Vector3.Dot(m_v3MovementVelocity, m_v3SurfaceRight);
-
-        Vector3 v3DragVector = (fForwardComponent * m_v3SurfaceForward) + (fLateralComponent * m_v3SurfaceRight);
-
-        //float fVelComponent = Vector3.Dot(m_v3Velocity, v3DragVector);
-        //v3DragVector = m_v3Velocity.normalized * fVelComponent;
-
-        if (v3DragVector.sqrMagnitude > 1.0f)
-            return -v3DragVector.normalized * fDrag * Time.deltaTime;
-        else
-            return -v3DragVector * fDrag * Time.deltaTime;
-    }
-
     public Vector3 GetVelocity()
     {
         return m_v3Velocity;
@@ -302,6 +275,8 @@ public class PlayerController : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------
         // Checking if grounded
 
+        bool bGroundedLastFrame = m_bOnGround;
+
         Ray sphereRay = new Ray(transform.position, -transform.up);
         RaycastHit hit = new RaycastHit();
         float fSphereRadius = m_controller.radius * 0.5f;
@@ -355,19 +330,23 @@ public class PlayerController : MonoBehaviour
 
         if (m_bOnGround && m_v3LastFrameMoveVector.sqrMagnitude > 0.0f)
         {
+            /*
             Vector3 v3LastFrameVelNor = m_v3LastFrameVelocity.normalized;
             
             float fLFMoveComp = Mathf.Clamp(Vector3.Dot(m_v3LastFrameVelocity, m_v3LastFrameMoveVector), 0.0f, m_v3LastFrameVelocity.magnitude);
             Vector3 v3LFMoveApp = fLFMoveComp * v3LastFrameVelNor;
 
             Vector3 v3SubVec = m_v3LastFrameMoveVector - v3LFMoveApp;
+            */
 
             m_v3Velocity -= m_v3LastFrameMoveVector;
         }
-        
+
 
         // ------------------------------------------------------------------------------------------------------
         // Movement
+
+        Vector3 v3MoveNetForce = Vector3.zero;
 
         if (m_bOnGround)
         {
@@ -377,17 +356,13 @@ public class PlayerController : MonoBehaviour
             */
 
             // Calculate movement net force.
-            Vector3 v3MoveNetForce = WASDAcceleration(m_fGroundAcceleration);
+            v3MoveNetForce = WASDAcceleration(m_fGroundAcceleration);
 
             // Drag movement velocity.
             if (v3MoveNetForce.sqrMagnitude <= 0.01f)
             {
                 v3MoveNetForce += Drag(m_fMovementDrag, m_v3MovementVelocity);
-
-                // Drag main velocity alongside movement velocity.
-                v3NetForce -= DragMovement(m_fMovementDrag);
             }
-                
 
             // Apply results.
             m_v3MovementVelocity += v3MoveNetForce;
@@ -433,22 +408,25 @@ public class PlayerController : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------
         // Apply movement velocity if grounded.
 
-        Vector3 v3MoveVector = Vector3.zero;
-
         if(m_bOnGround)
         {
             m_v3LastFrameVelocity = m_v3Velocity;
 
-            Vector3 v3MoveDir = m_v3MovementVelocity.normalized;
+            Vector3 v3MoveDir = m_v3MovementVelocity;
+
+            if (m_v3MovementVelocity.sqrMagnitude > 1.0f)
+                v3MoveDir.Normalize();
 
             float fVelocityCompInMovDir = Vector3.Dot(m_v3Velocity, v3MoveDir);
             float fMoveComponent = Mathf.Clamp(m_fMaxMoveSpeed - Mathf.Max(fVelocityCompInMovDir, 0.0f), 0.0f, m_fMaxMoveSpeed);
-            v3MoveVector = fMoveComponent * v3MoveDir;
+            Vector3 v3MoveVector = fMoveComponent * v3MoveDir;
 
             float fMoveVelMag = m_v3MovementVelocity.sqrMagnitude;
-
+            
             if (v3MoveVector.sqrMagnitude > fMoveVelMag)
+            {
                 v3MoveVector = v3MoveVector.normalized * Mathf.Sqrt(fMoveVelMag);
+            }
 
             // Store for use in the next frame.
             m_v3LastFrameMoveVector = v3MoveVector;
@@ -456,8 +434,6 @@ public class PlayerController : MonoBehaviour
             // Apply to velocity.
             m_v3Velocity += v3MoveVector;
         }
-
-        Debug.Log(m_v3MovementVelocity);
 
         // ------------------------------------------------------------------------------------------------------
         // Clamp velocity

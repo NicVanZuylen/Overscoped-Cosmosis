@@ -209,6 +209,7 @@ public class GrappleHook : MonoBehaviour
         m_pullLine.SetPositions(v3PullLineArray);
     }
 
+    
     Vector3 GrappleFly(PlayerController controller)
     {
         Vector3 v3NetForce = Vector3.zero;
@@ -224,7 +225,7 @@ public class GrappleHook : MonoBehaviour
             v3NetForce += v3GrappleDir * m_fFlyAcceleration * Time.deltaTime;
 
         // Controls
-        v3NetForce += m_controller.WASDAcceleration(m_controller.m_fAirAcceleration);
+        v3NetForce += m_controller.MoveDirection() * m_controller.m_fAirAcceleration * Time.deltaTime;
 
         // Lateral drag.
         if (v3NonPullComponent.sqrMagnitude < 1.0f)
@@ -235,8 +236,6 @@ public class GrappleHook : MonoBehaviour
         // Stop when within radius and on ground.
         if (v3GrappleDif.sqrMagnitude <= m_fDestinationRadius * m_fDestinationRadius)
         {
-            controller.SetVelocity(Vector3.zero);
-
             // Disable hook visuals.
             m_grappleHook.SetActive(false);
             m_bGrappleHookActive = false;

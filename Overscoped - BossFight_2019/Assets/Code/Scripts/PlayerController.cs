@@ -22,8 +22,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Force applied upwards when jumping.")]
     public float m_fJumpForce = 5.0f;
 
-    [Tooltip("Movement velocity drag when on the ground.")]
-    public float m_fMovementDrag = 50.0f;
+    [Tooltip("Movement velocity drag multiplier when on the ground.")]
+    public float m_fMovementDrag = 1.0f;
 
     [Tooltip("Velocity drag when on the ground.")]
     public float m_fGroundDrag = 10.0f;
@@ -43,16 +43,9 @@ public class PlayerController : MonoBehaviour
     // Private:
 
     private CharacterController m_controller;
-    private CapsuleCollider m_collider;
     private Vector3 m_v3RespawnPosition;
 
-    // Main velocity
     private Vector3 m_v3Velocity;
-    private Vector3 m_v3LastFrameVelocity;
-
-    // Movement velocity
-    private Vector3 m_v3MovementVelocity;
-    private Vector3 m_v3LastFrameMoveVector;
 
     [SerializeField]
     private bool m_bOnGround;
@@ -73,7 +66,6 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         m_controller = GetComponent<CharacterController>();
-        m_collider = GetComponent<CapsuleCollider>();
         m_cameraTransform = GetComponentInChildren<Camera>().transform;
         m_v3RespawnPosition = transform.position;
 
@@ -85,99 +77,53 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    public void Jump()
+    public Vector3 JumpForce()
     {
-        m_v3Velocity += m_fJumpForce * m_v3SurfaceUp;
+        return m_fJumpForce * m_v3SurfaceUp;
     }
 
-    public Vector3 WASDAcceleration(float acceleration)
+    public Vector3 MoveDirection()
     {
-        Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);
-        Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceUp * 3.0f), Color.green);
-        Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceForward * 3.0f), Color.blue);
-
-        Vector3 v3NetForce = Vector3.zero;
-        bool bMoved = false;
+        Vector3 v3Direction = Vector3.zero;
+        int nMoveDirectionCount = 0;
 
         // On the ground, move relative to the camera and the surface.
         if (Input.GetKey(KeyCode.W))
         {
-            bMoved = true;
-            v3NetForce += m_v3SurfaceForward * acceleration * Time.deltaTime;
+            ++nMoveDirectionCount;
+            v3Direction += m_v3SurfaceForward;
         }
         if (Input.GetKey(KeyCode.A))
         {
-            bMoved = true;
-            v3NetForce -= m_v3SurfaceRight * acceleration * Time.deltaTime;
+            ++nMoveDirectionCount;
+            v3Direction -= m_v3SurfaceRight;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            bMoved = true;
-            v3NetForce -= m_v3SurfaceForward * acceleration * Time.deltaTime;
+            ++nMoveDirectionCount;
+            v3Direction -= m_v3SurfaceForward;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            bMoved = true;
-            v3NetForce += m_v3SurfaceRight * acceleration * Time.deltaTime;
+            ++nMoveDirectionCount;
+            v3Direction += m_v3SurfaceRight;
         }
 
         // Cancel diagonal movement speed boost.
-        if (bMoved)
-            v3NetForce = v3NetForce.normalized * acceleration;
+        if (nMoveDirectionCount >= 2)
+            v3Direction = v3Direction.normalized;
 
-        return v3NetForce * Time.deltaTime;
+        return v3Direction;
     }
 
     public bool IsGrounded()
     {
-        return m_controller.isGrounded;
-    }
-
-    public Vector3 Drag(float fDrag)
-    {
-        /*
-        Vector3 velNor;
-
-        if (m_velocity.magnitude > 1.0f)
-            velNor = m_velocity.normalized;
-        else // Special case where speed is less than one. Normalizing the velocity here would cause an increase in speed.
-            velNor = m_velocity;
-
-        return  -velNor * drag * Time.deltaTime;
-        */
-
-        float fForwardComponent = Vector3.Dot(m_v3Velocity, m_v3SurfaceForward);
-        float fLateralComponent = Vector3.Dot(m_v3Velocity, m_v3SurfaceRight);
-
-        Vector3 v3DragVector = (fForwardComponent * m_v3SurfaceForward) + (fLateralComponent * m_v3SurfaceRight);
-
-        if(v3DragVector.sqrMagnitude > 1.0f)
-            return -v3DragVector.normalized * fDrag * Time.deltaTime;
-        else
-            return -v3DragVector * fDrag * Time.deltaTime;
-    }
-
-    public Vector3 Drag(float fDrag, Vector3 v3Velocity)
-    {
-        float fForwardComponent = Vector3.Dot(v3Velocity, m_v3SurfaceForward);
-        float fLateralComponent = Vector3.Dot(v3Velocity, m_v3SurfaceRight);
-
-        Vector3 v3DragVector = (fForwardComponent * m_v3SurfaceForward) + (fLateralComponent * m_v3SurfaceRight);
-
-        if (v3DragVector.sqrMagnitude > 1.0f)
-            return -v3DragVector.normalized * fDrag * Time.deltaTime;
-        else
-            return -v3DragVector * fDrag * Time.deltaTime;
+        return m_bOnGround;
     }
 
     public Vector3 GetVelocity()
     {
-        return m_v3Velocity;
-    }
-
-    public void SetVelocity(Vector3 velocity)
-    {
-        m_v3Velocity = velocity;
+        return m_controller.velocity;
     }
 
     public void OverrideMovement(OverrideFunction function)
@@ -189,11 +135,6 @@ public class PlayerController : MonoBehaviour
     public void FreeOverride()
     {
         m_bOverridden = false;
-    }
-
-    Vector3 TestOverride(PlayerController controller)
-    {
-        return controller.GetVelocity();
     }
 
     public bool IsOverridden()
@@ -243,7 +184,7 @@ public class PlayerController : MonoBehaviour
         m_v3SurfaceRight = Vector3.Cross(m_v3SurfaceUp, m_v3SurfaceForward);
     }
 
-    void Update()
+    private void Update()
     {
         // ------------------------------------------------------------------------------------------------------
         // Mouse look
@@ -256,30 +197,22 @@ public class PlayerController : MonoBehaviour
         Quaternion targetCamRotation = Quaternion.Euler(m_fLookEulerX, m_fLookEulerY, 0.0f);
         m_cameraTransform.rotation = Quaternion.Slerp(m_cameraTransform.rotation, targetCamRotation, 0.7f);
 
-        // ------------------------------------------------------------------------------------------------------
-
-        if(m_bOverridden)
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            m_v3Velocity = m_overrideFunction(this);
-
-            m_controller.Move(m_v3Velocity * Time.deltaTime);
-
-            // Set velocity to controller velocity output to apply any changes made by the controller physics.
-            m_v3Velocity = m_controller.velocity;
-
-            return;
+            m_v3Velocity += m_v3SurfaceForward * 5.0f * Time.deltaTime;
+            m_v3Velocity.y = 0.0f;
         }
 
-        Vector3 v3NetForce = Vector3.zero;
+        Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);
+        Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceUp * 3.0f), Color.green);
+        Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceForward * 3.0f), Color.blue);
 
         // ------------------------------------------------------------------------------------------------------
-        // Checking if grounded
-
-        bool bGroundedLastFrame = m_bOnGround;
+        // Ground check
 
         Ray sphereRay = new Ray(transform.position, -transform.up);
         RaycastHit hit = new RaycastHit();
-        float fSphereRadius = m_controller.radius * 0.5f;
+        float fSphereRadius = m_controller.radius;
 
         // Sphere case down to the nearest surface below. Sphere cast is ignored if not falling.
         if (m_v3Velocity.y <= 0.0f || m_bOnGround)
@@ -294,7 +227,7 @@ public class PlayerController : MonoBehaviour
                 CalculateSurfaceTransform(hit);
 
                 if (hit.collider.tag == "CheckPoint") // Set respawn checkpoint.
-                    m_v3RespawnPosition = hit.collider.bounds.center + (Vector3.up * m_fRespawnHeight);
+                    m_v3RespawnPosition = hit.collider.bounds.center + new Vector3(0.0f, (hit.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
             }
 
             Debug.DrawLine(sphereRay.origin, hit.point);
@@ -302,165 +235,145 @@ public class PlayerController : MonoBehaviour
         else
         {
             m_bOnGround = false;
-
-            m_v3LastFrameMoveVector = Vector3.zero;
-            m_v3LastFrameVelocity = Vector3.zero;
         }
+            
 
         // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
         m_bOnGround |= m_controller.isGrounded;
 
         // ------------------------------------------------------------------------------------------------------
-        // Jumping
+        // Movement override
 
-        if (Input.GetKeyDown(KeyCode.Space) && m_bOnGround)
+        if (m_bOverridden)
         {
-            Jump();
-            m_bOnGround = false;
+            m_v3Velocity = m_overrideFunction(this);
 
-            m_v3LastFrameMoveVector = Vector3.zero;
-            m_v3LastFrameVelocity = Vector3.zero;
+            m_controller.Move(m_v3Velocity * Time.deltaTime);
+
+            // Set velocity to controller velocity output to apply any changes made by the controller physics.
+            m_v3Velocity = m_controller.velocity;
+
+            return;
         }
 
         // ------------------------------------------------------------------------------------------------------
-        // Ground movement velocity cancellation
+        // Jumping
 
-        if (Input.GetKeyDown(KeyCode.F))
-            m_v3Velocity += m_v3SurfaceForward * 100;
-
-        if (m_bOnGround && m_v3LastFrameMoveVector.sqrMagnitude > 0.0f)
+        if (m_bOnGround && Input.GetKeyDown(KeyCode.Space))
         {
-            /*
-            Vector3 v3LastFrameVelNor = m_v3LastFrameVelocity.normalized;
-            
-            float fLFMoveComp = Mathf.Clamp(Vector3.Dot(m_v3LastFrameVelocity, m_v3LastFrameMoveVector), 0.0f, m_v3LastFrameVelocity.magnitude);
-            Vector3 v3LFMoveApp = fLFMoveComp * v3LastFrameVelNor;
-
-            Vector3 v3SubVec = m_v3LastFrameMoveVector - v3LFMoveApp;
-            */
-
-            m_v3Velocity -= m_v3LastFrameMoveVector;
+            m_v3Velocity += JumpForce();
+            m_bOnGround = false;
         }
 
+
+        if (Input.GetKeyUp(KeyCode.W))
+            Debug.Log("K");
 
         // ------------------------------------------------------------------------------------------------------
         // Movement
 
-        Vector3 v3MoveNetForce = Vector3.zero;
+        Vector3 v3NetForce = Vector3.zero;
 
         if (m_bOnGround)
         {
-            /*
-            Vector3 v3OutAcceleration = WASDAcceleration(m_fGroundAcceleration);
-            v3NetForce += v3OutAcceleration;
-            */
+            Vector3 v3MoveDir = MoveDirection();
 
-            // Calculate movement net force.
-            v3MoveNetForce = WASDAcceleration(m_fGroundAcceleration);
+            // Lateral drag
 
-            // Drag movement velocity.
-            if (v3MoveNetForce.sqrMagnitude <= 0.01f)
+            Vector3 v3VelNoY = m_v3Velocity;
+            //v3VelNoY.y = 0.0f;
+
+            if (v3MoveDir.sqrMagnitude > 0.0f)
             {
-                v3MoveNetForce += Drag(m_fMovementDrag, m_v3MovementVelocity);
+                // Component magnitude of the current velocity in the direction of movement.
+                float fMoveDirComponent = Vector3.Dot(v3VelNoY, v3MoveDir);
+            
+                // Component of the velocity not in the direction of movement.
+                Vector3 v3NonMoveComponent = v3VelNoY - (v3MoveDir * fMoveDirComponent);
+
+                // Add force to counter act lateral velocity.
+                //m_controller.AddForce(-v3NonMoveComponent * 3.0f, ForceMode.Acceleration);
+                v3NetForce -= v3NonMoveComponent * 3.0f * Time.deltaTime;
+
+                // Movement velocity.
+
+                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(v3VelNoY, v3MoveDir), 0.0f, m_fMaxMoveSpeed);
+                float fMoveAmount = m_fMaxMoveSpeed - fCompInVelocity;
+
+                //Vector3 v3Acceleration = v3MoveDir * m_fGroundAcceleration;
+                Vector3 v3Acceleration = v3MoveDir * fMoveAmount * m_fGroundAcceleration;
+
+                //m_rigidbody.AddForce(v3Acceleration, ForceMode.Acceleration);
+                //m_controller.velocity += v3Acceleration * Time.fixedDeltaTime;
+                v3NetForce += v3Acceleration * Time.deltaTime;
             }
-
-            // Apply results.
-            m_v3MovementVelocity += v3MoveNetForce;
-
-            // Clamp movement velocity.
-            if (m_v3MovementVelocity.sqrMagnitude > m_fMaxMoveSpeed * m_fMaxMoveSpeed)
-                m_v3MovementVelocity = m_v3MovementVelocity.normalized * m_fMaxMoveSpeed;
-
-            // Drag main velocity.
-            if (v3NetForce.sqrMagnitude < 0.01f)
+            else
             {
-                v3NetForce += Drag(m_fGroundDrag, m_v3Velocity);
+                // Foot drag.
+                Vector3 v3FootDrag = m_v3Velocity;
+
+                //m_controller.velocity -= v3FootDrag * 10.0f * Time.fixedDeltaTime;
+                //m_rigidbody.AddForce(-v3FootDrag * 10.0f, ForceMode.Acceleration);
+                v3NetForce -= v3FootDrag * 10.0f * Time.deltaTime;
             }
         }
-        else
-        {
-            Vector3 v3OutAcceleration = WASDAcceleration(m_fAirAcceleration);
-            v3NetForce += v3OutAcceleration;
 
-            m_v3SurfaceRight = m_cameraTransform.right;
-            m_v3SurfaceUp = transform.up;
-
-            Vector3 v3ForwardVec = m_cameraTransform.forward;
-            v3ForwardVec.y = 0.0f; // The Y component needs to be removed since it can mess with drag.
-            v3ForwardVec.Normalize();
-
-            m_v3SurfaceForward = v3ForwardVec;
-
-            v3NetForce += Drag(m_fAirDrag);
-        }
-
-        // ------------------------------------------------------------------------------------------------------
-        // Gravity
-
-        // Apply gravity
-        v3NetForce += Physics.gravity * Time.deltaTime;
-
-        // ------------------------------------------------------------------------------------------------------
-        // Apply net force
+        // Gravity.
+        m_v3Velocity += Physics.gravity * Time.deltaTime;
 
         m_v3Velocity += v3NetForce;
 
-        // ------------------------------------------------------------------------------------------------------
-        // Apply movement velocity if grounded.
-
-        if(m_bOnGround)
-        {
-            m_v3LastFrameVelocity = m_v3Velocity;
-
-            Vector3 v3MoveDir = m_v3MovementVelocity;
-
-            if (m_v3MovementVelocity.sqrMagnitude > 1.0f)
-                v3MoveDir.Normalize();
-
-            float fVelocityCompInMovDir = Vector3.Dot(m_v3Velocity, v3MoveDir);
-            float fMoveComponent = Mathf.Clamp(m_fMaxMoveSpeed - Mathf.Max(fVelocityCompInMovDir, 0.0f), 0.0f, m_fMaxMoveSpeed);
-            Vector3 v3MoveVector = fMoveComponent * v3MoveDir;
-
-            float fMoveVelMag = m_v3MovementVelocity.sqrMagnitude;
-            
-            if (v3MoveVector.sqrMagnitude > fMoveVelMag)
-            {
-                v3MoveVector = v3MoveVector.normalized * Mathf.Sqrt(fMoveVelMag);
-            }
-
-            // Store for use in the next frame.
-            m_v3LastFrameMoveVector = v3MoveVector;
-
-            // Apply to velocity.
-            m_v3Velocity += v3MoveVector;
-        }
-
-        // ------------------------------------------------------------------------------------------------------
-        // Clamp velocity
-
-        if (m_bOnGround && m_v3Velocity.sqrMagnitude > m_fMaxGroundVelocity * m_fMaxGroundVelocity)
-        {
-            float fVelY = m_v3Velocity.y;
-        
-            m_v3Velocity = m_v3Velocity.normalized * m_fMaxGroundVelocity;
-            m_v3Velocity.y = fVelY;
-        }
-        else if (m_v3Velocity.sqrMagnitude > m_fTerminalVelocity * m_fTerminalVelocity)
-            m_v3Velocity = m_v3Velocity.normalized * m_fTerminalVelocity;
-
+        // Move using current velocity delta.
         m_controller.Move(m_v3Velocity * Time.deltaTime);
 
-        // Set velocity to controller velocity output to apply any changes made by the controller physics.
-        m_v3Velocity = m_controller.velocity;
-    }
+        // Get modified velocity back from the controller.
+        //m_v3Velocity.x = m_controller.velocity.x;
+        //m_v3Velocity.z = m_controller.velocity.z;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.tag == "Killbox" && m_v3RespawnPosition != null) // Respawn player.
+        m_v3Velocity = m_controller.velocity;
+
+        if(transform.position.y < -80.0f)
         {
+            // Get velocity and remove x and z components.
+            Vector3 v3BodyVelocity = m_controller.velocity;
+            v3BodyVelocity.x = 0.0f;
+            v3BodyVelocity.z = 0.0f;
+
+            // Apply new velocity.
+            m_v3Velocity = v3BodyVelocity;
+
+            // Teleport to spawn point.
             m_controller.enabled = false;
             transform.position = m_v3RespawnPosition;
             m_controller.enabled = true;
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.collider.tag == "CheckPoint")
+        {
+            // Set respawn collision to the centre + half its height + 10.
+            m_v3RespawnPosition = collision.collider.bounds.center + new Vector3(0.0f, (collision.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
+        }
+    }
+
+    /*
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Killbox" && m_v3RespawnPosition != null) // Respawn player.
+        {
+            // Get velocity and remove x and z components.
+            Vector3 v3BodyVelocity = m_controller.velocity;
+            v3BodyVelocity.x = 0.0f;
+            v3BodyVelocity.z = 0.0f;
+
+            // Apply new velocity.
+            m_v3Velocity = v3BodyVelocity;
+
+            // Teleport to spawn point.
+            transform.position = m_v3RespawnPosition;
+        }
+    }
+    */
 }

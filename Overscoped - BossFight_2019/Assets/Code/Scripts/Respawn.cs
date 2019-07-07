@@ -50,7 +50,7 @@ public class Respawn : MonoBehaviour
             transform.position = m_RespawnNode.transform.position;
             m_CharacterController.enabled = true;
 
-            m_PlayerController.SetVelocity(new Vector3(0.0f, m_PlayerController.GetVelocity().y, 0.0f));
+            //m_PlayerController.SetVelocity(new Vector3(0.0f, m_PlayerController.GetVelocity().y, 0.0f));
 
             Debug.Log("Respawn");
             m_IsDead = false;

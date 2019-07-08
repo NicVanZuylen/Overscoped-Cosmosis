@@ -14,7 +14,11 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Rate of acceleration when jumping/falling.")]
     public float m_fAirAcceleration = 0.1f;
 
-    public float m_fMaxMoveSpeed = 5.0f;
+    [Tooltip("Maximum input-induced movement speed whilst grounded.")]
+    public float m_fMaxGroundMoveSpeed = 5.0f;
+
+    [Tooltip("Maximum input-induced movement speed whilst flying.")]
+    public float m_fMaxAirbornMoveSpeed = 2.5f;
 
     [Tooltip("Maximum movement velocity when on a ground surface.")]
     public float m_fMaxGroundVelocity = 30.0f;
@@ -184,6 +188,25 @@ public class PlayerController : MonoBehaviour
         m_v3SurfaceRight = Vector3.Cross(m_v3SurfaceUp, m_v3SurfaceForward);
     }
 
+    private void RespawnBelowMinY()
+    {
+        if (transform.position.y < -80.0f)
+        {
+            // Get velocity and remove x and z components.
+            Vector3 v3BodyVelocity = m_controller.velocity;
+            v3BodyVelocity.x = 0.0f;
+            v3BodyVelocity.z = 0.0f;
+
+            // Apply new velocity.
+            m_v3Velocity = v3BodyVelocity;
+
+            // Teleport to spawn point.
+            m_controller.enabled = false;
+            transform.position = m_v3RespawnPosition;
+            m_controller.enabled = true;
+        }
+    }
+
     private void Update()
     {
         // ------------------------------------------------------------------------------------------------------
@@ -212,7 +235,7 @@ public class PlayerController : MonoBehaviour
 
         Ray sphereRay = new Ray(transform.position, -transform.up);
         RaycastHit hit = new RaycastHit();
-        float fSphereRadius = m_controller.radius;
+        float fSphereRadius = m_controller.radius * 0.5f;
 
         // Sphere case down to the nearest surface below. Sphere cast is ignored if not falling.
         if (m_v3Velocity.y <= 0.0f || m_bOnGround)
@@ -237,7 +260,6 @@ public class PlayerController : MonoBehaviour
             m_bOnGround = false;
         }
             
-
         // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
         m_bOnGround |= m_controller.isGrounded;
 
@@ -246,7 +268,11 @@ public class PlayerController : MonoBehaviour
 
         if (m_bOverridden)
         {
+            // Run override behaviour and use it's velocity output.
             m_v3Velocity = m_overrideFunction(this);
+
+            // Respawn they player if they fall too far.
+            RespawnBelowMinY();
 
             m_controller.Move(m_v3Velocity * Time.deltaTime);
 
@@ -265,40 +291,41 @@ public class PlayerController : MonoBehaviour
             m_bOnGround = false;
         }
 
-
-        if (Input.GetKeyUp(KeyCode.W))
-            Debug.Log("K");
-
         // ------------------------------------------------------------------------------------------------------
         // Movement
 
         Vector3 v3NetForce = Vector3.zero;
+        Vector3 v3MoveDir = MoveDirection();
+
+        Vector3 v3VelCopy = m_v3Velocity;
 
         if (m_bOnGround)
         {
-            Vector3 v3MoveDir = MoveDirection();
+            // ------------------------------------------------------------------------------------------------------
+            // Grounded movement
 
             // Lateral drag
 
-            Vector3 v3VelNoY = m_v3Velocity;
-            //v3VelNoY.y = 0.0f;
-
             if (v3MoveDir.sqrMagnitude > 0.0f)
             {
+                // ------------------------------------------------------------------------------------------------------
+                // Movement lateral tolerance.
+
                 // Component magnitude of the current velocity in the direction of movement.
-                float fMoveDirComponent = Vector3.Dot(v3VelNoY, v3MoveDir);
+                float fMoveDirComponent = Vector3.Dot(v3VelCopy, v3MoveDir);
             
                 // Component of the velocity not in the direction of movement.
-                Vector3 v3NonMoveComponent = v3VelNoY - (v3MoveDir * fMoveDirComponent);
+                Vector3 v3NonMoveComponent = v3VelCopy - (v3MoveDir * fMoveDirComponent);
 
                 // Add force to counter act lateral velocity.
                 //m_controller.AddForce(-v3NonMoveComponent * 3.0f, ForceMode.Acceleration);
                 v3NetForce -= v3NonMoveComponent * 3.0f * Time.deltaTime;
 
-                // Movement velocity.
+                // ------------------------------------------------------------------------------------------------------
+                // Running
 
-                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(v3VelNoY, v3MoveDir), 0.0f, m_fMaxMoveSpeed);
-                float fMoveAmount = m_fMaxMoveSpeed - fCompInVelocity;
+                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(v3VelCopy, v3MoveDir), 0.0f, m_fMaxGroundMoveSpeed);
+                float fMoveAmount = m_fMaxGroundMoveSpeed - fCompInVelocity;
 
                 //Vector3 v3Acceleration = v3MoveDir * m_fGroundAcceleration;
                 Vector3 v3Acceleration = v3MoveDir * fMoveAmount * m_fGroundAcceleration;
@@ -309,13 +336,29 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                // ------------------------------------------------------------------------------------------------------
+                // When not moving
+
                 // Foot drag.
                 Vector3 v3FootDrag = m_v3Velocity;
 
                 //m_controller.velocity -= v3FootDrag * 10.0f * Time.fixedDeltaTime;
                 //m_rigidbody.AddForce(-v3FootDrag * 10.0f, ForceMode.Acceleration);
-                v3NetForce -= v3FootDrag * 10.0f * Time.deltaTime;
+                v3NetForce -= v3FootDrag * m_fGroundDrag * Time.deltaTime;
             }
+        }
+        else
+        {
+            // ------------------------------------------------------------------------------------------------------
+            // Airborn movement
+
+            float fCompInVelocity = Mathf.Clamp(Vector3.Dot(v3VelCopy, v3MoveDir), 0.0f, m_fMaxAirbornMoveSpeed);
+            float fMoveAmount = m_fMaxAirbornMoveSpeed - fCompInVelocity;
+            
+            Vector3 v3Acceleration = v3MoveDir * fMoveAmount * m_fAirAcceleration;
+            v3Acceleration.y = 0.0f;
+
+            v3NetForce += v3Acceleration * Time.deltaTime;
         }
 
         // Gravity.
@@ -327,26 +370,10 @@ public class PlayerController : MonoBehaviour
         m_controller.Move(m_v3Velocity * Time.deltaTime);
 
         // Get modified velocity back from the controller.
-        //m_v3Velocity.x = m_controller.velocity.x;
-        //m_v3Velocity.z = m_controller.velocity.z;
-
         m_v3Velocity = m_controller.velocity;
 
-        if(transform.position.y < -80.0f)
-        {
-            // Get velocity and remove x and z components.
-            Vector3 v3BodyVelocity = m_controller.velocity;
-            v3BodyVelocity.x = 0.0f;
-            v3BodyVelocity.z = 0.0f;
-
-            // Apply new velocity.
-            m_v3Velocity = v3BodyVelocity;
-
-            // Teleport to spawn point.
-            m_controller.enabled = false;
-            transform.position = m_v3RespawnPosition;
-            m_controller.enabled = true;
-        }
+        // Respawn the player if they fall too far.
+        RespawnBelowMinY();
     }
 
     private void OnCollisionEnter(Collision collision)

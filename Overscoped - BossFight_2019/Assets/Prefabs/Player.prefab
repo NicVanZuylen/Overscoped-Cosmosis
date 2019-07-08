@@ -617,11 +617,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_fGroundAcceleration: 10
   m_fAirAcceleration: 5
-  m_fMaxMoveSpeed: 5
+  m_fMaxGroundMoveSpeed: 5
+  m_fMaxAirbornMoveSpeed: 2.5
   m_fMaxGroundVelocity: 30
   m_fJumpForce: 5
   m_fMovementDrag: 1
-  m_fGroundDrag: 100
+  m_fGroundDrag: 10
   m_fMomentumDrag: 5
   m_fAirDrag: 5
   m_fTerminalVelocity: 53

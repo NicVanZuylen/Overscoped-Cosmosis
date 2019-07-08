@@ -132,16 +132,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boss
       objectReference: {fileID: 0}
-    - target: {fileID: -6057140222963153312, guid: c69292d54465de3479e947bc8308f46d,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 3e1456fdb16eddc4bb4be8c2159e48ee, type: 2}
-    - target: {fileID: -6057140222963153312, guid: c69292d54465de3479e947bc8308f46d,
-        type: 3}
-      propertyPath: m_ApplyRootMotion
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: c69292d54465de3479e947bc8308f46d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5515,12 +5505,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &958452521 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3812603302388449865, guid: ed16ca3417fe22f478cf87da9d692428,
-    type: 3}
-  m_PrefabInstance: {fileID: 1333254969}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &977103618
 Mesh:
   m_ObjectHideFlags: 0
@@ -8807,32 +8791,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 99da4d3b4c81dd745a755bf172f07ebd, type: 3}
---- !u!1 &1614094746 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: c69292d54465de3479e947bc8308f46d,
-    type: 3}
-  m_PrefabInstance: {fileID: 5719451}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1614094748 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: c69292d54465de3479e947bc8308f46d,
     type: 3}
   m_PrefabInstance: {fileID: 5719451}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1614094749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1614094746}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9789a6ac4ed2729439bc4384b83b906e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_player: {fileID: 958452521}
-  m_fSlamDistance: 10
 --- !u!1 &1643978120
 GameObject:
   m_ObjectHideFlags: 0

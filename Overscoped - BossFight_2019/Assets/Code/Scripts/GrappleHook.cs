@@ -261,15 +261,19 @@ public class GrappleHook : MonoBehaviour
     {
         Vector3 v3NetForce = Vector3.zero;
 
+        // Calculate 2-dimensional movement vectors.
+        Vector3 v3ForwardVec = controller.LookForward();
+        Vector3 v3RightVec = Vector3.Cross(Vector3.up, v3ForwardVec);
+
         // Movement during grapple landing phase.
         if (Input.GetKey(KeyCode.W))
-            v3NetForce += controller.LookForward() * m_fLandMoveAcceleration * Time.deltaTime;
+            v3NetForce += v3ForwardVec * m_fLandMoveAcceleration * Time.deltaTime;
         if (Input.GetKey(KeyCode.A))
-            v3NetForce += controller.LookLeft() * m_fLandMoveAcceleration * Time.deltaTime;
+            v3NetForce -= v3RightVec * m_fLandMoveAcceleration * Time.deltaTime;
         if (Input.GetKey(KeyCode.S))
-            v3NetForce += controller.LookBack() * m_fLandMoveAcceleration * Time.deltaTime;
+            v3NetForce -= v3ForwardVec * m_fLandMoveAcceleration * Time.deltaTime;
         if (Input.GetKey(KeyCode.D))
-            v3NetForce += controller.LookRight() * m_fLandMoveAcceleration * Time.deltaTime;
+            v3NetForce += v3RightVec * m_fLandMoveAcceleration * Time.deltaTime;
 
         // Add gravity.
         v3NetForce += Physics.gravity * Time.deltaTime;

@@ -41,17 +41,10 @@ public class Hook : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(!m_bLodged)
+        if(!m_bLodged && m_pullType == EHookPullMode.PULL_PULL_TOWARDS_PLAYER && other.tag == "PullObj")
         {
-            if (other.tag == "PullObj")
-            {
-                m_pullObj = other.GetComponent<PullObject>();
-                transform.parent = m_pullObj.transform;
-
-                m_pullType = EHookPullMode.PULL_PULL_TOWARDS_PLAYER;
-            }
-            else
-                m_pullType = EHookPullMode.PULL_FLY_TOWARDS;
+            m_pullObj = other.GetComponent<PullObject>();
+            transform.parent = m_pullObj.transform;
         }
 
         m_bLodged = true;
@@ -62,7 +55,12 @@ public class Hook : MonoBehaviour
         return m_pullObj;
     }
 
-    public EHookPullMode PullType()
+    public void SetPullType(EHookPullMode pullType)
+    {
+        m_pullType = pullType;
+    }
+
+    public EHookPullMode GetPullType()
     {
         return m_pullType;
     }

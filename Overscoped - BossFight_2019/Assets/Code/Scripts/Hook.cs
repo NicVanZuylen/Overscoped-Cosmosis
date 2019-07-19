@@ -19,7 +19,6 @@ public class Hook : MonoBehaviour
 
     // Private:
     private SphereCollider m_collider;
-    private PullObject m_pullObj;
     private Bezier m_curve;
     private EHookPullMode m_pullType;
     private Vector3 m_v3Destination;
@@ -77,11 +76,6 @@ public class Hook : MonoBehaviour
     public float FlyProgress()
     {
         return m_fFlyProgress / m_fRopeLength;
-    }
-
-    public PullObject HookedObject()
-    {
-        return m_pullObj;
     }
 
     public void SetPullType(EHookPullMode pullType)

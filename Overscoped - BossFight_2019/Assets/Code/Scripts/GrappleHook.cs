@@ -12,6 +12,7 @@ public class GrappleHook : MonoBehaviour
     public LineRenderer m_grappleLine;
     public Transform m_grappleNode;
 
+    [Header("Physics")]
     [Tooltip("Acceleration due to grapple pull.")]
     public float m_fFlyAcceleration = 30.0f;
 
@@ -30,53 +31,83 @@ public class GrappleHook : MonoBehaviour
     [Tooltip("Player move acceleration when landing after successfully reaching the grapple hook.")]
     public float m_fLandMoveAcceleration = 5.0f;
 
-    [Tooltip("Spherecast radius for firing the grapple hook.")]
-    public float m_fHookRadius = 0.5f;
-
     [Tooltip("The distance the grapple hook will travel before cancelling.")]
     public float m_fGrapplebreakDistance = 20.0f;
+
+    [Header("Pull Mode")]
 
     [Tooltip("The distance the pull hook must be extended beyond the initial rope length on impact to decouple the target object.")]
     public float m_fPullBreakDistance = 8.0f;
 
+    [Header("Misc.")]
     [Tooltip("Whether or not the player will be restricted a spherical volume with the rope length as the radius when grappling.")]
     public bool m_bRestrictToRopeLength = true;
+
+    [Tooltip("Spherecast radius for firing the grapple hook.")]
+    public float m_fHookRadius = 0.5f;
+
+    [Header("Effects")]
+    [Tooltip("Delay between getting a new set of random points for the rope shake effect.")]
+    public float m_fRopeShakeDelay = 0.1f;
+
+    [Tooltip("Speed of rope point movement between random points.")]
+    public float m_fShakeSpeed = 0.1f;
+
+    [Tooltip("Maximum offset of rope points from thier position on the curve.")]
+    public float m_fShakeMagnitude = 0.05f;
+
+    public GameObject m_handEffect;
+    public GameObject m_impactEffect;
 
     // Private:
 
     private PlayerController m_controller;
     private Hook m_graphookScript;
-    private PullObject m_pullObj;
+    private bool m_bGrappleHookActive;
+
+    // Rope & Grapple function
     private GradientColorKey[] m_colorKeys;
     private RaycastHit m_fireHit;
     private Bezier m_ropeCurve;
     private Vector3[] m_v3GrapLinePoints;
+    private Vector3[] m_v3GrapLinePointOffsets;
+    private Vector3[] m_v3ShakeVectors;
     private Vector3 m_v3GrapplePoint;
     private Vector3 m_v3GrappleNormal;
-    private Vector3 m_v3PullTension;
     private float m_fGrapRopeLength;
+    private float m_fShakeTime;
+
+    // Pull function
+    private PullObject m_pullObj;
+    private Vector3 m_v3PullTension;
     private float m_fPullRopeLength;
-    private bool m_bGrappleHookActive;
-    private bool m_bGrapRopeLenCalculated;
+
+    // Misc.
 
     void Awake()
     {
+        // Component retreival.
         m_controller = GetComponent<PlayerController>();
-
         m_graphookScript = m_grappleHook.GetComponent<Hook>();
 
+        // Rope color and curve.
         m_colorKeys = new GradientColorKey[m_grappleLine.colorGradient.colorKeys.Length];
         m_ropeCurve = new Bezier(2);
-        m_v3GrapLinePoints = new Vector3[m_grappleLine.positionCount];
 
         for (int i = 0; i < m_grappleLine.colorGradient.colorKeys.Length; ++i)
             m_colorKeys[i] = m_grappleLine.colorGradient.colorKeys[i];
 
+        // Rope points.
+        m_v3GrapLinePoints = new Vector3[m_grappleLine.positionCount];
+        m_v3GrapLinePointOffsets = new Vector3[m_grappleLine.positionCount];
+        m_v3ShakeVectors = new Vector3[m_grappleLine.positionCount];
+
         m_grappleHook.SetActive(false);
 
+        // Misc.
         m_v3GrapplePoint = Vector3.zero;
+        m_fShakeTime = 0.0f;
         m_bGrappleHookActive = false;
-        m_bGrapRopeLenCalculated = false;
     }
 
     void Update()
@@ -148,6 +179,8 @@ public class GrappleHook : MonoBehaviour
         */
 
         m_grappleLine.enabled = m_bGrappleHookActive;
+        m_handEffect.SetActive(m_bGrappleHookActive);
+        m_impactEffect.SetActive(m_graphookScript.IsLodged() && m_bGrappleHookActive);
 
         if (m_bGrappleHookActive)
         {
@@ -158,6 +191,10 @@ public class GrappleHook : MonoBehaviour
             if (m_graphookScript.IsLodged() && m_graphookScript.GetPullType() == Hook.EHookPullMode.PULL_FLY_TOWARDS) // Hook is stuck in an object.
             {
                 m_v3GrapplePoint = m_grappleHook.transform.position;
+
+                // Impact particle effect.
+                m_impactEffect.transform.position = m_v3GrapplePoint;
+                m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
 
                 m_controller.OverrideMovement(GrappleFly);
 
@@ -172,6 +209,10 @@ public class GrappleHook : MonoBehaviour
             }
             else if(m_graphookScript.IsLodged() && m_graphookScript.GetPullType() == Hook.EHookPullMode.PULL_PULL_TOWARDS_PLAYER) // Hook is lodged in pull mode.
             {
+                // Impact particle effect.
+                m_impactEffect.transform.position = m_v3GrapplePoint;
+                m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
+
                 // Exit when releasing the right mouse button.
                 if (Input.GetMouseButtonUp(1))
                 {
@@ -253,23 +294,53 @@ public class GrappleHook : MonoBehaviour
         Vector3 v3HorizontalVec = m_controller.LookRight();
         float fHorizontalAmount = Vector3.Dot(v3HorizontalVec, v3DiffNoY);
 
-        Vector3 v3CurveCorner = m_grappleNode.transform.position + (v3DiffNoY * 0.5f) - (fHorizontalAmount * v3HorizontalVec * 0.5f);
+        Vector3 v3CurveCorner = m_grappleNode.transform.position + (v3DiffNoY) - (fHorizontalAmount * v3HorizontalVec);
 
         // Curve points.
         m_ropeCurve.m_v3Start = m_grappleNode.position;
         m_ropeCurve.m_v3Corners[0] = v3CurveCorner;
-        m_ropeCurve.m_v3Corners[1] = m_v3GrapplePoint + (m_v3GrappleNormal * 5.0f);
+        m_ropeCurve.m_v3Corners[1] = m_v3GrapplePoint + (m_v3GrappleNormal * Mathf.Min(5.0f, v3DiffNoY.magnitude));
         m_ropeCurve.m_v3End = m_v3GrapplePoint;
+
+        Debug.DrawLine(m_ropeCurve.m_v3Start, m_ropeCurve.m_v3Corners[0], Color.green);
+        Debug.DrawLine(m_ropeCurve.m_v3Corners[0], m_ropeCurve.m_v3Corners[1], Color.green);
+        Debug.DrawLine(m_ropeCurve.m_v3Corners[1], m_ropeCurve.m_v3End, Color.green);
+
+        m_fShakeTime -= Time.deltaTime;
 
         // Set each line point to the correct points on the curve.
         int nPointCount = m_grappleLine.positionCount;
-        for (int i = 1; i < nPointCount; ++i)
+
+        if(m_fShakeTime <= 0.0f) // Shake points are due to be randomized.
         {
-            m_v3GrapLinePoints[i] = m_ropeCurve.Evaluate(((float)i / (float)nPointCount) * m_graphookScript.FlyProgress());
+            for (int i = 1; i < nPointCount; ++i)
+            {
+                m_v3ShakeVectors[i].x = Random.Range(-1.0f, 1.0f);
+                m_v3ShakeVectors[i].y = Random.Range(-1.0f, 1.0f);
+                m_v3ShakeVectors[i].z = Random.Range(-1.0f, 1.0f);
+                m_v3ShakeVectors[i] *= m_fShakeMagnitude;
+
+                m_v3GrapLinePointOffsets[i] = Vector3.Lerp(m_v3GrapLinePointOffsets[i], m_v3ShakeVectors[i], m_fShakeSpeed);
+
+                m_v3GrapLinePoints[i] = m_ropeCurve.Evaluate(((float)i / (float)nPointCount) * m_graphookScript.FlyProgress()) + m_v3GrapLinePointOffsets[i];
+            }
+
+            m_fShakeTime = m_fRopeShakeDelay;
+        }
+        else // Shake points are not yet due to be randomized.
+        {
+            for (int i = 1; i < nPointCount; ++i)
+            {
+                m_v3GrapLinePointOffsets[i] = Vector3.Lerp(m_v3GrapLinePointOffsets[i], m_v3ShakeVectors[i], m_fShakeSpeed);
+                m_v3GrapLinePoints[i] = m_ropeCurve.Evaluate(((float)i / (float)nPointCount) * m_graphookScript.FlyProgress()) + m_v3GrapLinePointOffsets[i];
+            }
         }
         
         // First point hardcoded to hook node.
         m_v3GrapLinePoints[0] = m_grappleNode.position;
+
+        // Hand particle effect rotation.
+        m_handEffect.transform.rotation = Quaternion.LookRotation(m_v3GrapLinePoints[1] - m_v3GrapLinePoints[0], Vector3.up);
 
         if(m_graphookScript.IsLodged())
             m_v3GrapLinePoints[nPointCount - 1] = m_v3GrapplePoint;

@@ -18,10 +18,14 @@ public class Hook : MonoBehaviour
     public float m_fFlySpeed = 5.0f;
 
     // Private:
-
     private SphereCollider m_collider;
     private PullObject m_pullObj;
+    private Bezier m_curve;
     private EHookPullMode m_pullType;
+    private Vector3 m_v3Destination;
+    private float m_fRopeLength;
+    private float m_fFlyProgress;
+    private const int m_nCurveCount = 2;
     private bool m_bLodged;
 
     void Awake()
@@ -30,24 +34,49 @@ public class Hook : MonoBehaviour
         Physics.IgnoreCollision(m_collider, m_playerController, true);
 
         m_pullType = EHookPullMode.PULL_FLY_TOWARDS;
+
+        m_fRopeLength = Mathf.Infinity;
         m_bLodged = false;
     }
 
     void Update()
     {
-        if (!m_bLodged)
-            transform.Translate(transform.forward * m_fFlySpeed * Time.deltaTime, Space.World);
+        //if (!m_bLodged)
+          //  transform.Translate(transform.forward * m_fFlySpeed * Time.deltaTime, Space.World);
+
+        if(!m_bLodged)
+        {
+            m_fFlyProgress += m_fFlySpeed * Time.deltaTime;
+            transform.position = m_curve.Evaluate(FlyProgress());
+
+            if(m_fFlyProgress >= m_fRopeLength)
+            {
+                transform.position = m_v3Destination;
+
+                m_bLodged = true;
+            }
+        }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void SetTarget(Vector3 v3Destination, float fDistance)
     {
-        if(!m_bLodged && m_pullType == EHookPullMode.PULL_PULL_TOWARDS_PLAYER && other.tag == "PullObj")
-        {
-            m_pullObj = other.GetComponent<PullObject>();
-            transform.parent = m_pullObj.transform;
-        }
+        m_v3Destination = v3Destination;
+        m_fRopeLength = fDistance;
+    }
 
-        m_bLodged = true;
+    public void SetCurve(Bezier curve)
+    {
+        m_curve = curve;
+    }
+
+    public Vector3 Destination()
+    {
+        return m_v3Destination;
+    }
+
+    public float FlyProgress()
+    {
+        return m_fFlyProgress / m_fRopeLength;
     }
 
     public PullObject HookedObject()
@@ -72,13 +101,15 @@ public class Hook : MonoBehaviour
 
     public void UnLodge()
     {
-        gameObject.SetActive(false);
         transform.parent = null;
+        m_fFlyProgress = 0.0f;
         m_bLodged = false;
+        gameObject.SetActive(false);
     }
 
     private void OnEnable()
     {
+        m_fFlyProgress = 0.0f;
         m_bLodged = false;
     }
 }

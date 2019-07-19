@@ -2,25 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bezier
+public struct Bezier
 {
-    private Vector3 m_v3Start;
-    private Vector3 m_v3Corner;
-    private Vector3 m_v3End;
+    public Vector3 m_v3Start;
+    public Vector3[] m_v3Corners;
+    public Vector3 m_v3End;
+    public Vector3[] m_v3InterpolatedPoints;
 
-    public void SetStart(Vector3 v3Start)
+    /*
+    Constructor:
+    Param:
+        int nCornerCount: The amount of corner points within the curve.
+    */
+    public Bezier(int nCornerCount)
     {
-        m_v3Start = v3Start;
-    }
-
-    public void SetCorner(Vector3 v3Corner)
-    {
-        m_v3Corner = v3Corner;
-    }
-
-    public void SetEnd(Vector3 v3End)
-    {
-        m_v3End = v3End;
+        m_v3Start = Vector3.zero;
+        m_v3End = Vector3.zero;
+        m_v3Corners = new Vector3[nCornerCount];
+        m_v3InterpolatedPoints = new Vector3[nCornerCount];
     }
 
     /*
@@ -34,12 +33,16 @@ public class Bezier
         // Clamp between 0 and 1.
         fDistance = Mathf.Clamp(fDistance, 0.0f, 1.0f);
 
-        // Distance along first line.
-        Vector3 v3FirstLinePoint = Vector3.Lerp(m_v3Start, m_v3Corner, fDistance);
+        // m_v3InterpolatedPoints contains the interpolated points within the line segments (between start, corners, end).
+        m_v3InterpolatedPoints[0] = Vector3.Lerp(m_v3Start, m_v3Corners[0], fDistance);
 
-        // Distance along second line.
-        Vector3 v3SecondLinePoint = Vector3.Lerp(m_v3Corner, m_v3End, fDistance);
+        for(int i = 1; i < m_v3InterpolatedPoints.Length; ++i)
+        {
+            // Interpolate between previous interpolated point and interpolated point in the current line segment.
+            m_v3InterpolatedPoints[i] = Vector3.Lerp(m_v3InterpolatedPoints[i - 1], Vector3.Lerp(m_v3Corners[i - 1], m_v3Corners[i], fDistance), fDistance);
+        }
 
-        return Vector3.Lerp(v3FirstLinePoint, v3SecondLinePoint, fDistance);
+        // Return final interpolation.
+        return Vector3.Lerp(m_v3InterpolatedPoints[m_v3InterpolatedPoints.Length - 1], Vector3.Lerp(m_v3Corners[m_v3Corners.Length - 1], m_v3End, fDistance), fDistance);
     }
 }

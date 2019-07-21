@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Assets\Code\AnimBehaviours\ResetToIdle.cs" />
     <Compile Include="Assets\Code\Classes\BehaviourNode.cs" />
+    <Compile Include="Assets\Code\Classes\Bezier.cs" />
     <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
     <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
     <Compile Include="Assets\Code\Scripts\GameManager.cs" />
@@ -77,8 +78,11 @@
     <None Include="Assets\Code\BossBehaviours\BossTree.xml" />
     <None Include="Assets\3rd Party\tripolygon\UModeler\Materials\Basic\UModeler_UnlitVertexColorShader.shader" />
     <None Include="Assets\Materials\Shaders\Galaxy_Render.shader" />
+    <None Include="Assets\BURT\Materials\Shaders\AMP_Parallax_UL.shader" />
     <None Include="Assets\BTreeTemp.xml" />
     <None Include="Assets\Code\BossBehaviours\BossTreeExample.xml" />
+    <None Include="Assets\BURT\Materials\Shaders\AMP_Line.shader" />
+    <None Include="Assets\BURT\Materials\Shaders\AMP_CVS.shader" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
@@ -90,6 +94,9 @@
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime">
       <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualEffectGraph.Runtime">
+      <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
@@ -120,6 +127,9 @@
     </Reference>
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualEffectGraph.Editor">
+      <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.ShaderGraph.Editor">
       <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>

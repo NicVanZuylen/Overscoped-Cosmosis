@@ -8,7 +8,6 @@ public class GrappleHook : MonoBehaviour
 {
     // Public:
     public GameObject m_grappleHook;
-    public Color m_grappleModeColor;
     public LineRenderer m_grappleLine;
     public Transform m_grappleNode;
 
@@ -47,6 +46,9 @@ public class GrappleHook : MonoBehaviour
     public float m_fHookRadius = 0.5f;
 
     [Header("Effects")]
+    [Tooltip("Color of the grapple line when in grapple mode.")]
+    public Color m_grappleModeColor;
+
     [Tooltip("Delay between getting a new set of random points for the rope shake effect.")]
     public float m_fRopeShakeDelay = 0.1f;
 
@@ -160,24 +162,7 @@ public class GrappleHook : MonoBehaviour
             m_bGrappleHookActive = true;
         }
 
-        /*
-        if (!m_bPullHookActive && Input.GetMouseButtonDown(1))
-        {
-            // Fire pulling hook.
-            m_pullHook.SetActive(true);
-
-            m_pullHook.transform.position = m_pullNode.position;
-            m_pullHook.transform.rotation = m_pullNode.parent.rotation;
-
-            // Revert hook color back to original.
-            m_pullLine.colorGradient.SetKeys(m_colorKeys, m_pullLine.colorGradient.alphaKeys);
-            m_pullLine.startColor = m_colorKeys[0].color;
-            m_pullLine.endColor = m_colorKeys[0].color;
-
-            m_bPullHookActive = true;
-        }
-        */
-
+        // Effects
         m_grappleLine.enabled = m_bGrappleHookActive;
         m_handEffect.SetActive(m_bGrappleHookActive);
         m_impactEffect.SetActive(m_graphookScript.IsLodged() && m_bGrappleHookActive);
@@ -238,46 +223,6 @@ public class GrappleHook : MonoBehaviour
                 }
             }
         }
-        
-        /*
-        if(m_bPullHookActive)
-        {
-            if (m_pullHookScript.IsLodged() && m_pullHookScript.PullType() == Hook.EHookPullMode.PULL_PULL_TOWARDS_PLAYER)
-            {
-                // Calculate rope length initially.
-                if (!m_bPullRopeLenCalculated)
-                {
-                    m_fPullRopeLength = (m_pullHook.transform.position - transform.position).sqrMagnitude;
-                    m_bPullRopeLenCalculated = true;
-                }
-
-                PullObject();
-            }
-            else if (m_pullHookScript.IsLodged() && m_pullHookScript.PullType() == Hook.EHookPullMode.PULL_FLY_TOWARDS)
-            {
-                // Cancel if it is a static (un-pullable) object.
-                m_pullHook.SetActive(false);
-
-                m_pullHookScript.UnLodge();
-                m_bPullHookActive = false;
-            }
-            else
-            {
-                m_bPullRopeLenCalculated = false;
-                m_fPullRopeLength = (m_pullHook.transform.position - transform.position).sqrMagnitude;
-
-                // Cancel since the rope is now too long.
-                if(m_fPullRopeLength > m_fGrapplebreakDistance * m_fGrapplebreakDistance)
-                {
-                    m_pullHook.SetActive(false);
-
-                    m_pullHookScript.UnLodge();
-                    m_bPullHookActive = false;
-                }
-            }
-                
-        }
-        */
     }
 
     private void LateUpdate()

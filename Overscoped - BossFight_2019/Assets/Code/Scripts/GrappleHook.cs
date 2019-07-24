@@ -58,12 +58,19 @@ public class GrappleHook : MonoBehaviour
     [Tooltip("Maximum offset of rope points from thier position on the curve.")]
     public float m_fShakeMagnitude = 0.05f;
 
+    [Tooltip("Amount of waves in the rope whilst it flies.")]
+    public int m_nWaveCount = 3;
+
+    [Tooltip("Wave amplitude multiplier of the wobble effect.")]
+    public float m_fWobbleWaveAmp = 0.15f;
+
     public GameObject m_handEffect;
     public GameObject m_impactEffect;
 
     // Private:
 
     private PlayerController m_controller;
+    private PlayerStats m_stats;
     private Hook m_graphookScript;
     private bool m_bGrappleHookActive;
 
@@ -74,6 +81,7 @@ public class GrappleHook : MonoBehaviour
     private Vector3[] m_v3GrapLinePoints;
     private Vector3[] m_v3GrapLinePointOffsets;
     private Vector3[] m_v3ShakeVectors;
+    private Vector3[] m_v3WobbleVectors;
     private Vector3 m_v3GrapplePoint;
     private Vector3 m_v3GrappleNormal;
     private float m_fGrapRopeLength;
@@ -90,6 +98,7 @@ public class GrappleHook : MonoBehaviour
     {
         // Component retreival.
         m_controller = GetComponent<PlayerController>();
+        m_stats = GetComponent<PlayerStats>();
         m_graphookScript = m_grappleHook.GetComponent<Hook>();
 
         // Rope color and curve.
@@ -103,6 +112,7 @@ public class GrappleHook : MonoBehaviour
         m_v3GrapLinePoints = new Vector3[m_grappleLine.positionCount];
         m_v3GrapLinePointOffsets = new Vector3[m_grappleLine.positionCount];
         m_v3ShakeVectors = new Vector3[m_grappleLine.positionCount];
+        m_v3WobbleVectors = new Vector3[m_grappleLine.positionCount];
 
         m_grappleHook.SetActive(false);
 
@@ -116,7 +126,9 @@ public class GrappleHook : MonoBehaviour
     {
         Ray grapRay = new Ray(m_grappleNode.position, m_grappleNode.forward);
 
-        if(!m_bGrappleHookActive && Input.GetMouseButtonDown(0) && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance))
+        bool bPlayerHasEnoughMana = m_stats.EnoughMana();
+
+        if(bPlayerHasEnoughMana && !m_bGrappleHookActive && Input.GetMouseButtonDown(0) && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance))
         {
             m_v3GrapplePoint = m_fireHit.point;
             m_v3GrappleNormal = m_fireHit.normal;
@@ -136,7 +148,7 @@ public class GrappleHook : MonoBehaviour
 
             m_bGrappleHookActive = true;
         }
-        else if (!m_bGrappleHookActive && Input.GetMouseButtonDown(1) && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance))
+        else if (bPlayerHasEnoughMana && !m_bGrappleHookActive && Input.GetMouseButtonDown(1) && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance))
         {
             if (m_fireHit.collider.tag == "PullObj")
                 m_pullObj = m_fireHit.collider.gameObject.GetComponent<PullObject>();
@@ -184,7 +196,7 @@ public class GrappleHook : MonoBehaviour
                 m_controller.OverrideMovement(GrappleFly);
 
                 // Exit when releasing the left mouse button.
-                if (Input.GetMouseButtonUp(0))
+                if (Input.GetMouseButtonUp(0) || !bPlayerHasEnoughMana)
                 {
                     m_controller.FreeOverride();
 
@@ -199,7 +211,7 @@ public class GrappleHook : MonoBehaviour
                 m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
 
                 // Exit when releasing the right mouse button.
-                if (Input.GetMouseButtonUp(1))
+                if (Input.GetMouseButtonUp(1) || !bPlayerHasEnoughMana)
                 {
                     m_controller.FreeOverride();
 
@@ -225,6 +237,11 @@ public class GrappleHook : MonoBehaviour
         }
     }
 
+    const float m_fOffsetLerpFly = 0.1f;
+    const float m_fOffsetLerpLodged = 0.35f;
+    const float m_fImpactShakeDuration = 0.4f;
+    float m_fImpactShakeTime = 0.0f;
+
     private void LateUpdate()
     {
         if (!m_bGrappleHookActive)
@@ -244,9 +261,10 @@ public class GrappleHook : MonoBehaviour
         // Curve points.
         m_ropeCurve.m_v3Start = m_grappleNode.position;
         m_ropeCurve.m_v3Corners[0] = v3CurveCorner;
-        m_ropeCurve.m_v3Corners[1] = m_v3GrapplePoint + (m_v3GrappleNormal * Mathf.Min(5.0f, v3DiffNoY.magnitude));
+        m_ropeCurve.m_v3Corners[1] = m_v3GrapplePoint + (m_v3GrappleNormal * (Mathf.Min(5.0f, v3DiffNoY.magnitude)));
         m_ropeCurve.m_v3End = m_v3GrapplePoint;
 
+        // Draw curve line segments in scene view.
         Debug.DrawLine(m_ropeCurve.m_v3Start, m_ropeCurve.m_v3Corners[0], Color.green);
         Debug.DrawLine(m_ropeCurve.m_v3Corners[0], m_ropeCurve.m_v3Corners[1], Color.green);
         Debug.DrawLine(m_ropeCurve.m_v3Corners[1], m_ropeCurve.m_v3End, Color.green);
@@ -256,39 +274,63 @@ public class GrappleHook : MonoBehaviour
         // Set each line point to the correct points on the curve.
         int nPointCount = m_grappleLine.positionCount;
 
-        if(m_fShakeTime <= 0.0f) // Shake points are due to be randomized.
+        Vector3 v3WobbleAxis = Vector3.Cross(Vector3.up, v3DiffNoY).normalized;
+
+        float fWobbleMult = m_fWobbleWaveAmp;
+        float fImpactShakeMult = 0.3f * Mathf.Clamp(m_fImpactShakeTime / m_fImpactShakeDuration, 0.0f, 1.0f);
+        bool bHookLodged = m_graphookScript.IsLodged();
+
+        // When hooked-in tension should be high so remove the wobble effect.
+        if (bHookLodged)
         {
-            for (int i = 1; i < nPointCount; ++i)
+            fWobbleMult = 0.0f;
+
+            m_fImpactShakeTime -= Time.deltaTime;
+        }
+        else
+            m_fImpactShakeTime = m_fImpactShakeDuration;
+
+        Vector3 v3WobbleShake = Vector3.zero;
+
+        for (int i = 1; i < nPointCount; ++i)
+        {
+            float fPointProgress = (float)i / nPointCount;
+            float fCurvePoint = Mathf.Sin(fPointProgress * m_nWaveCount * Mathf.PI);
+
+            if (m_fShakeTime <= 0.0f)
             {
+                // Re-randomize shake vector.
                 m_v3ShakeVectors[i].x = Random.Range(-1.0f, 1.0f);
                 m_v3ShakeVectors[i].y = Random.Range(-1.0f, 1.0f);
                 m_v3ShakeVectors[i].z = Random.Range(-1.0f, 1.0f);
                 m_v3ShakeVectors[i] *= m_fShakeMagnitude;
 
-                m_v3GrapLinePointOffsets[i] = Vector3.Lerp(m_v3GrapLinePointOffsets[i], m_v3ShakeVectors[i], m_fShakeSpeed);
-
-                m_v3GrapLinePoints[i] = m_ropeCurve.Evaluate(((float)i / (float)nPointCount) * m_graphookScript.FlyProgress()) + m_v3GrapLinePointOffsets[i];
+                if(bHookLodged)
+                    v3WobbleShake = v3WobbleAxis * fCurvePoint * fImpactShakeMult;
             }
 
+            // Wave offset that produces a low-tension effect.
+            Vector3 v3WobbleOffset = v3WobbleAxis * fCurvePoint * fPointProgress * fWobbleMult;
+
+            // Different lerp values are used for both rope states, when lodged the value is more snappy.
+            if(!m_graphookScript.IsLodged())
+                m_v3WobbleVectors[i] = Vector3.Lerp(m_v3WobbleVectors[i], v3WobbleOffset, m_fOffsetLerpFly);
+            else
+                m_v3WobbleVectors[i] = Vector3.Lerp(m_v3WobbleVectors[i], v3WobbleOffset + v3WobbleShake, m_fOffsetLerpLodged);
+
+            m_v3GrapLinePointOffsets[i] = Vector3.Lerp(m_v3GrapLinePointOffsets[i], m_v3ShakeVectors[i], m_fShakeSpeed);
+            m_v3GrapLinePoints[i] = m_ropeCurve.Evaluate(((float)i / (float)nPointCount) * m_graphookScript.FlyProgress()) + m_v3GrapLinePointOffsets[i] + m_v3WobbleVectors[i];
+        }
+
+        if (m_fShakeTime <= 0.0f)
             m_fShakeTime = m_fRopeShakeDelay;
-        }
-        else // Shake points are not yet due to be randomized.
-        {
-            for (int i = 1; i < nPointCount; ++i)
-            {
-                m_v3GrapLinePointOffsets[i] = Vector3.Lerp(m_v3GrapLinePointOffsets[i], m_v3ShakeVectors[i], m_fShakeSpeed);
-                m_v3GrapLinePoints[i] = m_ropeCurve.Evaluate(((float)i / (float)nPointCount) * m_graphookScript.FlyProgress()) + m_v3GrapLinePointOffsets[i];
-            }
-        }
-        
+
         // First point hardcoded to hook node.
         m_v3GrapLinePoints[0] = m_grappleNode.position;
+        m_v3GrapLinePoints[nPointCount - 1] = m_grappleHook.transform.position;
 
         // Hand particle effect rotation.
         m_handEffect.transform.rotation = Quaternion.LookRotation(m_v3GrapLinePoints[1] - m_v3GrapLinePoints[0], Vector3.up);
-
-        if(m_graphookScript.IsLodged())
-            m_v3GrapLinePoints[nPointCount - 1] = m_v3GrapplePoint;
 
         m_grappleLine.SetPositions(m_v3GrapLinePoints);
     }
@@ -414,5 +456,10 @@ public class GrappleHook : MonoBehaviour
             m_bGrappleHookActive = false;
             m_graphookScript.UnLodge();
         }
+    }
+
+    public bool IsActive()
+    {
+        return m_bGrappleHookActive;
     }
 }

@@ -4929,7 +4929,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 1
+  moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -9794,7 +9794,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3812603301381602550}
   m_LocalRotation: {x: 0.55077213, y: -0, z: -0, w: 0.8346557}
-  m_LocalPosition: {x: -0.5999985, y: 0.43295518, z: -0.05577579}
+  m_LocalPosition: {x: -0.572, y: -0.244, z: 0.089}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5006512735346248341}
@@ -9841,23 +9841,18 @@ LineRenderer:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
   - {x: 0, y: 0, z: 2}
-  - {x: 0, y: 0, z: 3}
-  - {x: 0, y: 0, z: 4}
-  - {x: 0, y: 0, z: 5}
-  - {x: 0, y: 0, z: 6}
-  - {x: 0, y: 0, z: 7}
-  - {x: 0, y: 0, z: 8}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
-  - {x: 0, y: 0, z: 9}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
+  - {x: 0, y: 0, z: 2}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.25
@@ -10112,6 +10107,7 @@ GameObject:
   - component: {fileID: 3812603302388449868}
   - component: {fileID: 3812603302388449869}
   - component: {fileID: 9089708072951148978}
+  - component: {fileID: 6149349662412444835}
   - component: {fileID: 3812603302388449864}
   - component: {fileID: 3812603302388449870}
   m_Layer: 0
@@ -10200,6 +10196,27 @@ CharacterController:
   m_SkinWidth: 0.01
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6149349662412444835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3812603302388449865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbe9cfdef836b5b41bfbc86c1a48a18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_fMaxHealth: 100
+  m_fMaxMana: 100
+  m_fManaLossRate: 15
+  m_fManaRegenRate: 35
+  m_fManaRegenRateLerp: 0.1
+  m_fManaRegenDelay: 1
+  m_manaRegenMode: 1
+  m_healthFillRect: {fileID: 0}
+  m_manaFillRect: {fileID: 0}
 --- !u!114 &3812603302388449864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10238,11 +10255,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_grappleHook: {fileID: 3812603302679706673}
-  m_grappleModeColor: {r: 1, g: 1, b: 1, a: 1}
   m_grappleLine: {fileID: 1101892924}
-  m_grappleNode: {fileID: 1419247292}
-  m_fFlyAcceleration: 20
-  m_fMaxFlySpeed: 10
+  m_grappleNode: {fileID: 3812603301381602537}
+  m_fFlyAcceleration: 10
+  m_fMaxFlySpeed: 15
   m_fDestinationRadius: 2
   m_fDriftTolerance: 8
   m_fPushUpForce: 4
@@ -10251,9 +10267,12 @@ MonoBehaviour:
   m_fPullBreakDistance: 20
   m_bRestrictToRopeLength: 1
   m_fHookRadius: 0.5
+  m_grappleModeColor: {r: 1, g: 1, b: 1, a: 1}
   m_fRopeShakeDelay: 0.1
   m_fShakeSpeed: 0.1
   m_fShakeMagnitude: 0.05
+  m_nWaveCount: 3
+  m_fWobbleWaveAmp: 1
   m_handEffect: {fileID: 1419247291}
   m_impactEffect: {fileID: 540026478}
 --- !u!1 &3812603302679706673
@@ -10362,7 +10381,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_playerController: {fileID: 9089708072951148978}
-  m_fFlySpeed: 30
+  m_fFlySpeed: 100
 --- !u!54 &3812603302679706679
 Rigidbody:
   m_ObjectHideFlags: 0

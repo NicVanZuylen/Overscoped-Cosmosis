@@ -50,9 +50,16 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private RectTransform m_manaFillRect;
 
+    [SerializeField]
+    private Material m_manaMat;
+
+    [SerializeField]
+    private Material m_healthMat;
+
     // Private:
 
     private GrappleHook m_hookScript;
+    private PlayerController m_controller;
 
     private float m_fHealth;
     private float m_fMana;
@@ -61,6 +68,7 @@ public class PlayerStats : MonoBehaviour
     void Awake()
     {
         m_hookScript = GetComponent<GrappleHook>();
+        m_controller = GetComponent<PlayerController>();
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
@@ -83,7 +91,10 @@ public class PlayerStats : MonoBehaviour
         }
         else
         {
-            m_fCurrentRegenDelay -= Time.deltaTime;
+            if (m_controller.IsGrounded())
+                m_fCurrentRegenDelay -= Time.deltaTime;
+            else
+                m_fCurrentRegenDelay = m_fManaRegenDelay;
 
             if (m_fCurrentRegenDelay <= 0.0f)
             {
@@ -103,6 +114,9 @@ public class PlayerStats : MonoBehaviour
         // Clamp health and mana.
         m_fHealth = Mathf.Clamp(m_fHealth, 0.0f, m_fMaxHealth);
         m_fMana = Mathf.Clamp(m_fMana, 0.0f, m_fMaxMana);
+
+        m_healthMat.SetFloat("_Mana", 1.0f - (m_fHealth / m_fMaxHealth));
+        m_manaMat.SetFloat("_Mana", 1.0f - (m_fMana / m_fMaxMana));
 
         m_healthFillRect.sizeDelta = new Vector2((m_fHealth / m_fMaxHealth) * 300.0f, m_healthFillRect.sizeDelta.y);
         m_manaFillRect.sizeDelta = new Vector3((m_fMana / m_fMaxMana) * 300.0f, m_manaFillRect.sizeDelta.y);

@@ -64,6 +64,12 @@ public class GrappleHook : MonoBehaviour
     [Tooltip("Wave amplitude multiplier of the wobble effect.")]
     public float m_fWobbleWaveAmp = 0.15f;
 
+    [Tooltip("Thickness the line will expand to when popping.")]
+    public float m_fPopThickness = 2.0f;
+
+    [Tooltip("Rate in which the line will expand and pop after use.")]
+    public float m_fPopRate = 3.0f;
+
     public GameObject m_handEffect;
     public GameObject m_impactEffect;
 
@@ -71,6 +77,8 @@ public class GrappleHook : MonoBehaviour
 
     private PlayerController m_controller;
     private PlayerStats m_stats;
+    private Animator m_animController;
+    private Transform m_cameraTransform;
     private Hook m_graphookScript;
     private bool m_bGrappleHookActive;
 
@@ -86,6 +94,7 @@ public class GrappleHook : MonoBehaviour
     private Vector3 m_v3GrappleNormal;
     private float m_fGrapRopeLength;
     private float m_fShakeTime;
+    private float m_fLineThickness;
 
     // Pull function
     private PullObject m_pullObj;
@@ -99,6 +108,8 @@ public class GrappleHook : MonoBehaviour
         // Component retreival.
         m_controller = GetComponent<PlayerController>();
         m_stats = GetComponent<PlayerStats>();
+        m_animController = GetComponentInChildren<Animator>();
+        m_cameraTransform = GetComponentInChildren<Camera>().transform;
         m_graphookScript = m_grappleHook.GetComponent<Hook>();
 
         // Rope color and curve.
@@ -118,18 +129,24 @@ public class GrappleHook : MonoBehaviour
 
         // Misc.
         m_v3GrapplePoint = Vector3.zero;
+        m_fLineThickness = m_grappleLine.startWidth;
         m_fShakeTime = 0.0f;
         m_bGrappleHookActive = false;
     }
 
     void Update()
     {
-        Ray grapRay = new Ray(m_grappleNode.position, m_grappleNode.forward);
+        // ------------------------------------------------------------------------------------------------------------------------------
+        // Shooting
+
+        Ray grapRay = new Ray(m_cameraTransform.position, m_cameraTransform.forward);
 
         bool bPlayerHasEnoughMana = m_stats.EnoughMana();
 
         if(bPlayerHasEnoughMana && !m_bGrappleHookActive && Input.GetMouseButtonDown(0) && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance))
         {
+            
+
             m_v3GrapplePoint = m_fireHit.point;
             m_v3GrappleNormal = m_fireHit.normal;
             m_fGrapRopeLength = m_fireHit.distance;
@@ -174,10 +191,23 @@ public class GrappleHook : MonoBehaviour
             m_bGrappleHookActive = true;
         }
 
-        // Effects
-        m_grappleLine.enabled = m_bGrappleHookActive;
+        // ------------------------------------------------------------------------------------------------------------------------------
+        // Effects & Animations
+
+        // Line will disable when the pop effect finishes.
+        m_grappleLine.enabled = m_bGrappleHookActive || m_fCurrentLineThickness < (m_fPopThickness - 0.1f);
         m_handEffect.SetActive(m_bGrappleHookActive);
-        m_impactEffect.SetActive(m_graphookScript.IsLodged() && m_bGrappleHookActive);
+
+        bool bImpacted = m_graphookScript.IsLodged() && m_bGrappleHookActive;
+
+        // Animations
+        m_animController.SetBool("isCasting", m_bGrappleHookActive);
+
+        m_impactEffect.SetActive(bImpacted);
+        m_animController.SetBool("isGrappled", bImpacted);
+
+        // ------------------------------------------------------------------------------------------------------------------------------
+        // Active behaviour
 
         if (m_bGrappleHookActive)
         {
@@ -235,17 +265,39 @@ public class GrappleHook : MonoBehaviour
                 }
             }
         }
+
+        // ------------------------------------------------------------------------------------------------------------------------------
     }
 
-    const float m_fOffsetLerpFly = 0.1f;
-    const float m_fOffsetLerpLodged = 0.35f;
-    const float m_fImpactShakeDuration = 0.4f;
-    float m_fImpactShakeTime = 0.0f;
+    private const float m_fOffsetLerpFly = 0.1f;
+    private const float m_fOffsetLerpLodged = 0.35f;
+    private const float m_fImpactShakeDuration = 0.4f;
+    private float m_fImpactShakeTime;
+    private float m_fCurrentLineThickness;
 
     private void LateUpdate()
     {
+        // ------------------------------------------------------------------------------------------------------------------------------
+        // Effects
+
         if (!m_bGrappleHookActive)
+        {
+            // Expand thickness after use.
+            m_fCurrentLineThickness = Mathf.Lerp(m_fCurrentLineThickness, m_fPopThickness, m_fPopRate);
+
+            m_fCurrentLineThickness = Mathf.Clamp(m_fCurrentLineThickness, 0.0f, m_fPopThickness);
+
+            // Grapple is not active, play the poof effect.
+            m_grappleLine.startWidth = m_fCurrentLineThickness;
+            m_grappleLine.endWidth = m_fCurrentLineThickness;
+
             return;
+        }
+
+        // Reset thickness to default when in use.
+        m_fCurrentLineThickness = m_fLineThickness;
+        m_grappleLine.startWidth = m_fCurrentLineThickness;
+        m_grappleLine.endWidth = m_fCurrentLineThickness;
 
         Vector3 v3DiffNoY = (m_graphookScript.Destination() + m_grappleNode.position) * 0.5f;
         v3DiffNoY -= m_grappleNode.position;
@@ -333,9 +385,11 @@ public class GrappleHook : MonoBehaviour
         m_handEffect.transform.rotation = Quaternion.LookRotation(m_v3GrapLinePoints[1] - m_v3GrapLinePoints[0], Vector3.up);
 
         m_grappleLine.SetPositions(m_v3GrapLinePoints);
+
+        // ------------------------------------------------------------------------------------------------------------------------------
     }
 
-    
+
     Vector3 GrappleFly(PlayerController controller)
     {
         Vector3 v3NetForce = Vector3.zero;

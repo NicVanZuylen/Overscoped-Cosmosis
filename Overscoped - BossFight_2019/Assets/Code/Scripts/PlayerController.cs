@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviour
 
     // Movement
     private CharacterController m_controller;
+    private Animator m_animController;
     private Vector3 m_v3RespawnPosition;
     private Vector3 m_v3SurfaceRight;
     private Vector3 m_v3SurfaceUp;
@@ -78,6 +79,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         m_controller = GetComponent<CharacterController>();
+        m_animController = GetComponentInChildren<Animator>();
         m_cameraTransform = GetComponentInChildren<Camera>().transform;
         m_v3RespawnPosition = transform.position;
 
@@ -333,6 +335,11 @@ public class PlayerController : MonoBehaviour
             if (v3MoveDir.sqrMagnitude > 0.0f)
             {
                 // ------------------------------------------------------------------------------------------------------
+                // Play animation...
+
+                m_animController.SetBool("isRunning", true);
+
+                // ------------------------------------------------------------------------------------------------------
                 // Movement lateral tolerance.
 
                 // Component magnitude of the current velocity in the direction of movement.
@@ -369,10 +376,16 @@ public class PlayerController : MonoBehaviour
                     // Slide drag.
                     v3NetForce -= m_v3Velocity * m_fMomentumDrag * Time.deltaTime;
                 }
+
+                    m_animController.SetBool("isRunning", false);
             }
         }
         else
         {
+            // ------------------------------------------------------------------------------------------------------
+            // Play flying animation...
+            m_animController.SetBool("isRunning", false);
+
             // ------------------------------------------------------------------------------------------------------
             // Reset movement vectors for airborn movement.
 

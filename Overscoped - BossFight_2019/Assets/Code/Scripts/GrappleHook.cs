@@ -73,7 +73,14 @@ public class GrappleHook : MonoBehaviour
     public GameObject m_handEffect;
     public GameObject m_impactEffect;
 
+    public ComputeShader m_lineCompute;
+
     // Private:
+
+    private ComputeBuffer m_pointBuffer;
+    private ComputeBuffer m_bezierPointBuffer;
+    private ComputeBuffer m_bezierIntPointBuffer;
+    private int m_pointKernelIndex;
 
     private PlayerController m_controller;
     private PlayerStats m_stats;
@@ -105,6 +112,19 @@ public class GrappleHook : MonoBehaviour
 
     void Awake()
     {
+        const int nPointCount = 4;
+
+        m_pointBuffer = new ComputeBuffer(m_grappleLine.positionCount, sizeof(float) * 3);
+        m_bezierPointBuffer = new ComputeBuffer(nPointCount, sizeof(float) * 3);
+        m_bezierIntPointBuffer = new ComputeBuffer(nPointCount * m_grappleLine.positionCount, sizeof(float) * 3);
+
+        m_pointKernelIndex = m_lineCompute.FindKernel("CSMain");
+        m_lineCompute.SetBuffer(m_pointKernelIndex, "outPoints", m_pointBuffer);
+        m_lineCompute.SetBuffer(m_pointKernelIndex, "bezierPoints", m_bezierPointBuffer);
+        m_lineCompute.SetBuffer(m_pointKernelIndex, "bezierIntPoints", m_bezierIntPointBuffer);
+
+        m_lineCompute.SetInt("pointCount", nPointCount);
+
         // Component retreival.
         m_controller = GetComponent<PlayerController>();
         m_stats = GetComponent<PlayerStats>();
@@ -114,7 +134,7 @@ public class GrappleHook : MonoBehaviour
 
         // Rope color and curve.
         m_colorKeys = new GradientColorKey[m_grappleLine.colorGradient.colorKeys.Length];
-        m_ropeCurve = new Bezier(2);
+        m_ropeCurve = new Bezier(nPointCount - 2);
 
         for (int i = 0; i < m_grappleLine.colorGradient.colorKeys.Length; ++i)
             m_colorKeys[i] = m_grappleLine.colorGradient.colorKeys[i];
@@ -132,6 +152,13 @@ public class GrappleHook : MonoBehaviour
         m_fLineThickness = m_grappleLine.startWidth;
         m_fShakeTime = 0.0f;
         m_bGrappleHookActive = false;
+    }
+
+    private void OnDestroy()
+    {
+        m_bezierIntPointBuffer.Release();
+        m_bezierPointBuffer.Release();
+        m_pointBuffer.Release();
     }
 
     void Update()
@@ -311,15 +338,17 @@ public class GrappleHook : MonoBehaviour
         Vector3 v3CurveCorner = m_grappleNode.transform.position + (v3DiffNoY) - (fHorizontalAmount * v3HorizontalVec);
 
         // Curve points.
-        m_ropeCurve.m_v3Start = m_grappleNode.position;
-        m_ropeCurve.m_v3Corners[0] = v3CurveCorner;
-        m_ropeCurve.m_v3Corners[1] = m_v3GrapplePoint + (m_v3GrappleNormal * (Mathf.Min(5.0f, v3DiffNoY.magnitude)));
-        m_ropeCurve.m_v3End = m_v3GrapplePoint;
+        //m_ropeCurve.m_v3Start = m_grappleNode.position;
+        m_ropeCurve.m_v3Points[0] = m_grappleNode.position;
+        m_ropeCurve.m_v3Points[1] = v3CurveCorner;
+        m_ropeCurve.m_v3Points[2] = m_v3GrapplePoint + (m_v3GrappleNormal * (Mathf.Min(5.0f, v3DiffNoY.magnitude)));
+        m_ropeCurve.m_v3Points[m_ropeCurve.m_v3Points.Length - 1] = m_v3GrapplePoint;
+        //m_ropeCurve.m_v3End = m_v3GrapplePoint;
 
         // Draw curve line segments in scene view.
-        Debug.DrawLine(m_ropeCurve.m_v3Start, m_ropeCurve.m_v3Corners[0], Color.green);
-        Debug.DrawLine(m_ropeCurve.m_v3Corners[0], m_ropeCurve.m_v3Corners[1], Color.green);
-        Debug.DrawLine(m_ropeCurve.m_v3Corners[1], m_ropeCurve.m_v3End, Color.green);
+        //Debug.DrawLine(m_ropeCurve.m_v3Start, m_ropeCurve.m_v3Points[0], Color.green);
+        //Debug.DrawLine(m_ropeCurve.m_v3Points[0], m_ropeCurve.m_v3Points[1], Color.green);
+        //Debug.DrawLine(m_ropeCurve.m_v3Points[1], m_ropeCurve.m_v3End, Color.green);
 
         m_fShakeTime -= Time.deltaTime;
 
@@ -344,6 +373,7 @@ public class GrappleHook : MonoBehaviour
 
         Vector3 v3WobbleShake = Vector3.zero;
 
+        /*
         for (int i = 1; i < nPointCount; ++i)
         {
             float fPointProgress = (float)i / nPointCount;
@@ -373,6 +403,13 @@ public class GrappleHook : MonoBehaviour
             m_v3GrapLinePointOffsets[i] = Vector3.Lerp(m_v3GrapLinePointOffsets[i], m_v3ShakeVectors[i], m_fShakeSpeed);
             m_v3GrapLinePoints[i] = m_ropeCurve.Evaluate(((float)i / (float)nPointCount) * m_graphookScript.FlyProgress()) + m_v3GrapLinePointOffsets[i] + m_v3WobbleVectors[i];
         }
+        */
+
+        m_bezierPointBuffer.SetData(m_ropeCurve.m_v3Points);
+
+        m_lineCompute.Dispatch(m_pointKernelIndex, Mathf.CeilToInt((float)m_pointBuffer.count / 256.0f), 1, 1);
+
+        m_pointBuffer.GetData(m_v3GrapLinePoints);
 
         if (m_fShakeTime <= 0.0f)
             m_fShakeTime = m_fRopeShakeDelay;

@@ -4,9 +4,9 @@ using UnityEngine;
 
 public struct Bezier
 {
-    public Vector3 m_v3Start;
-    public Vector3[] m_v3Corners;
-    public Vector3 m_v3End;
+    //public Vector3 m_v3Start;
+    public Vector3[] m_v3Points;
+    //public Vector3 m_v3End;
     public Vector3[] m_v3InterpolatedPoints;
 
     /*
@@ -16,10 +16,10 @@ public struct Bezier
     */
     public Bezier(int nCornerCount)
     {
-        m_v3Start = Vector3.zero;
-        m_v3End = Vector3.zero;
-        m_v3Corners = new Vector3[nCornerCount];
-        m_v3InterpolatedPoints = new Vector3[nCornerCount];
+        //m_v3Start = Vector3.zero;
+        //m_v3End = Vector3.zero;
+        m_v3Points = new Vector3[nCornerCount + 2];
+        m_v3InterpolatedPoints = new Vector3[nCornerCount + 2];
     }
 
     /*
@@ -34,15 +34,16 @@ public struct Bezier
         fDistance = Mathf.Clamp(fDistance, 0.0f, 1.0f);
 
         // m_v3InterpolatedPoints contains the interpolated points within the line segments (between start, corners, end).
-        m_v3InterpolatedPoints[0] = Vector3.Lerp(m_v3Start, m_v3Corners[0], fDistance);
+        m_v3InterpolatedPoints[0] = Vector3.Lerp(m_v3Points[0], m_v3Points[1], fDistance);
 
         for(int i = 1; i < m_v3InterpolatedPoints.Length; ++i)
         {
             // Interpolate between previous interpolated point and interpolated point in the current line segment.
-            m_v3InterpolatedPoints[i] = Vector3.Lerp(m_v3InterpolatedPoints[i - 1], Vector3.Lerp(m_v3Corners[i - 1], m_v3Corners[i], fDistance), fDistance);
+            m_v3InterpolatedPoints[i] = Vector3.Lerp(m_v3InterpolatedPoints[i - 1], Vector3.Lerp(m_v3Points[i - 1], m_v3Points[i], fDistance), fDistance);
         }
 
         // Return final interpolation.
-        return Vector3.Lerp(m_v3InterpolatedPoints[m_v3InterpolatedPoints.Length - 1], Vector3.Lerp(m_v3Corners[m_v3Corners.Length - 1], m_v3End, fDistance), fDistance);
+        //return Vector3.Lerp(m_v3InterpolatedPoints[m_v3InterpolatedPoints.Length - 1], Vector3.Lerp(m_v3Points[m_v3Points.Length - 1], m_v3End, fDistance), fDistance);
+        return m_v3InterpolatedPoints[m_v3InterpolatedPoints.Length - 1];
     }
 }

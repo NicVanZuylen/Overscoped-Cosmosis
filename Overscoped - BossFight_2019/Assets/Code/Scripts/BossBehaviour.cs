@@ -19,6 +19,9 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject m_armour;
 
+    [SerializeField]
+    private List<GameObject> m_portalSpawns;
+
     [Tooltip("Distance in which the boss will attempt a slam attack.")]
     [SerializeField]
     private float m_fSlamDistance = 10.0f;
@@ -30,14 +33,18 @@ public class BossBehaviour : MonoBehaviour
     private float m_fMeteorCD = 10f;
     private float m_fMeteorCDTimer;
 
-    [Tooltip("Amount of time before slam attack can be used again.")]
+    [Tooltip("Amount of time before portal punch attack can be used again.")]
     [SerializeField]
-    private float m_fSlamCD = 4f;
-    private float m_fSlamCDTimer;
+    private float m_fPortalPunchCD = 4f;
+    private float m_fPortalPunchCDTimer;
 
     [Tooltip("Amount of time spent stuck.")]
     [SerializeField]
     private float m_fStuckTime;
+    
+    private float m_fTimeSinceGlobalAttack;
+    [SerializeField]
+    private float m_fTimeBetweenAttacks;
 
     public Vector3 m_vSize;
 
@@ -49,8 +56,9 @@ public class BossBehaviour : MonoBehaviour
     {
         m_playerController = m_player.GetComponent<PlayerController>();
         m_animator = GetComponent<Animator>();
+        m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
-        string treePath = Application.dataPath + "/Code/BossBehaviours/BossTree.xml";
+        string treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
         m_bossTree = BTreeEditor.BTreeEditor.LoadTree(treePath, this);
     }
 
@@ -59,8 +67,10 @@ public class BossBehaviour : MonoBehaviour
         ResetAnimToIdle();
         m_bossTree.Run();
 
+        m_fTimeSinceGlobalAttack -= Time.deltaTime;
+
         m_fMeteorCDTimer -= Time.deltaTime;
-        m_fSlamCDTimer -= Time.deltaTime;
+        m_fPortalPunchCDTimer -= Time.deltaTime;
     }
 
     // ----------------------------------------------------------------------------------------------
@@ -71,6 +81,15 @@ public class BossBehaviour : MonoBehaviour
         if (m_playerController.IsGrounded())
             return ENodeResult.NODE_SUCCESS;
 
+        return ENodeResult.NODE_FAILURE;
+    }
+
+    public ENodeResult CondTimeSinceGlobalAttack()
+    {
+        if(m_fTimeSinceGlobalAttack <= 0)
+        {
+            return ENodeResult.NODE_SUCCESS;
+        }
         return ENodeResult.NODE_FAILURE;
     }
 
@@ -86,7 +105,7 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondSlamCD()
     {
-        if (m_fSlamCDTimer <= 0)
+        if (m_fPortalPunchCDTimer <= 0)
         {
             return ENodeResult.NODE_SUCCESS;
         }
@@ -119,14 +138,17 @@ public class BossBehaviour : MonoBehaviour
     // ----------------------------------------------------------------------------------------------
     // Actions
 
-    public ENodeResult ActPlaySlamAnim()
+    public ENodeResult ActPlayPortalPunchAnim()
     {
         if (m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) // Only transition from idle.
         {
             m_animator.SetInteger("AttackID", 1);
-            m_fSlamCDTimer = m_fSlamCD;
+            m_fPortalPunchCDTimer = m_fPortalPunchCD;
+            m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+            m_portalSpawns[Random.Range(0, m_portalSpawns.Count)].SetActive(true);
+            return ENodeResult.NODE_SUCCESS;
         }
-        return ENodeResult.NODE_SUCCESS;
+        return ENodeResult.NODE_FAILURE;
     }
 
     public ENodeResult ActPlayMeteorAnim()

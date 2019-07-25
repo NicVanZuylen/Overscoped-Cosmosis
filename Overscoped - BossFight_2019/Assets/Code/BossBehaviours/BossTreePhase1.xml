@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<NodeData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+  <m_name>Base</m_name>
+  <m_funcName>NO_FUNCTION</m_funcName>
+  <m_description />
+  <m_children>
+    <NodeData>
+      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+      <m_name>Boss Stuck</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description />
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_CONDITION</m_eType>
+          <m_name>Boss Stuck</m_name>
+          <m_funcName>CondBossStuck</m_funcName>
+          <m_description>Checks if the boss is stuck</m_description>
+          <m_children />
+        </NodeData>
+      </m_children>
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+      <m_name>Attacks</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description />
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+          <m_name>Portal Punch</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Punches the ground which spawn portals that punch through around the map</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>Time Since Last Attack</m_name>
+              <m_funcName>CondTimeSinceGlobalAttack</m_funcName>
+              <m_description>Checks when the last attack was used</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>New Node</m_name>
+              <m_funcName>ActPlayPortalPunchAnim</m_funcName>
+              <m_description>Plays the portal punch animation</m_description>
+              <m_children />
+            </NodeData>
+          </m_children>
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Track Player</m_name>
+          <m_funcName>ActTrackPlayer</m_funcName>
+          <m_description>Look at and face the player.</m_description>
+          <m_children />
+        </NodeData>
+      </m_children>
+    </NodeData>
+  </m_children>
+</NodeData>

@@ -6,61 +6,54 @@
   <m_description />
   <m_children>
     <NodeData>
+      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+      <m_name>Boss Stuck</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description />
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_CONDITION</m_eType>
+          <m_name>Boss Stuck</m_name>
+          <m_funcName>CondBossStuck</m_funcName>
+          <m_description>Checks if the boss is stuck</m_description>
+          <m_children />
+        </NodeData>
+      </m_children>
+    </NodeData>
+    <NodeData>
       <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
-      <m_name>ProcessAttacks</m_name>
+      <m_name>Attacks</m_name>
       <m_funcName>NO_FUNCTION</m_funcName>
       <m_description />
       <m_children>
         <NodeData>
           <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-          <m_name>SlamProcess</m_name>
+          <m_name>Portal Punch</m_name>
           <m_funcName>NO_FUNCTION</m_funcName>
-          <m_description>Process of querying if it is a suitable time to slam the player, and executing the animation.</m_description>
+          <m_description>Punches the ground which spawn portals that punch through around the map</m_description>
           <m_children>
             <NodeData>
               <m_eType>NODE_CONDITION</m_eType>
-              <m_name>PlayerGrounded</m_name>
-              <m_funcName>CondPlayerGrounded</m_funcName>
-              <m_description>Checks if the player is grounded.</m_description>
-              <m_children />
-            </NodeData>
-            <NodeData>
-              <m_eType>NODE_CONDITION</m_eType>
-              <m_name>WithinRange</m_name>
-              <m_funcName>CondWithinSlamDistance</m_funcName>
-              <m_description>Tests if the player is within slamming range.</m_description>
+              <m_name>Time Since Last Attack</m_name>
+              <m_funcName>CondTimeSinceGlobalAttack</m_funcName>
+              <m_description>Checks when the last attack was used</m_description>
               <m_children />
             </NodeData>
             <NodeData>
               <m_eType>NODE_ACTION</m_eType>
-              <m_name>Slam</m_name>
-              <m_funcName>ActPlaySlamAnim</m_funcName>
-              <m_description>Slam animation.</m_description>
+              <m_name>New Node</m_name>
+              <m_funcName>ActPlayPortalPunchAnim</m_funcName>
+              <m_description>Plays the portal punch animation</m_description>
               <m_children />
             </NodeData>
           </m_children>
         </NodeData>
         <NodeData>
-          <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-          <m_name>MeteorProcess</m_name>
-          <m_funcName>NO_FUNCTION</m_funcName>
-          <m_description>Process of querying if it is a suitable time to summon a meteor on the player, and executing the animation.</m_description>
-          <m_children>
-            <NodeData>
-              <m_eType>NODE_CONDITION</m_eType>
-              <m_name>PlayerGrounded</m_name>
-              <m_funcName>CondPlayerGrounded</m_funcName>
-              <m_description>Checks if the player is grounded.</m_description>
-              <m_children />
-            </NodeData>
-            <NodeData>
-              <m_eType>NODE_ACTION</m_eType>
-              <m_name>Meteor</m_name>
-              <m_funcName>ActPlayMeteorAnim</m_funcName>
-              <m_description>Meteor animation.</m_description>
-              <m_children />
-            </NodeData>
-          </m_children>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Track Player</m_name>
+          <m_funcName>ActTrackPlayer</m_funcName>
+          <m_description>Look at and face the player.</m_description>
+          <m_children />
         </NodeData>
       </m_children>
     </NodeData>

@@ -1,11 +1,14 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
+﻿// Compile CSMain as a compute kernel.
 #pragma kernel CSMain
 
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
-//RWTexture2D<float4> Result;
+#define WAVE_COUNT 8
+#define PI 3.14159265359
 
-uint pointCount;
+uint inPointCount;
+uint inWobblePointCount;
+
+float inFlyProgress;
+float inRippleMagnitude;
 
 RWStructuredBuffer<float3> bezierPoints;
 RWStructuredBuffer<float3> bezierIntPoints;
@@ -19,26 +22,24 @@ float3 Lerp(float3 a, float3 b, float t)
 }
 
 // Evaluate provided bezier curve.
-float3 EvaluateCurve(RWStructuredBuffer<float3> points, uint threadIdx, uint pointCount, float progress) 
+float3 EvaluateCurve(RWStructuredBuffer<float3> points, uint threadIdx, uint startIndex, uint pointCount, float progress) 
 {
 	// Clamp progress between 0 and 1.
 	if (progress > 1.0f)
 		progress = 1.0f;
 	else if (progress < 0.0f)
 		progress = 0.0f;
-	
-	float3 intPoints[4];
-	
+
 	uint intPointIndex = threadIdx * pointCount;
 
 	// Interpolate all line segments...
-	bezierIntPoints[intPointIndex] = Lerp(points[0], points[1], progress);
+	bezierIntPoints[intPointIndex] = Lerp(points[startIndex], points[startIndex + 1], progress);
 	
 	for(uint i = 1; i < pointCount; ++i)
 	{
 		uint trueIndex = intPointIndex + i;
 
-		bezierIntPoints[trueIndex] = Lerp(bezierIntPoints[trueIndex - 1], Lerp(points[i - 1], points[i], progress), progress);
+		bezierIntPoints[trueIndex] = Lerp(bezierIntPoints[trueIndex - 1], Lerp(points[(startIndex + i) - 1], points[startIndex + i], progress), progress);
 	}
 
 	return bezierIntPoints[intPointIndex + (pointCount - 1)];
@@ -52,9 +53,35 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	uint outPointStride = 0;
 	outPoints.GetDimensions(outPointCount, outPointStride);
 
+	outPointCount /= 2;
+
 	// Get point's point along the line.
-	float progress = (float)id.x / outPointCount;
+	float progress = ((float)id.x / outPointCount) * inFlyProgress;
+
+	// Rope wave
+	float waveInput = pow((1.0f - progress), 2) * WAVE_COUNT * PI;
+	float fCurveMag = sin(waveInput);
+	float fCurveMagY = -cos(waveInput);
+
+	// Directions
+	float3 ropeDir = normalize(bezierPoints[0] - bezierPoints[inPointCount - 1]);
+	float3 rippleDir = cross(ropeDir, float3(0.0f, 1.0f, 0.0f));
+
+	float3 rippleVec = float3(0.0f, 0.0f, 0.0f);
+
+	if (id.x > 0 && id.x < outPointCount - 1) 
+	{
+		outPoints[outPointCount + id.x] = Lerp(outPoints[outPointCount + id.x], EvaluateCurve(bezierPoints, id.x, inPointCount, inWobblePointCount, progress), 0.1f);
+
+		float power = pow((1.0f - progress), 5);
+
+		rippleVec = (rippleDir * power  * fCurveMag) + (float3(0.0f, 1.0f, 0.0f) * power * fCurveMagY); // Ripple vector
+
+		// Multipliers
+		rippleVec *= max((inRippleMagnitude - (pow(inFlyProgress, 5) * inRippleMagnitude)), 0.8f);
+		rippleVec *= inRippleMagnitude;
+	}
 
 	// Evaluate curve for output point.
-	outPoints[id.x] = EvaluateCurve(bezierPoints, id.x, pointCount, progress);
+	outPoints[id.x] = EvaluateCurve(bezierPoints, id.x, 0, inPointCount, progress) + outPoints[outPointCount + id.x] + rippleVec;
 }

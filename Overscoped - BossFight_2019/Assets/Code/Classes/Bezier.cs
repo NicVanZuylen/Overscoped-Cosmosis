@@ -14,12 +14,10 @@ public struct Bezier
     Param:
         int nCornerCount: The amount of corner points within the curve.
     */
-    public Bezier(int nCornerCount)
+    public Bezier(int nPointCount)
     {
-        //m_v3Start = Vector3.zero;
-        //m_v3End = Vector3.zero;
-        m_v3Points = new Vector3[nCornerCount + 2];
-        m_v3InterpolatedPoints = new Vector3[nCornerCount + 2];
+        m_v3Points = new Vector3[nPointCount];
+        m_v3InterpolatedPoints = new Vector3[nPointCount];
     }
 
     /*

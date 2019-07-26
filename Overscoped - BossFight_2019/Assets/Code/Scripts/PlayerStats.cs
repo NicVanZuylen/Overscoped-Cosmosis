@@ -45,16 +45,16 @@ public class PlayerStats : MonoBehaviour
     [Space(10)]
 
     [SerializeField]
-    private RectTransform m_healthFillRect;
+    private RectTransform m_healthFillRect = null;
 
     [SerializeField]
-    private RectTransform m_manaFillRect;
+    private RectTransform m_manaFillRect = null;
 
     [SerializeField]
-    private Material m_manaMat;
+    private Material m_manaMat = null;
 
     [SerializeField]
-    private Material m_healthMat;
+    private Material m_healthMat = null;
 
     // Private:
 
@@ -91,10 +91,7 @@ public class PlayerStats : MonoBehaviour
         }
         else
         {
-            if (m_controller.IsGrounded())
-                m_fCurrentRegenDelay -= Time.deltaTime;
-            else
-                m_fCurrentRegenDelay = m_fManaRegenDelay;
+            m_fCurrentRegenDelay -= Time.deltaTime;
 
             if (m_fCurrentRegenDelay <= 0.0f)
             {

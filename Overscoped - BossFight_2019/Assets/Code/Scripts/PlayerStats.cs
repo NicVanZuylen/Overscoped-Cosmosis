@@ -20,6 +20,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fMaxMana = 100.0f;
 
+    [Tooltip("Minimum mana to cast the grapple.")]
+    [SerializeField]
+    private float m_fMinManaCost = 15.0f;
+
     [Tooltip("Rate of player's mana loss when using the grapple.")]
     [SerializeField]
     private float m_fManaLossRate = 5.0f;
@@ -80,21 +84,20 @@ public class PlayerStats : MonoBehaviour
     {
         if(m_hookScript.IsActive())
         {
+            // Reset mana regen delay.
             m_fCurrentRegenDelay = m_fManaRegenDelay;
 
+            // Lose mana whilst the hook is active.
             m_fMana -= m_fManaLossRate * Time.deltaTime;
-
-            if(m_fMana <= 0.0f)
-            {
-                // Deactivate hook.
-            }
         }
         else
         {
+            // Count down regen delay.
             m_fCurrentRegenDelay -= Time.deltaTime;
 
             if (m_fCurrentRegenDelay <= 0.0f)
             {
+                // Regenerate mana.
                 switch(m_manaRegenMode)
                 {
                     case ERegenMode.REGEN_LINEAR:
@@ -119,8 +122,47 @@ public class PlayerStats : MonoBehaviour
         m_manaFillRect.sizeDelta = new Vector3((m_fMana / m_fMaxMana) * 300.0f, m_manaFillRect.sizeDelta.y);
     }
 
+    /*
+    Description: Whether or not the player has enough mana to cast the grapple. 
+    Return Type: bool
+    */
     public bool EnoughMana()
     {
-        return m_fMana > 0.0f;
+        return m_fMana > m_fMinManaCost;
+    }
+
+    /*
+    Description: Restore the player's health to full, and reverse any death effects.
+    */
+    public void Resurrect()
+    {
+        m_fHealth = m_fMaxHealth;
+
+        // Reverse death effects...
+    }
+
+    /*
+    Description: Restore the player's health to full. 
+    */
+    public void RestoreHealth()
+    {
+        m_fHealth = m_fMaxHealth;
+    }
+
+    /*
+    Description: Deal damage to the player's health, and play any related effects.
+    Param:
+        float fDamage: The amount of damage to deal to the player's health.
+    */
+    public void DealDamage(float fDamage)
+    {
+        m_fHealth -= fDamage;
+
+        if(m_fHealth <= 0.0f)
+        {
+            m_fHealth = 0.0f;
+
+            // Kill player...
+        }
     }
 }

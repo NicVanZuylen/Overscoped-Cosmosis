@@ -9,6 +9,7 @@ Shader "Shaders_Burt/Line"
 		_Offset("Offset", Vector) = (-3,0,0,0)
 		[HDR]_ColorLow("Color Low", Color) = (1024,1024,1024,0)
 		[HDR]_ColorHigh("Color High", Color) = (1024,895.498,0,0)
+		_Opacity("Opacity", Range( 0 , 1)) = 1
     }
 
     SubShader
@@ -68,7 +69,6 @@ Shader "Shaders_Burt/Line"
 					float3 positionOS : POSITION;
 					float4 normalOS : NORMAL;
 					float4 ase_texcoord : TEXCOORD0;
-					float4 ase_color : COLOR;
 					#if UNITY_ANY_INSTANCING_ENABLED
 					uint instanceID : INSTANCEID_SEMANTIC;
 					#endif 
@@ -78,7 +78,6 @@ Shader "Shaders_Burt/Line"
 				{
 					float4 positionCS : SV_Position;
 					float4 ase_texcoord : TEXCOORD0;
-					float4 ase_color : COLOR;
 					#if UNITY_ANY_INSTANCING_ENABLED
 					uint instanceID : INSTANCEID_SEMANTIC; 
 					#endif
@@ -87,6 +86,7 @@ Shader "Shaders_Burt/Line"
 				sampler2D _Alpha;
 				float2 _Tiling;
 				float2 _Offset;
+				float _Opacity;
 				
 				                
                 struct SurfaceDescription
@@ -121,7 +121,6 @@ Shader "Shaders_Burt/Line"
 					UNITY_TRANSFER_INSTANCE_ID(inputMesh, outputPackedVaryingsMeshToPS);
 
 					outputPackedVaryingsMeshToPS.ase_texcoord.xy = inputMesh.ase_texcoord.xy;
-					outputPackedVaryingsMeshToPS.ase_color = inputMesh.ase_color;
 					
 					//setting value to unused interpolator channels and avoid initialization warnings
 					outputPackedVaryingsMeshToPS.ase_texcoord.zw = 0;
@@ -170,7 +169,7 @@ Shader "Shaders_Burt/Line"
 					float2 uv06 = packedInput.ase_texcoord.xy * _Tiling + ( _Time.y * _Offset );
 					float4 tex2DNode4 = tex2D( _Alpha, uv06 );
 					
-					surfaceDescription.Alpha = ( tex2DNode4 * packedInput.ase_color.a ).r;
+					surfaceDescription.Alpha = ( tex2DNode4 * _Opacity ).r;
 					surfaceDescription.AlphaClipThreshold =  0;
 
 					GetSurfaceAndBuiltinData(surfaceDescription, input, V, posInput, surfaceData, builtinData);
@@ -239,7 +238,6 @@ Shader "Shaders_Burt/Line"
 					float3 positionOS : POSITION;
 					float4 normalOS : NORMAL;
 					float4 ase_texcoord : TEXCOORD0;
-					float4 ase_color : COLOR;
 					#if UNITY_ANY_INSTANCING_ENABLED
 					uint instanceID : INSTANCEID_SEMANTIC;
 					#endif
@@ -249,7 +247,6 @@ Shader "Shaders_Burt/Line"
 				{
 					float4 positionCS : SV_Position;
 					float4 ase_texcoord : TEXCOORD0;
-					float4 ase_color : COLOR;
 					#if UNITY_ANY_INSTANCING_ENABLED
 					uint instanceID : INSTANCEID_SEMANTIC; 
 					#endif 
@@ -260,6 +257,7 @@ Shader "Shaders_Burt/Line"
 				sampler2D _Alpha;
 				float2 _Tiling;
 				float2 _Offset;
+				float _Opacity;
 				
 				                
 		            
@@ -297,7 +295,6 @@ Shader "Shaders_Burt/Line"
 					UNITY_TRANSFER_INSTANCE_ID(inputMesh, outputPackedVaryingsMeshToPS);
 
 					outputPackedVaryingsMeshToPS.ase_texcoord.xy = inputMesh.ase_texcoord.xy;
-					outputPackedVaryingsMeshToPS.ase_color = inputMesh.ase_color;
 					
 					//setting value to unused interpolator channels and avoid initialization warnings
 					outputPackedVaryingsMeshToPS.ase_texcoord.zw = 0;
@@ -335,7 +332,7 @@ Shader "Shaders_Burt/Line"
 					float4 lerpResult23 = lerp( _ColorLow , _ColorHigh , tex2DNode4);
 					
 					surfaceDescription.Color =  lerpResult23.rgb;
-					surfaceDescription.Alpha = ( tex2DNode4 * packedInput.ase_color.a ).r;
+					surfaceDescription.Alpha = ( tex2DNode4 * _Opacity ).r;
 					surfaceDescription.AlphaClipThreshold =  0;
 
 					GetSurfaceAndBuiltinData(surfaceDescription, input, V, posInput, surfaceData, builtinData);
@@ -396,7 +393,6 @@ Shader "Shaders_Burt/Line"
 					float3 positionOS : POSITION;
 					float3 normalOS : NORMAL;
 					float4 ase_texcoord : TEXCOORD0;
-					float4 ase_color : COLOR;
 					#if UNITY_ANY_INSTANCING_ENABLED
 					uint instanceID : INSTANCEID_SEMANTIC;
 					#endif
@@ -406,7 +402,6 @@ Shader "Shaders_Burt/Line"
 				{
 					float4 positionCS : SV_Position;
 					float4 ase_texcoord : TEXCOORD0;
-					float4 ase_color : COLOR;
 					#if UNITY_ANY_INSTANCING_ENABLED
 					uint instanceID : INSTANCEID_SEMANTIC;
 					#endif
@@ -415,6 +410,7 @@ Shader "Shaders_Burt/Line"
 				sampler2D _Alpha;
 				float2 _Tiling;
 				float2 _Offset;
+				float _Opacity;
 				
 				                
 			    
@@ -481,7 +477,6 @@ Shader "Shaders_Burt/Line"
 					UNITY_TRANSFER_INSTANCE_ID(inputMesh, outputPackedVaryingsMeshToPS);
 
 					outputPackedVaryingsMeshToPS.ase_texcoord.xy = inputMesh.ase_texcoord.xy;
-					outputPackedVaryingsMeshToPS.ase_color = inputMesh.ase_color;
 					
 					//setting value to unused interpolator channels and avoid initialization warnings
 					outputPackedVaryingsMeshToPS.ase_texcoord.zw = 0;
@@ -533,7 +528,7 @@ Shader "Shaders_Burt/Line"
 						float2 uv06 = packedInput.ase_texcoord.xy * _Tiling + ( _Time.y * _Offset );
 						float4 tex2DNode4 = tex2D( _Alpha, uv06 );
 						
-						surfaceDescription.Alpha = ( tex2DNode4 * packedInput.ase_color.a ).r;
+						surfaceDescription.Alpha = ( tex2DNode4 * _Opacity ).r;
 						surfaceDescription.AlphaClipThreshold = 0;
 
 						GetSurfaceAndBuiltinData(surfaceDescription,input, V, posInput, surfaceData, builtinData);
@@ -620,7 +615,6 @@ Shader "Shaders_Burt/Line"
 				{
 					float4 positionCS : SV_Position;
 					float4 ase_texcoord : TEXCOORD0;
-					float4 ase_color : COLOR;
 					#if UNITY_ANY_INSTANCING_ENABLED
 					uint instanceID : INSTANCEID_SEMANTIC;
 					#endif
@@ -631,6 +625,7 @@ Shader "Shaders_Burt/Line"
 				sampler2D _Alpha;
 				float2 _Tiling;
 				float2 _Offset;
+				float _Opacity;
 				
 				                
                 struct SurfaceDescription
@@ -676,7 +671,6 @@ Shader "Shaders_Burt/Line"
 					UNITY_TRANSFER_INSTANCE_ID(inputMesh, outputPackedVaryingsMeshToPS);
 
 					outputPackedVaryingsMeshToPS.ase_texcoord.xy = inputMesh.uv0.xy;
-					outputPackedVaryingsMeshToPS.ase_color = inputMesh.color;
 					
 					//setting value to unused interpolator channels and avoid initialization warnings
 					outputPackedVaryingsMeshToPS.ase_texcoord.zw = 0;
@@ -724,7 +718,7 @@ Shader "Shaders_Burt/Line"
 					float4 lerpResult23 = lerp( _ColorLow , _ColorHigh , tex2DNode4);
 					
 					surfaceDescription.Color =  lerpResult23.rgb;
-					surfaceDescription.Alpha = ( tex2DNode4 * packedInput.ase_color.a ).r;
+					surfaceDescription.Alpha = ( tex2DNode4 * _Opacity ).r;
 					surfaceDescription.AlphaClipThreshold =  0;
 
 					GetSurfaceAndBuiltinData(surfaceDescription,input, V, posInput, surfaceData, builtinData);
@@ -754,19 +748,19 @@ Shader "Shaders_Burt/Line"
 }
 /*ASEBEGIN
 Version=16800
-1680;1;1666;981;1491.923;435.7041;1;True;False
+0;73;1191;638;1359.686;406.9124;1.041271;True;True
 Node;AmplifyShaderEditor.SimpleTimeNode;11;-1414.447,210.0386;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
 Node;AmplifyShaderEditor.Vector2Node;8;-1380.447,304.0386;Float;False;Property;_Offset;Offset;2;0;Create;True;0;0;False;0;-3,0;0,0;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;12;-1219.447,259.0386;Float;False;2;2;0;FLOAT;0;False;1;FLOAT2;0,0;False;1;FLOAT2;0
 Node;AmplifyShaderEditor.Vector2Node;7;-1224.547,103.4159;Float;False;Property;_Tiling;Tiling;1;0;Create;True;0;0;False;0;1,1;0,0;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
 Node;AmplifyShaderEditor.TextureCoordinatesNode;6;-1050.347,162.3159;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.TexturePropertyNode;5;-1079,-55;Float;True;Property;_Alpha;Alpha;0;0;Create;True;0;0;False;0;61c0b9c0523734e0e91bc6043c72a490;None;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
+Node;AmplifyShaderEditor.TexturePropertyNode;5;-1079,-55;Float;True;Property;_Alpha;Alpha;0;0;Create;True;0;0;False;0;61c0b9c0523734e0e91bc6043c72a490;61c0b9c0523734e0e91bc6043c72a490;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
 Node;AmplifyShaderEditor.SamplerNode;4;-781,22;Float;True;Property;_TextureSample0;Texture Sample 0;0;0;Create;True;0;0;False;0;None;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.VertexColorNode;13;-665.3708,210.4915;Float;False;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.ColorNode;25;-593.9243,-287.9417;Float;False;Property;_ColorHigh;Color High;4;1;[HDR];Create;True;0;0;False;0;1024,895.498,0,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.ColorNode;24;-595.9243,-452.9417;Float;False;Property;_ColorLow;Color Low;3;1;[HDR];Create;True;0;0;False;0;1024,1024,1024,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;14;-466.2041,148.0395;Float;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;1;COLOR;0
+Node;AmplifyShaderEditor.RangedFloatNode;26;-715.1393,230.3452;Float;False;Property;_Opacity;Opacity;5;0;Create;True;0;0;False;0;1;0;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.LerpOp;23;-286.9243,-222.9417;Float;False;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;14;-375.6136,122.0078;Float;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;1;COLOR;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;4;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;Depth prepass;0;0;Depth prepass;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=DepthForwardOnly;False;0;Hidden/InternalErrorShader;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;4;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;ShadowCaster;0;2;ShadowCaster;1;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;False;False;False;False;True;1;LightMode=ShadowCaster;False;0;Hidden/InternalErrorShader;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;3;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;4;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;META;0;3;META;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;True;2;False;-1;False;False;False;False;False;True;1;LightMode=Meta;False;0;Hidden/InternalErrorShader;0;0;Standard;0;5;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
@@ -777,12 +771,12 @@ WireConnection;6;0;7;0
 WireConnection;6;1;12;0
 WireConnection;4;0;5;0
 WireConnection;4;1;6;0
-WireConnection;14;0;4;0
-WireConnection;14;1;13;4
 WireConnection;23;0;24;0
 WireConnection;23;1;25;0
 WireConnection;23;2;4;0
+WireConnection;14;0;4;0
+WireConnection;14;1;26;0
 WireConnection;1;0;23;0
 WireConnection;1;1;14;0
 ASEEND*/
-//CHKSM=4978F8FE8DBA365DF6709AB0CB59F047C4908724
+//CHKSM=9F19FD61D5E4107AE364F2D7F102F3201558EC37

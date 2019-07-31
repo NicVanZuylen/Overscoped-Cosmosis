@@ -407,7 +407,7 @@ public class PlayerController : MonoBehaviour
                     v3NetForce -= m_v3Velocity * m_fMomentumDrag * Time.deltaTime;
                 }
 
-                    m_animController.SetBool("isRunning", false);
+                m_animController.SetBool("isRunning", false);
             }
         }
         else
@@ -427,11 +427,15 @@ public class PlayerController : MonoBehaviour
 
             float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, v3MoveDir), 0.0f, m_fMaxAirbornMoveSpeed);
             float fMoveAmount = m_fMaxAirbornMoveSpeed - fCompInVelocity;
+
             
             Vector3 v3Acceleration = v3MoveDir * fMoveAmount * m_fAirAcceleration;
             v3Acceleration.y = 0.0f;
 
-            v3NetForce += v3Acceleration * Time.deltaTime;
+            Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag;
+            v3AirDrag.y = 0.0f;
+            
+            v3NetForce += (v3Acceleration + v3AirDrag) * Time.deltaTime;
         }
 
         // Gravity.

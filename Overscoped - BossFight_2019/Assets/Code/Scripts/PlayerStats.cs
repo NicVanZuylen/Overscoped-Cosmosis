@@ -132,6 +132,15 @@ public class PlayerStats : MonoBehaviour
     }
 
     /*
+    Description: The current mana value for the player.
+    Return Type: float
+    */
+    public float GetMana()
+    {
+        return m_fMana;
+    }
+
+    /*
     Description: Restore the player's health to full, and reverse any death effects.
     */
     public void Resurrect()

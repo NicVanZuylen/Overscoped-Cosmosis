@@ -78,6 +78,8 @@ public class GrappleHook : MonoBehaviour
 
     public GameObject m_handEffect;
     public GameObject m_impactEffect;
+    public Material m_grappleLineMat;
+    public Material m_pullLineMat;
 
     public ComputeShader m_lineCompute;
 
@@ -148,7 +150,7 @@ public class GrappleHook : MonoBehaviour
         m_cameraTransform = cam.transform;
         m_graphookScript = m_grappleHook.GetComponent<Hook>();
 
-        // Rope color and curve.
+        // Line color and curve.
         m_colorKeys = new GradientColorKey[m_grappleLine.colorGradient.colorKeys.Length];
         m_ropeCurve = new Bezier(nPointCount);
 
@@ -161,6 +163,9 @@ public class GrappleHook : MonoBehaviour
 
         m_v3ShakeVectors[0] = Vector3.zero;
         m_v3ShakeVectors[m_v3ShakeVectors.Length - 1] = Vector3.zero;
+
+        // Line material
+        m_grappleLine.materials[0] = m_grappleLineMat;
 
         m_grappleHook.SetActive(false);
 
@@ -198,7 +203,10 @@ public class GrappleHook : MonoBehaviour
             // Fire hook in grapple mode.
             m_grappleHook.SetActive(true);
             m_graphookScript.SetPullType(Hook.EHookPullMode.PULL_FLY_TOWARDS);
-            
+
+            // Material
+            m_grappleLine.material = m_grappleLineMat;
+
             m_grappleHook.transform.position = m_grappleNode.position;
             m_grappleHook.transform.rotation = m_grappleNode.parent.rotation;
 
@@ -225,6 +233,9 @@ public class GrappleHook : MonoBehaviour
             // Fire hook in pull mode.
             m_grappleHook.SetActive(true);
             m_graphookScript.SetPullType(Hook.EHookPullMode.PULL_PULL_TOWARDS_PLAYER);
+
+            // Material
+            m_grappleLine.material = m_pullLineMat;
 
             m_grappleHook.transform.position = m_grappleNode.position;
             m_grappleHook.transform.rotation = m_grappleNode.parent.rotation;
@@ -284,7 +295,7 @@ public class GrappleHook : MonoBehaviour
                 m_controller.OverrideMovement(GrappleFly);
 
                 // Exit when releasing the left mouse button.
-                if (Input.GetMouseButtonUp(0) || !bPlayerHasEnoughMana)
+                if (Input.GetMouseButtonUp(0) || m_stats.GetMana() <= 0.0f)
                 {
                     m_controller.FreeOverride();
 
@@ -309,7 +320,7 @@ public class GrappleHook : MonoBehaviour
                 m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
 
                 // Exit when releasing the right mouse button.
-                if (Input.GetMouseButtonUp(1) || !bPlayerHasEnoughMana)
+                if (Input.GetMouseButtonUp(1) || m_stats.GetMana() <= 0.0f)
                 {
                     m_controller.FreeOverride();
 
@@ -353,6 +364,9 @@ public class GrappleHook : MonoBehaviour
 
             m_fCurrentLineThickness = Mathf.Clamp(m_fCurrentLineThickness, 0.0f, m_fPopThickness);
 
+            // Set line shader opacity.
+            m_grappleLine.material.SetFloat("_Opacity", 1.0f - (m_fCurrentLineThickness / m_fPopThickness));
+
             // Grapple is not active, play the poof effect.
             m_grappleLine.startWidth = m_fCurrentLineThickness;
             m_grappleLine.endWidth = m_fCurrentLineThickness;
@@ -364,6 +378,9 @@ public class GrappleHook : MonoBehaviour
         m_fCurrentLineThickness = m_fLineThickness;
         m_grappleLine.startWidth = m_fCurrentLineThickness;
         m_grappleLine.endWidth = m_fCurrentLineThickness;
+
+        // Reset line shader opacity.
+        m_grappleLine.material.SetFloat("_Opacity", 1.0f);
 
         Vector3 v3DiffNoY = (m_graphookScript.Destination() + m_grappleNode.position) * 0.5f;
         v3DiffNoY -= m_grappleNode.position;
@@ -562,6 +579,9 @@ public class GrappleHook : MonoBehaviour
         return v3Velocity + v3NetForce;
     }
 
+    /*
+    Description: Tug/pull an object towards the player when a tension threshold is exceeded.
+    */
     void PullObject()
     {
         Vector3 v3ObjDiff = transform.position - m_grappleHook.transform.position;
@@ -592,6 +612,10 @@ public class GrappleHook : MonoBehaviour
         }
     }
 
+    /*
+    Description: Whether or not the grapple is active (hooked or flying).
+    Return Type: bool
+    */
     public bool IsActive()
     {
         return m_bGrappleHookActive;

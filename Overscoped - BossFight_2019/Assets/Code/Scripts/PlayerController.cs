@@ -213,12 +213,48 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
-    Description: Calculate surface-parallel movement vectors.
+    Description: Get the standing surface-relative forward vector of the player.
+    Return Type: Vector3
+    */
+    public Vector3 SurfaceForward()
+    {
+        return m_v3SurfaceForward;
+    }
+
+    /*
+    Description: Get the standing surface-relative right vector of the player.
+    Return Type: Vector3
+    */
+    public Vector3 SurfaceRight()
+    {
+        return m_v3SurfaceRight;
+    }
+
+    /*
+    Description: Add an impulse to the velocity of the controller.
+    Param:
+        Vector3 v3Impulse: The impulse to be applied to velocity.
+    */
+    public void AddImpulse(Vector3 v3Impulse)
+    {
+        m_v3Velocity += v3Impulse;
+    }
+
+    /*
+    Description: Calculate surface-parallel movement vectors, flat if beyond the slope limit.
     Param:
         Vector3 v3Normal: The surface normal used for calculating surface-parallel vectors.
     */
     void CalculateSurfaceTransform(Vector3 v3Normal)
     {
+        Vector3 v3SlopeRight = Vector3.Cross(v3Normal, Vector3.up);
+        Vector3 v3SlopeForward = Vector3.Cross(v3SlopeRight, v3Normal);
+        float fSurfaceAngle = Vector3.Dot(v3SlopeForward, Vector3.up);
+
+        // If the slope is too steep the surface vectors will be flattened.
+        if((Mathf.Abs(fSurfaceAngle) * 90.0f) >= m_controller.slopeLimit)
+            v3Normal = Vector3.up;
+
         m_v3SurfaceUp = v3Normal;
         m_v3SurfaceForward = Vector3.Cross(m_cameraTransform.right, m_v3SurfaceUp);
         m_v3SurfaceRight = Vector3.Cross(m_v3SurfaceUp, m_v3SurfaceForward);
@@ -278,7 +314,7 @@ public class PlayerController : MonoBehaviour
 
             // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
             // So to be sure its updated we update it using the sphere case hit.
-            if (bSphereCastHit)
+            if (m_bOnGround)
             {
                 CalculateSurfaceTransform(hit.normal);
 
@@ -292,7 +328,7 @@ public class PlayerController : MonoBehaviour
         {
             m_bOnGround = false;
         }
-            
+
         // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
         m_bOnGround |= m_controller.isGrounded;
 

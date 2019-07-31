@@ -83,17 +83,17 @@ PrefabInstance:
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -95.2
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -19.6
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -19.4
       objectReference: {fileID: 0}
     - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -114,6 +114,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SlopeLimit
       value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fAirDrag
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fReleaseForce
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -140,6 +150,16 @@ PrefabInstance:
       propertyPath: m_fImpactShakeMult
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_grappleLineMat
+      value: 
+      objectReference: {fileID: 2100000, guid: 2f5ad4b40d8b8f740851f55634751833, type: 2}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_pullLineMat
+      value: 
+      objectReference: {fileID: 2100000, guid: bdbf487508546df44a44eadfef69c303, type: 2}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_lineCompute
@@ -306,8 +326,7 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: a9f20fa563421e640a2bd3073484070d, type: 2}
-    m_RemovedComponents:
-    - {fileID: 3812603302679706674, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
 --- !u!1 &8670336758924537316 stripped
 GameObject:

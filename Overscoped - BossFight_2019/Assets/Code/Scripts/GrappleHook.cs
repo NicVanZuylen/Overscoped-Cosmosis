@@ -33,6 +33,12 @@ public class GrappleHook : MonoBehaviour
     [Tooltip("The distance the grapple hook will travel before cancelling.")]
     public float m_fGrapplebreakDistance = 20.0f;
 
+    [Tooltip("The minimum time grappling before the release boost can be applied.")]
+    public float m_fMinReleaseBoostTime = 0.3f;
+
+    [Tooltip("The magnitude of the forward force applied to the player upon rope release.")]
+    public float m_fReleaseForce = 20.0f;
+
     [Header("Pull Mode")]
 
     [Tooltip("The distance the pull hook must be extended beyond the initial rope length on impact to decouple the target object.")]
@@ -115,6 +121,7 @@ public class GrappleHook : MonoBehaviour
     private float fRippleMult;
     private float m_fImpactShakeTime;
     private float m_fCurrentLineThickness;
+    private float m_fGrappleTime;
 
     // Pull function
     private PullObject m_pullObj;
@@ -173,6 +180,7 @@ public class GrappleHook : MonoBehaviour
         m_v3GrapplePoint = Vector3.zero;
         m_fLineThickness = m_grappleLine.startWidth;
         m_fShakeTime = 0.0f;
+        m_fGrappleTime = 0.0f;
         m_bGrappleHookActive = false;
     }
 
@@ -203,6 +211,9 @@ public class GrappleHook : MonoBehaviour
             // Fire hook in grapple mode.
             m_grappleHook.SetActive(true);
             m_graphookScript.SetPullType(Hook.EHookPullMode.PULL_FLY_TOWARDS);
+
+            // Fly time.
+            m_fGrappleTime = 0.0f;
 
             // Material
             m_grappleLine.material = m_grappleLineMat;
@@ -283,6 +294,9 @@ public class GrappleHook : MonoBehaviour
                 else
                     m_cameraEffects.ApplyShakeOverTime(0.1f, 0.1f);
 
+                // Increment grapple time.
+                m_fGrappleTime += Time.deltaTime;
+
                 // Add small FOV offset.
                 m_cameraEffects.SetFOVOffset(5.0f);
 
@@ -301,6 +315,10 @@ public class GrappleHook : MonoBehaviour
 
                     m_bGrappleHookActive = false;
                     m_graphookScript.UnLodge();
+
+                    // Release impulse.
+                    if(m_fGrappleTime >= m_fMinReleaseBoostTime)
+                        m_controller.AddImpulse(m_controller.SurfaceForward() * m_fReleaseForce);
                 }
             }
             else if(m_graphookScript.IsLodged() && m_graphookScript.GetPullType() == Hook.EHookPullMode.PULL_PULL_TOWARDS_PLAYER) // Hook is lodged in pull mode.

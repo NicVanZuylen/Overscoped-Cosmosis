@@ -13,17 +13,17 @@ public class PortalPunch : MonoBehaviour
     private bool m_bPunch;
 
     [SerializeField]
-    private float m_fPortalSpawnTime;
+    private float m_fPortalSpawnTime = 1.0f;
     [SerializeField]
-    private float m_fPunchSpeedUp;
+    private float m_fPunchSpeedUp = 1.0f;
     [SerializeField]
-    private float m_fPunchSpeedDown;
+    private float m_fPunchSpeedDown = 1.0f;
     [SerializeField]
-    private float m_fPunchSitTime;
+    private float m_fPunchSitTime = 1.0f;
     [SerializeField]
-    private float m_fPortalEndTime;
+    private float m_fPortalEndTime = 1.0f;
     [SerializeField]
-    private float m_fPunchHeight;
+    private float m_fPunchHeight = 5.0f;
 
     private void OnEnable()
     {

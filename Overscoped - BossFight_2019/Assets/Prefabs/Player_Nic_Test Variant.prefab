@@ -113,7 +113,7 @@ PrefabInstance:
     - target: {fileID: 9089708072951148978, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_SlopeLimit
-      value: 45
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -326,7 +326,9 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: a9f20fa563421e640a2bd3073484070d, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3812603302679706674, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
+    - {fileID: 3812603302679706677, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
 --- !u!1 &8670336758924537316 stripped
 GameObject:

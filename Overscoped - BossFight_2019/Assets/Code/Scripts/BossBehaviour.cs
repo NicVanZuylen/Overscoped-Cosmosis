@@ -13,14 +13,15 @@ public class BossBehaviour : MonoBehaviour
 
     [Tooltip("Meteor object reference.")]
     [SerializeField]
-    private GameObject m_meteor;
+    private GameObject m_meteor = null;
 
     [Tooltip("Armour object reference.")]
     [SerializeField]
-    private GameObject m_armour;
+    private GameObject m_armour = null;
 
     [SerializeField]
-    private List<GameObject> m_portalSpawns;
+    private GameObject m_portal = null;
+    //private List<GameObject> m_portalSpawns;
 
     [Tooltip("Distance in which the boss will attempt a slam attack.")]
     [SerializeField]
@@ -46,17 +47,25 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private float m_fTimeBetweenAttacks;
 
+    [Tooltip("The length of the boss arm, used for portal punching.")]
+    private float m_fArmLength = 10.0f;
+
     public Vector3 m_vSize;
 
     private PlayerController m_playerController;
     private Animator m_animator;
     private CompositeNode m_bossTree;
 
+    private Portal m_portalScript;
+
     void Awake()
     {
         m_playerController = m_player.GetComponent<PlayerController>();
         m_animator = GetComponent<Animator>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+
+        m_portalScript = m_portal.GetComponent<Portal>();
+        m_portal.SetActive(false);
 
         string treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
         m_bossTree = BTreeEditor.BTreeEditor.LoadTree(treePath, this);
@@ -145,7 +154,10 @@ public class BossBehaviour : MonoBehaviour
             m_animator.SetInteger("AttackID", 1);
             m_fPortalPunchCDTimer = m_fPortalPunchCD;
             m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
-            m_portalSpawns[Random.Range(0, m_portalSpawns.Count)].SetActive(true);
+
+            if(!m_portalScript.IsActive())
+                SummonPortal();
+
             return ENodeResult.NODE_SUCCESS;
         }
         return ENodeResult.NODE_FAILURE;
@@ -200,7 +212,26 @@ public class BossBehaviour : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = new Color(1, 0, 0, .5f);
+        Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(new Vector3(transform.position.x, transform.position.y + 100, transform.position.z), m_vSize);
+    }
+
+    private void SummonPortal()
+    {
+        Vector3 v3PortalOffset = Vector3.up * m_fArmLength;
+        //float fRemainingMag = 1.0f;
+
+        // Create random unit vector.
+        //v3RandomVec.x = Random.Range(-1.0f, 1.0f);
+        //v3RandomVec.y = Random.Range(0.0f, 1.0f);
+        //v3RandomVec.z = Random.Range(-1.0f, 1.0f);
+
+        //v3RandomVec.Normalize();
+
+        m_portal.SetActive(true);
+        m_portal.transform.position = m_player.transform.position + m_playerController.GetVelocity() + v3PortalOffset;
+
+        Vector3 v3PlayerDir = (m_player.transform.position - m_portal.transform.position).normalized;
+        m_portal.transform.rotation = Quaternion.LookRotation(Vector3.down, Vector3.up);
     }
 }

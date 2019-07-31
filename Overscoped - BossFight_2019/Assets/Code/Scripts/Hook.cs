@@ -40,9 +40,6 @@ public class Hook : MonoBehaviour
 
     void Update()
     {
-        //if (!m_bLodged)
-          //  transform.Translate(transform.forward * m_fFlySpeed * Time.deltaTime, Space.World);
-
         if(!m_bLodged)
         {
             m_fFlyProgress += m_fFlySpeed * Time.deltaTime;

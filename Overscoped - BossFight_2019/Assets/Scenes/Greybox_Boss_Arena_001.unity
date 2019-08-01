@@ -2799,6 +2799,8 @@ MonoBehaviour:
     _prefab: Assets/Meshes/SK_BossDummy_01.fbx
   - _gameObject: {fileID: 535304911}
     _prefab: Assets/Prefabs/Boss.prefab
+  - _gameObject: {fileID: 1641004311}
+    _prefab: Assets/Prefabs/Portal.prefab
   - _gameObject: {fileID: 1740376335}
     _prefab: Assets/Prefabs/GUI/GameCanvas.prefab
 --- !u!4 &354204014
@@ -8211,6 +8213,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5528784100356115722}
   m_PrefabAsset: {fileID: 0}
+--- !u!143 &1489674478 stripped
+CharacterController:
+  m_CorrespondingSourceObject: {fileID: 3647650225079379841, guid: 08267407a60da1046ac8f6f1de23b161,
+    type: 3}
+  m_PrefabInstance: {fileID: 5528784100356115722}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &1503004599
 Mesh:
   m_ObjectHideFlags: 0
@@ -8769,6 +8777,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 99da4d3b4c81dd745a755bf172f07ebd, type: 3}
+--- !u!1 &1641004311 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1052553495887856370, guid: 15224bf2b194e9c47af1aa65c1964291,
+    type: 3}
+  m_PrefabInstance: {fileID: 1052553494603693006}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1643978120
 GameObject:
   m_ObjectHideFlags: 0
@@ -12731,6 +12745,16 @@ PrefabInstance:
       propertyPath: m_player
       value: 
       objectReference: {fileID: 1489674474}
+    - target: {fileID: 1052553496023486851, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_fTimeBetweenAttacks
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1052553495887856270, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_playerCollider
+      value: 
+      objectReference: {fileID: 1489674478}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15224bf2b194e9c47af1aa65c1964291, type: 3}
 --- !u!1001 &5528784100356115722
@@ -12814,6 +12838,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SlopeLimit
       value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 8670336758252196988, guid: 08267407a60da1046ac8f6f1de23b161,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8670336758252196988, guid: 08267407a60da1046ac8f6f1de23b161,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -108.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8670336758252196988, guid: 08267407a60da1046ac8f6f1de23b161,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -15.15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08267407a60da1046ac8f6f1de23b161, type: 3}

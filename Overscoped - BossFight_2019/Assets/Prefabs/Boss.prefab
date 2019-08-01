@@ -229,25 +229,20 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1052553494790951508}
     m_Modifications:
-    - target: {fileID: 712468161514190663, guid: ca323c48f256131459a83772a53cf010,
-        type: 3}
-      propertyPath: m_Name
-      value: Portal
-      objectReference: {fileID: 0}
     - target: {fileID: 712468161514190662, guid: ca323c48f256131459a83772a53cf010,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -47.489998
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 712468161514190662, guid: ca323c48f256131459a83772a53cf010,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.4400005
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 712468161514190662, guid: ca323c48f256131459a83772a53cf010,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 84.47
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 712468161514190662, guid: ca323c48f256131459a83772a53cf010,
         type: 3}
@@ -289,10 +284,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 712468161514190651, guid: ca323c48f256131459a83772a53cf010,
+    - target: {fileID: 712468161514190663, guid: ca323c48f256131459a83772a53cf010,
         type: 3}
-      propertyPath: m_playerCollider
-      value: 
+      propertyPath: m_Name
+      value: Portal
+      objectReference: {fileID: 0}
+    - target: {fileID: 1318029747167642450, guid: ca323c48f256131459a83772a53cf010,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ca323c48f256131459a83772a53cf010, type: 3}

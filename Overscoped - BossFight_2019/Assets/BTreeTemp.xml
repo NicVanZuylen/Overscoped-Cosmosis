@@ -21,39 +21,104 @@
       </m_children>
     </NodeData>
     <NodeData>
-      <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
-      <m_name>Attacks</m_name>
+      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+      <m_name>Attacks Master</m_name>
       <m_funcName>NO_FUNCTION</m_funcName>
       <m_description />
       <m_children>
         <NodeData>
-          <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-          <m_name>Portal Punch</m_name>
+          <m_eType>NODE_CONDITION</m_eType>
+          <m_name>Is Idle</m_name>
+          <m_funcName>CondIsIdleAnimation</m_funcName>
+          <m_description>Attacks can only be performed from the idle animation state.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_CONDITION</m_eType>
+          <m_name>Global Attack Cooldown</m_name>
+          <m_funcName>CondGlobalAttackCD</m_funcName>
+          <m_description>Make sure global attack cooldown is zero.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+          <m_name>Attacks</m_name>
           <m_funcName>NO_FUNCTION</m_funcName>
-          <m_description>Punches the ground which spawn portals that punch through around the map</m_description>
+          <m_description>Attempt first usable attack. Track the player if no attacks can be used.</m_description>
           <m_children>
             <NodeData>
-              <m_eType>NODE_CONDITION</m_eType>
-              <m_name>Time Since Last Attack</m_name>
-              <m_funcName>CondTimeSinceGlobalAttack</m_funcName>
-              <m_description>Checks when the last attack was used</m_description>
-              <m_children />
+              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+              <m_name>Meteor</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Attempt to summon and hurl a meteor towards the player, when they enter a valid meteor location.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Meteor Cooldown</m_name>
+                  <m_funcName>CondMeteorCD</m_funcName>
+                  <m_description>Don't attack if the meteor attack cooldown is still active.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>PortalNotInUse</m_name>
+                  <m_funcName>CondPortalNotActive</m_funcName>
+                  <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Grounded</m_name>
+                  <m_funcName>CondPlayerGrounded</m_funcName>
+                  <m_description>Don't attack if the player is flying.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Meteor Summon Action</m_name>
+                  <m_funcName>ActPlayMeteorAnim</m_funcName>
+                  <m_description>Play meteor summon animation.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+              <m_name>Portal Punch</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Punches the ground which spawn portals that punch through around the map</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>New Node</m_name>
+                  <m_funcName>CondSlamCD</m_funcName>
+                  <m_description>Makes sure the portal punch cooldown is zero.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>PortalNotInUse</m_name>
+                  <m_funcName>CondPortalNotActive</m_funcName>
+                  <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Portal Punch Action</m_name>
+                  <m_funcName>ActPlayPortalPunchAnim</m_funcName>
+                  <m_description>Plays the portal punch animation.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
             </NodeData>
             <NodeData>
               <m_eType>NODE_ACTION</m_eType>
-              <m_name>New Node</m_name>
-              <m_funcName>ActPlayPortalPunchAnim</m_funcName>
-              <m_description>Plays the portal punch animation</m_description>
+              <m_name>Track Player</m_name>
+              <m_funcName>ActTrackPlayer</m_funcName>
+              <m_description>Look at and face the player.</m_description>
               <m_children />
             </NodeData>
           </m_children>
-        </NodeData>
-        <NodeData>
-          <m_eType>NODE_ACTION</m_eType>
-          <m_name>Track Player</m_name>
-          <m_funcName>ActTrackPlayer</m_funcName>
-          <m_description>Look at and face the player.</m_description>
-          <m_children />
         </NodeData>
       </m_children>
     </NodeData>

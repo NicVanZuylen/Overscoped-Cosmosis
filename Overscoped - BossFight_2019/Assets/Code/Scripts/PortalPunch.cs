@@ -5,7 +5,7 @@ using UnityEngine;
 public class PortalPunch : MonoBehaviour
 {
     [SerializeField]
-    private List<GameObject> m_portals;
+    private List<GameObject> m_portals = null;
 
     [SerializeField]
     private GameObject m_player;

@@ -614,6 +614,7 @@ namespace BTreeEditor
         static Node m_baseNode = null;
         static NodeData m_data = null;
         static Stack<BTreeEditAction> m_actions = new Stack<BTreeEditAction>();
+        static string m_loadedPath;
 
         const float m_fDefaultScale = 1000.0f;
 
@@ -702,13 +703,13 @@ namespace BTreeEditor
         {
             // Save to temp file.
             if (m_baseNode != null)
-                Save(Application.dataPath + "/BTreeTemp.xml");
+                Save(Application.dataPath + "/BTreeTemp.xml", true);
         }
 
         public static void RestoreTemp()
         {
             Debug.Log("Behaviour Tree Editor: Restoring Temp Data.");
-            m_baseNode = new Node(Load(Application.dataPath + "/BTreeTemp.xml"));
+            m_baseNode = new Node(Load(Application.dataPath + "/BTreeTemp.xml", true));
         }
 
         // Show window...
@@ -759,6 +760,10 @@ namespace BTreeEditor
                     else if(m_bControlDown && e.keyCode == KeyCode.Z)
                     {
                         Undo();
+                    }
+                    else if (m_bControlDown && e.keyCode == KeyCode.S)
+                    {
+                        Save(m_loadedPath);
                     }
 
                     break;
@@ -918,7 +923,7 @@ namespace BTreeEditor
             }
         }
 
-        private void Save(string path)
+        private void Save(string path, bool bTempLoad = false)
         {
             m_data = new NodeData(m_baseNode);
 
@@ -935,6 +940,13 @@ namespace BTreeEditor
 
                 // Close file.
                 file.Close();
+
+                if (!bTempLoad)
+                {
+                    Debug.Log("Behaviour Tree Editor: Behaviour Tree Saved at Path: " + path);
+
+                    m_loadedPath = path;
+                }
             }
             catch (Exception e)
             {
@@ -942,7 +954,7 @@ namespace BTreeEditor
             }
         }
 
-        private static NodeData Load(string path)
+        private static NodeData Load(string path, bool bTempLoad = false)
         {
             try
             {
@@ -957,6 +969,13 @@ namespace BTreeEditor
 
                 // Close file.
                 file.Close();
+
+                if (!bTempLoad)
+                {
+                    Debug.Log("Behaviour Tree Editor: Behaviour Tree Loaded at Path: " + path);
+
+                    m_loadedPath = path;
+                }
 
                 return data;
             }

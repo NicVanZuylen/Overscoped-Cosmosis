@@ -21,7 +21,6 @@ public class BossBehaviour : MonoBehaviour
 
     [SerializeField]
     private GameObject m_portal = null;
-    //private List<GameObject> m_portalSpawns;
 
     [Tooltip("Distance in which the boss will attempt a slam attack.")]
     [SerializeField]
@@ -41,11 +40,12 @@ public class BossBehaviour : MonoBehaviour
 
     [Tooltip("Amount of time spent stuck.")]
     [SerializeField]
-    private float m_fStuckTime;
+    private float m_fStuckTime = 0.0f;
     
-    private float m_fTimeSinceGlobalAttack;
     [SerializeField]
-    private float m_fTimeBetweenAttacks;
+    private float m_fTimeBetweenAttacks = 5.0f;
+
+    private float m_fTimeSinceGlobalAttack = 0.0f;
 
     [Tooltip("The length of the boss arm, used for portal punching.")]
     private float m_fArmLength = 10.0f;
@@ -73,7 +73,9 @@ public class BossBehaviour : MonoBehaviour
 
     void Update()
     {
-        ResetAnimToIdle();
+        if (CondIsIdleAnimation() == ENodeResult.NODE_FAILURE)
+            m_animator.SetInteger("AttackID", 0);
+
         m_bossTree.Run();
 
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
@@ -93,12 +95,23 @@ public class BossBehaviour : MonoBehaviour
         return ENodeResult.NODE_FAILURE;
     }
 
-    public ENodeResult CondTimeSinceGlobalAttack()
+    public ENodeResult CondGlobalAttackCD()
     {
-        if(m_fTimeSinceGlobalAttack <= 0)
+        if(m_fTimeSinceGlobalAttack <= 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
         }
+
+        return ENodeResult.NODE_FAILURE;
+    }
+
+    public ENodeResult CondNotGlobalAttackCD()
+    {
+        if (m_fTimeSinceGlobalAttack > 0.0f)
+        {
+            return ENodeResult.NODE_SUCCESS;
+        }
+
         return ENodeResult.NODE_FAILURE;
     }
 
@@ -114,7 +127,7 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondSlamCD()
     {
-        if (m_fPortalPunchCDTimer <= 0)
+        if (m_fPortalPunchCDTimer <= 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
         }
@@ -124,10 +137,11 @@ public class BossBehaviour : MonoBehaviour
     // Meteor
     public ENodeResult CondMeteorCD()
     {
-        if (m_fMeteorCDTimer <= 0)
+        if (m_fMeteorCDTimer <= 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
         }
+
         return ENodeResult.NODE_FAILURE;
     }
 
@@ -143,35 +157,47 @@ public class BossBehaviour : MonoBehaviour
         return ENodeResult.NODE_FAILURE;
     }
 
+    public ENodeResult CondPortalNotActive()
+    {
+        if (m_portalScript.IsActive())
+            return ENodeResult.NODE_FAILURE;
+
+        return ENodeResult.NODE_SUCCESS;
+    }
+
+    public ENodeResult CondIsIdleAnimation()
+    {
+        if (m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+            return ENodeResult.NODE_SUCCESS;
+
+        return ENodeResult.NODE_FAILURE;
+    }
 
     // ----------------------------------------------------------------------------------------------
     // Actions
 
     public ENodeResult ActPlayPortalPunchAnim()
     {
-        if (m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) // Only transition from idle.
-        {
-            m_animator.SetInteger("AttackID", 1);
-            m_fPortalPunchCDTimer = m_fPortalPunchCD;
-            m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+        Debug.Log("Portal Punch!");
 
-            if(!m_portalScript.IsActive())
-                SummonPortal();
+        m_animator.SetInteger("AttackID", 1);
+        m_fPortalPunchCDTimer = m_fPortalPunchCD;
+        m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
-            return ENodeResult.NODE_SUCCESS;
-        }
-        return ENodeResult.NODE_FAILURE;
+        return ENodeResult.NODE_SUCCESS;
     }
 
     public ENodeResult ActPlayMeteorAnim()
     {
-        if (m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) // Only transition from idle.
-        {
-            m_animator.SetInteger("AttackID", 2);
-            m_fMeteorCDTimer = m_fMeteorCD;
-            Vector3 pos = new Vector3(transform.position.x, transform.position.y + 100, transform.position.z) + new Vector3(Random.Range(-m_vSize.x / 2, m_vSize.x / 2), Random.Range(-m_vSize.y / 2, m_vSize.y / 2), Random.Range(-m_vSize.z / 2, m_vSize.z / 2));
-            Instantiate(m_meteor, pos, m_meteor.transform.rotation);
-        }
+        Debug.Log("Meteor Attack!");
+
+        m_animator.SetInteger("AttackID", 2);
+        m_fMeteorCDTimer = m_fMeteorCD;
+        m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+
+        Vector3 pos = new Vector3(transform.position.x, transform.position.y + 100, transform.position.z) + new Vector3(Random.Range(-m_vSize.x / 2, m_vSize.x / 2), Random.Range(-m_vSize.y / 2, m_vSize.y / 2), Random.Range(-m_vSize.z / 2, m_vSize.z / 2));
+        Instantiate(m_meteor, pos, m_meteor.transform.rotation);
+
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -201,23 +227,12 @@ public class BossBehaviour : MonoBehaviour
         m_armour.tag = "Untagged";
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void SummonPortal()
     {
-        if (other.tag == "Stuck")
-        {
-            Destroy(other.gameObject);
-            m_bIsStuck = true;
-        }
-    }
+        // Do nothing if the portal is already active.
+        if (m_portalScript.IsActive())
+            return;
 
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(new Vector3(transform.position.x, transform.position.y + 100, transform.position.z), m_vSize);
-    }
-
-    private void SummonPortal()
-    {
         Vector3 v3PortalOffset = Vector3.up * m_fArmLength;
         //float fRemainingMag = 1.0f;
 
@@ -233,5 +248,23 @@ public class BossBehaviour : MonoBehaviour
 
         Vector3 v3PlayerDir = (m_player.transform.position - m_portal.transform.position).normalized;
         m_portal.transform.rotation = Quaternion.LookRotation(Vector3.down, Vector3.up);
+
+        return;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Stuck")
+        {
+            Destroy(other.gameObject);
+            m_bIsStuck = true;
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1, 0, 0, 0.5f);
+        Gizmos.DrawCube(new Vector3(transform.position.x, transform.position.y + 100, transform.position.z), m_vSize);
+    }
+
 }

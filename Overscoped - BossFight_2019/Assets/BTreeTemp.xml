@@ -7,133 +7,134 @@
   <m_children>
     <NodeData>
       <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-      <m_name>Boss Stuck</m_name>
+      <m_name>AttackMelee</m_name>
       <m_funcName>NO_FUNCTION</m_funcName>
-      <m_description />
+      <m_description>Attacks the player if the player is within range and not behind the AI.</m_description>
       <m_children>
         <NodeData>
+          <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+          <m_name>TurnFacePlayer</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Turns the boss to face the player if not facing them</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>New Node</m_name>
+              <m_funcName>CondPlayerNotBehind</m_funcName>
+              <m_description />
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>TurnFacePlayer</m_name>
+              <m_funcName>ActFacePlayer</m_funcName>
+              <m_description />
+              <m_children />
+            </NodeData>
+          </m_children>
+        </NodeData>
+        <NodeData>
           <m_eType>NODE_CONDITION</m_eType>
-          <m_name>Boss Stuck</m_name>
-          <m_funcName>CondBossStuck</m_funcName>
-          <m_description>Checks if the boss is stuck</m_description>
+          <m_name>New Node</m_name>
+          <m_funcName>CondPlayerNotBehind</m_funcName>
+          <m_description />
           <m_children />
         </NodeData>
         <NodeData>
-          <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
-          <m_name>New Node</m_name>
-          <m_funcName>NO_FUNCTION</m_funcName>
-          <m_description />
+          <m_eType>NODE_CONDITION</m_eType>
+          <m_name>Within Range</m_name>
+          <m_funcName>CondWithinMeleeRange</m_funcName>
+          <m_description>Detects if the player is within melee range.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Attack</m_name>
+          <m_funcName>ActMeleeAttack</m_funcName>
+          <m_description>Use melee attack on player.</m_description>
           <m_children />
         </NodeData>
       </m_children>
     </NodeData>
     <NodeData>
       <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-      <m_name>Attacks Master</m_name>
+      <m_name>AttackRanged</m_name>
       <m_funcName>NO_FUNCTION</m_funcName>
-      <m_description />
+      <m_description>Perform a throwing attack if the player is out of melee range.</m_description>
       <m_children>
         <NodeData>
           <m_eType>NODE_CONDITION</m_eType>
-          <m_name>Is Idle</m_name>
-          <m_funcName>CondIsIdleAnimation</m_funcName>
-          <m_description>Attacks can only be performed from the idle animation state.</m_description>
+          <m_name>Out of Melee Range</m_name>
+          <m_funcName>CondOutOfMeleeRange</m_funcName>
+          <m_description>Detects if the player is outside of melee range.</m_description>
           <m_children />
         </NodeData>
         <NodeData>
           <m_eType>NODE_CONDITION</m_eType>
-          <m_name>Global Attack Cooldown</m_name>
-          <m_funcName>CondGlobalAttackCD</m_funcName>
-          <m_description>Make sure global attack cooldown is zero.</m_description>
+          <m_name>In Throw Range</m_name>
+          <m_funcName>CondWithinThrowRange</m_funcName>
+          <m_description>Detects if the player is within throwing attack range.</m_description>
           <m_children />
         </NodeData>
         <NodeData>
-          <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
-          <m_name>Attacks</m_name>
-          <m_funcName>NO_FUNCTION</m_funcName>
-          <m_description>Attempt first usable attack. Track the player if no attacks can be used.</m_description>
-          <m_children>
-            <NodeData>
-              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-              <m_name>Meteor</m_name>
-              <m_funcName>NO_FUNCTION</m_funcName>
-              <m_description>Attempt to summon and hurl a meteor towards the player, when they enter a valid meteor location.</m_description>
-              <m_children>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>Meteor Cooldown</m_name>
-                  <m_funcName>CondMeteorCD</m_funcName>
-                  <m_description>Don't attack if the meteor attack cooldown is still active.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>PortalNotInUse</m_name>
-                  <m_funcName>CondPortalNotActive</m_funcName>
-                  <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>Player Grounded</m_name>
-                  <m_funcName>CondPlayerGrounded</m_funcName>
-                  <m_description>Don't attack if the player is flying.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_ACTION</m_eType>
-                  <m_name>Meteor Summon Action</m_name>
-                  <m_funcName>ActPlayMeteorAnim</m_funcName>
-                  <m_description>Play meteor summon animation.</m_description>
-                  <m_children />
-                </NodeData>
-              </m_children>
-            </NodeData>
-            <NodeData>
-              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-              <m_name>Portal Punch</m_name>
-              <m_funcName>NO_FUNCTION</m_funcName>
-              <m_description>Punches the ground which spawn portals that punch through around the map</m_description>
-              <m_children>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>New Node</m_name>
-                  <m_funcName>CondSlamCD</m_funcName>
-                  <m_description>Makes sure the portal punch cooldown is zero.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>PortalNotInUse</m_name>
-                  <m_funcName>CondPortalNotActive</m_funcName>
-                  <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_ACTION</m_eType>
-                  <m_name>Portal Punch Action</m_name>
-                  <m_funcName>ActPlayPortalPunchAnim</m_funcName>
-                  <m_description>Plays the portal punch animation.</m_description>
-                  <m_children />
-                </NodeData>
-              </m_children>
-            </NodeData>
-          </m_children>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Attack</m_name>
+          <m_funcName>ActThrowAttack</m_funcName>
+          <m_description>Use throw attack on player.</m_description>
+          <m_children />
         </NodeData>
       </m_children>
     </NodeData>
     <NodeData>
-      <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
-      <m_name>Tracking</m_name>
+      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+      <m_name>MoveToAttack</m_name>
       <m_funcName>NO_FUNCTION</m_funcName>
-      <m_description>Attempt to track the player's movement/face them.</m_description>
+      <m_description>Turn to face the player if the player is behind the boss.
+If the player is outside of throwing range, move closer to them.</m_description>
       <m_children>
         <NodeData>
-          <m_eType>NODE_ACTION</m_eType>
-          <m_name>Track Player</m_name>
-          <m_funcName>ActTrackPlayer</m_funcName>
-          <m_description>Look at and face the player.</m_description>
-          <m_children />
+          <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+          <m_name>MoveCloserPlayer</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Move closer to the player if outside of throwing range.</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>OutOfThrowRange</m_name>
+              <m_funcName>CondOutOfThrowRange</m_funcName>
+              <m_description>Detects if the player is outside of throwing range.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>MoveCloserPlayer</m_name>
+              <m_funcName>ActMoveCloser</m_funcName>
+              <m_description>Move closer to the player.</m_description>
+              <m_children />
+            </NodeData>
+          </m_children>
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+          <m_name>MoveCloserPlayer</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Move closer to the player if outside of throwing range.</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>OutOfThrowRange</m_name>
+              <m_funcName>CondOutOfThrowRange</m_funcName>
+              <m_description>Detects if the player is outside of throwing range.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>MoveCloserPlayer</m_name>
+              <m_funcName>ActMoveCloser</m_funcName>
+              <m_description>Move closer to the player.</m_description>
+              <m_children />
+            </NodeData>
+          </m_children>
         </NodeData>
       </m_children>
     </NodeData>

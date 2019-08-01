@@ -190,7 +190,7 @@ namespace BehaviourTree
             ENodeResult result = ENodeResult.NODE_FAILURE;
 
             // Run all childen, exit if one succeeds.
-            for(int i = 0; i < m_children.Count; ++i)
+            for (int i = 0; i < m_children.Count; ++i)
             {
                 result = m_children[i].Run();
 
@@ -236,7 +236,7 @@ namespace BehaviourTree
 
             return result;
         }
-}
+    }
 
     public class CompositeSequence : BehaviourNode
     {
@@ -246,7 +246,7 @@ namespace BehaviourTree
             ENodeResult result = ENodeResult.NODE_SUCCESS;
 
             // Run all children, exit if one fails.
-            for(int i = 0; i < m_children.Count; ++i)
+            for (int i = 0; i < m_children.Count; ++i)
             {
                 result = m_children[i].Run();
 

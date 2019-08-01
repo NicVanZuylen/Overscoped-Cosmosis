@@ -292,7 +292,7 @@ namespace BTreeEditor
         // Positioning
 
         // Reposition this node and all it's children to neaten the tree structure.
-        public void Reposition(float fReferenceWidth, float fScale)
+        public void Reposition(float fReferenceWidth, float fScale, bool bPreview = false)
         {
             if(m_parent != null)
             {
@@ -303,11 +303,16 @@ namespace BTreeEditor
                 int nThisChildIndex = m_parent.m_children.IndexOf(this);
 
                 // Node visual dimensions
-                m_v2VisualDimensions.x = fNodeArea * 0.75f;
-                m_v2VisualDimensions.y = fNodeHeight * fScale * 0.5f;
+                //m_v2VisualDimensions.x = fNodeArea * 0.85f;
+                //m_v2VisualDimensions.y = fNodeHeight * fScale * 0.5f;
 
-                if (m_v2VisualDimensions.x > fNodeWidth)
-                    m_v2VisualDimensions.x = fNodeWidth;
+                //if (m_v2VisualDimensions.x > fNodeWidth)
+                //    m_v2VisualDimensions.x = fNodeWidth;
+
+                m_v2VisualDimensions = new Vector2(fNodeWidth, fNodeHeight);
+
+
+
 
                 float fLeftOffset = fNodeArea * 0.5f;
                 m_rect.x = (m_parent.m_rect.x - v2ParentBounds.x * 0.5f) + fLeftOffset + (nThisChildIndex * fNodeArea);
@@ -325,13 +330,16 @@ namespace BTreeEditor
                 m_rect.height = fNodeHeight * 2.0f * fScale;
 
                 // Visual dimensions
-                m_v2VisualDimensions = new Vector2(fNodeWidth, 80.0f * fScale);
+                //m_v2VisualDimensions = new Vector2(fNodeWidth, 80.0f * fScale);
+                m_v2VisualDimensions = new Vector2(250.0f, 150.0f);
             }
+
+            bool bChildPreview = (m_children.Count * fNodeWidth >= m_rect.width);
 
             // Reposition all children...
             for(int i = 0; i < m_children.Count; ++i)
             {
-                m_children[i].Reposition(fReferenceWidth, fScale);
+                m_children[i].Reposition(fReferenceWidth, fScale, bChildPreview);
             }
         }
 
@@ -542,7 +550,7 @@ namespace BTreeEditor
 
             nWindowIndex++;
 
-            // Draw curve between this node and it's parent.
+            // Draw line between this node and it's parent.
             if(m_parent != null)
             {
                 Vector2 v2StartPos = m_parent.m_rect.position - new Vector2((fNodeWidth - m_parent.m_v2VisualDimensions.x) * -0.5f, 0.0f)
@@ -553,9 +561,9 @@ namespace BTreeEditor
                 Handles.DrawLine(v2StartPos + BTreeEditor.m_v2GlobalViewOffset, v2EndPos);
             }
 
-            // Draw children...
             for (int i = 0; i < m_children.Count; ++i)
             {
+                // Draw children.
                 m_children[i].Draw();
             }
         }
@@ -627,10 +635,10 @@ namespace BTreeEditor
         // Undo
         bool m_bControlDown;
 
-        public static CompositeNode LoadTree(string path, object classInstance)
+        public static BehaviourNode LoadTree(string path, object classInstance)
         {
             NodeData data = Load(path);
-            CompositeNode baseNode = null;
+            BehaviourNode baseNode = null;
 
             // Initialize base node, it can be either a selector or sequence.
             switch(data.m_eType)
@@ -650,7 +658,7 @@ namespace BTreeEditor
             return baseNode;
         }
 
-        private static void ConstructNode(CompositeNode parent, NodeData data, object classInstance)
+        private static void ConstructNode(BehaviourNode parent, NodeData data, object classInstance)
         {
             for(int i = 0; i < data.m_children.Length; ++i)
             {
@@ -673,11 +681,16 @@ namespace BTreeEditor
                         break;
 
                     case ENodeType.NODE_ACTION:
-                        parent.AddAction(new BehaviourTree.Action(childData.m_funcName, classInstance)); // Create and add action function.
+                        BehaviourNode newAction = new BehaviourTree.Action(childData.m_funcName, classInstance);
+
+                        parent.AddNode(newAction); // Create and add action function.
                         break;
 
                     case ENodeType.NODE_CONDITION:
-                        parent.AddCondition(new BehaviourTree.Condition(childData.m_funcName, classInstance)); // Create and add condition function.
+
+                        BehaviourNode newCondition = new Condition(childData.m_funcName, classInstance);
+
+                        parent.AddNode(newCondition); // Create and add condition function.
                         break;
 
                         

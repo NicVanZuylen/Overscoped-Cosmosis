@@ -54,7 +54,7 @@ public class BossBehaviour : MonoBehaviour
 
     private PlayerController m_playerController;
     private Animator m_animator;
-    private CompositeNode m_bossTree;
+    private BehaviourNode m_bossTree;
 
     private Portal m_portalScript;
 

@@ -111,14 +111,22 @@
                 </NodeData>
               </m_children>
             </NodeData>
-            <NodeData>
-              <m_eType>NODE_ACTION</m_eType>
-              <m_name>Track Player</m_name>
-              <m_funcName>ActTrackPlayer</m_funcName>
-              <m_description>Look at and face the player.</m_description>
-              <m_children />
-            </NodeData>
           </m_children>
+        </NodeData>
+      </m_children>
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+      <m_name>Tracking</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description>Attempt to track the player's movement/face them.</m_description>
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Track Player</m_name>
+          <m_funcName>ActTrackPlayer</m_funcName>
+          <m_description>Look at and face the player.</m_description>
+          <m_children />
         </NodeData>
       </m_children>
     </NodeData>

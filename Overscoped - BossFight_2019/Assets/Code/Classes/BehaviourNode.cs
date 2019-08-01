@@ -13,9 +13,30 @@ namespace BehaviourTree
         NODE_SUCCESS
     }
 
-    public struct Action
+    public abstract class BehaviourNode
+    {
+        protected BehaviourNode m_parent;
+        protected List<BehaviourNode> m_children;
+
+        public BehaviourNode()
+        {
+            m_children = new List<BehaviourNode>();
+        }
+
+        public abstract ENodeResult Run();
+
+        // Add a node of any type to this node as a child of it.
+        public void AddNode(BehaviourNode node)
+        {
+            node.m_parent = this;
+            m_children.Add(node);
+        }
+    }
+
+    public class Action : BehaviourNode
     {
         public delegate ENodeResult ActionFunc();
+        private ActionFunc m_action;
 
         public Action(ActionFunc actionFunc)
         {
@@ -37,12 +58,16 @@ namespace BehaviourTree
             }
         }
 
-        public ActionFunc m_action;
+        public override ENodeResult Run()
+        {
+            return m_action();
+        }
     }
 
-    public struct Condition
+    public class Condition : BehaviourNode
     {
         public delegate ENodeResult QueryFunc();
+        private QueryFunc m_condition;
 
         public Condition(QueryFunc conditionFunc)
         {
@@ -64,10 +89,14 @@ namespace BehaviourTree
             }
         }
 
-        public QueryFunc m_condition;
+        public override ENodeResult Run()
+        {
+            return m_condition();
+        }
     }
 
-    public abstract class CompositeNode
+    /*
+    public class CompositeNode
     {
         private CompositeNode m_parent;
 
@@ -145,23 +174,32 @@ namespace BehaviourTree
             m_conditions.RemoveAt(nIndex);
         }
 
-        // Run all this node and all of it's children, and return success of failure.
-        public abstract ENodeResult Run();
-
         protected void PerformActions()
         {
             for (int i = 0; i < m_actions.Count; ++i)
                 m_actions[i].m_action();
         }
     }
+    */
 
-    public class CompositeSelector : CompositeNode
+    public class CompositeSelector : BehaviourNode
     {
         public override ENodeResult Run()
         {
             // Success if at least one child node returns success.
             ENodeResult result = ENodeResult.NODE_FAILURE;
 
+            // Run all childen, exit if one succeeds.
+            for(int i = 0; i < m_children.Count; ++i)
+            {
+                result = m_children[i].Run();
+
+                // Exit of one result succeeds.
+                if (result == ENodeResult.NODE_SUCCESS)
+                    return result;
+            }
+
+            /*
             // Query children until one result returns success.
             for (int i = 0; i < m_children.Count; ++i)
             {
@@ -194,18 +232,30 @@ namespace BehaviourTree
                 result = ENodeResult.NODE_SUCCESS;
                 PerformActions();
             }
+            */
 
             return result;
         }
 }
 
-    public class CompositeSequence : CompositeNode
+    public class CompositeSequence : BehaviourNode
     {
         public override ENodeResult Run()
         {
             // Success if all child nodes return success.
             ENodeResult result = ENodeResult.NODE_SUCCESS;
 
+            // Run all children, exit if one fails.
+            for(int i = 0; i < m_children.Count; ++i)
+            {
+                result = m_children[i].Run();
+
+                // Exit on failure.
+                if (result == ENodeResult.NODE_FAILURE)
+                    return result;
+            }
+
+            /*
             // Query children until one result returns failure.
             for (int i = 0; i < m_children.Count; ++i)
             {
@@ -226,6 +276,7 @@ namespace BehaviourTree
 
             // If there is no failiure by this point all conditions/child nodes returned success, perform actions.
             PerformActions();
+            */
 
             return result;
         }

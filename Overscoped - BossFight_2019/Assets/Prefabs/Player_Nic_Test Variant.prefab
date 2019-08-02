@@ -23,7 +23,7 @@ PrefabInstance:
     - target: {fileID: 3812603301322367557, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_Name
-      value: Player_Nic_Test
+      value: Player_Nic_Test Variant
       objectReference: {fileID: 0}
     - target: {fileID: 3812603301322367556, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -83,17 +83,17 @@ PrefabInstance:
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -95.2
+      value: 8.82
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -19.6
+      value: 1.075
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -19.4
+      value: 5.59
       objectReference: {fileID: 0}
     - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -114,6 +114,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SlopeLimit
       value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302679706674, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -154,21 +159,34 @@ PrefabInstance:
         type: 3}
       propertyPath: m_grappleLineMat
       value: 
-      objectReference: {fileID: 2100000, guid: 2f5ad4b40d8b8f740851f55634751833, type: 2}
+      objectReference: {fileID: 2100000, guid: 4332df5f22776d0448185af098352553, type: 2}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_pullLineMat
       value: 
-      objectReference: {fileID: 2100000, guid: bdbf487508546df44a44eadfef69c303, type: 2}
+      objectReference: {fileID: 2100000, guid: 0a75a4e0afb744840be9dc139d473ca3, type: 2}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_lineCompute
       value: 
       objectReference: {fileID: 7200000, guid: b38e0ed2e84bb61479895571d31a1039, type: 3}
+    - target: {fileID: 3812603302388449869, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
       propertyPath: m_Positions.Array.size
       value: 1024
       objectReference: {fileID: 0}
+    - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4332df5f22776d0448185af098352553, type: 2}
     - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
       propertyPath: m_Positions.Array.data[1].z
       value: 0
@@ -224,6 +242,10 @@ PrefabInstance:
     - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
       propertyPath: m_Positions.Array.data[14].z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3427286244367884368, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -298,8 +320,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3812603301716786121, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
-      propertyPath: near clip plane
-      value: 0.01
+      propertyPath: m_FocalLength
+      value: 16.516582
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603301716786121, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: field of view
+      value: 72
       objectReference: {fileID: 0}
     - target: {fileID: 4971805156251471514, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -315,6 +342,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1607527199722658905, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1607527199722658905, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}

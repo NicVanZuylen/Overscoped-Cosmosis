@@ -27,6 +27,13 @@
       <m_description />
       <m_children>
         <NodeData>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Beam Track</m_name>
+          <m_funcName>ActBeamTrack</m_funcName>
+          <m_description>Beam attack tracking occurs even when the beam is not in use.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
           <m_eType>NODE_CONDITION</m_eType>
           <m_name>Is Idle</m_name>
           <m_funcName>CondIsIdleAnimation</m_funcName>
@@ -46,6 +53,28 @@
           <m_funcName>NO_FUNCTION</m_funcName>
           <m_description>Attempt first usable attack. Track the player if no attacks can be used.</m_description>
           <m_children>
+            <NodeData>
+              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+              <m_name>Beam</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Long range tracking beam aimed towards the player with some lag to allow the player to escape at high speeds.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Beam Cooldown/Active</m_name>
+                  <m_funcName>CondBeamActive</m_funcName>
+                  <m_description>Make sure the beam cooldown is zero, or proceed if the beam is already active.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Beam Attack Action</m_name>
+                  <m_funcName>ActUseBeam</m_funcName>
+                  <m_description>Use the beam attack on the player.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
             <NodeData>
               <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
               <m_name>Meteor</m_name>
@@ -74,6 +103,13 @@
                   <m_children />
                 </NodeData>
                 <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Beam Not Active</m_name>
+                  <m_funcName>CondBeamNotActive</m_funcName>
+                  <m_description>Ensures the beam attack is not currently active.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
                   <m_eType>NODE_ACTION</m_eType>
                   <m_name>Meteor Summon Action</m_name>
                   <m_funcName>ActPlayMeteorAnim</m_funcName>
@@ -90,7 +126,7 @@
               <m_children>
                 <NodeData>
                   <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>New Node</m_name>
+                  <m_name>Punch Cooldown</m_name>
                   <m_funcName>CondSlamCD</m_funcName>
                   <m_description>Makes sure the portal punch cooldown is zero.</m_description>
                   <m_children />
@@ -100,6 +136,13 @@
                   <m_name>PortalNotInUse</m_name>
                   <m_funcName>CondPortalNotActive</m_funcName>
                   <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Beam Not Active</m_name>
+                  <m_funcName>CondBeamNotActive</m_funcName>
+                  <m_description>Ensures the beam attack is not currently active.</m_description>
                   <m_children />
                 </NodeData>
                 <NodeData>

@@ -1978,12 +1978,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &273178013 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9059701784543160156, guid: 15224bf2b194e9c47af1aa65c1964291,
-    type: 3}
-  m_PrefabInstance: {fileID: 1052553494603693006}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &284072202
 GameObject:
   m_ObjectHideFlags: 0
@@ -2794,13 +2788,15 @@ MonoBehaviour:
   - _gameObject: {fileID: 1846803620}
     _prefab: Assets/Prefabs/Environment/GameManager.prefab
   - _gameObject: {fileID: 535304911}
-    _prefab: Assets/Prefabs/Boss.prefab
-  - _gameObject: {fileID: 273178013}
-    _prefab: Assets/Meshes/SK_BossDummy_01.fbx
-  - _gameObject: {fileID: 535304911}
-    _prefab: Assets/Prefabs/Boss.prefab
+    _prefab: Assets/Prefabs/MidlifeCrisisMan.prefab
   - _gameObject: {fileID: 1301231932}
     _prefab: Assets/Prefabs/Portal.prefab
+  - _gameObject: {fileID: 1052553494603693008}
+    _prefab: Assets/Meshes/SK_BOSSDUMMY_Again.fbx
+  - _gameObject: {fileID: 535304911}
+    _prefab: Assets/Prefabs/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 1052553494603693007}
+    _prefab: Assets/Prefabs/Meteor.prefab
   - _gameObject: {fileID: 1740376335}
     _prefab: Assets/Prefabs/GUI/GameCanvas.prefab
 --- !u!4 &354204014
@@ -11244,19 +11240,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7463969799319368318, guid: a79dd3800fbead54690329d9fb26154d,
         type: 3}
-      propertyPath: m_RenderMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7463969799319368318, guid: a79dd3800fbead54690329d9fb26154d,
-        type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1696045119}
-    - target: {fileID: 7463969799319368318, guid: a79dd3800fbead54690329d9fb26154d,
-        type: 3}
-      propertyPath: m_PlaneDistance
-      value: 0.31
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a79dd3800fbead54690329d9fb26154d, type: 3}
 --- !u!1 &2034580150
@@ -12740,18 +12726,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1052553496023486851, guid: 15224bf2b194e9c47af1aa65c1964291,
-        type: 3}
-      propertyPath: m_player
-      value: 
-      objectReference: {fileID: 1489674474}
     - target: {fileID: 1052553495887856270, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_playerCollider
       value: 
       objectReference: {fileID: 1489674478}
+    - target: {fileID: 9048526173686419721, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_player
+      value: 
+      objectReference: {fileID: 1489674474}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15224bf2b194e9c47af1aa65c1964291, type: 3}
+--- !u!1 &1052553494603693007 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1042704758854634759, guid: 15224bf2b194e9c47af1aa65c1964291,
+    type: 3}
+  m_PrefabInstance: {fileID: 1052553494603693006}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1052553494603693008 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3800206674758254174, guid: 15224bf2b194e9c47af1aa65c1964291,
+    type: 3}
+  m_PrefabInstance: {fileID: 1052553494603693006}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5528784100356115722
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -67,9 +67,13 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private float m_fBeamDuration = 5.0f;
 
+    [Tooltip("Minimum beam attack tracking speed.")]
+    [SerializeField]
+    private float m_fMinBeamTrackSpeed = 50.0f;
+
     [Tooltip("Maximum beam attack tracking speed.")]
     [SerializeField]
-    private float m_fBeamTrackSpeed = 0.05f;
+    private float m_fMaxBeamTrackSpeed = 200.0f;
 
     [Header("Misc.")]
     [Tooltip("Amount of time spent stuck.")]
@@ -106,7 +110,9 @@ public class BossBehaviour : MonoBehaviour
         m_fMeteorCDTimer = m_fMeteorCD;
         m_fBeamAttackCDTimer = m_fBeamAttackCD;
 
+        // Beam
         m_fBeamTime = m_fBeamDuration;
+        m_v3BeamEnd = m_player.transform.position;
 
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.SetActive(false);
@@ -292,28 +298,46 @@ public class BossBehaviour : MonoBehaviour
     {
         Vector3 lookPos = m_player.transform.position - transform.position;
         lookPos.y = 0;
-        var rotation = Quaternion.LookRotation(lookPos);
+        Quaternion rotation = Quaternion.LookRotation(lookPos);
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 2);
 
         return ENodeResult.NODE_SUCCESS;
     }
 
+    public Vector3 PointOnSphere(Vector3 v3Point, Vector3 v3SpherePos, float fSphereRadius)
+    {
+        Vector3 v3Dir = (v3Point - v3SpherePos).normalized;
+
+        return v3SpherePos + (v3Dir * fSphereRadius);
+    }
+
     // Track the beam's aim. Even if the beam is not in use.
     public ENodeResult ActBeamTrack()
     {
-        Vector3 v3PlayerDir = (m_player.transform.position - m_beamOrigin.position).normalized;
+        float fSphereMag = (m_player.transform.position - m_beamOrigin.position).magnitude;
 
-        Vector3 v3Target = m_beamOrigin.position + (v3PlayerDir * m_fBeamMaxRange);
+        Vector3 v3EndOnRadius = PointOnSphere(m_v3BeamEnd, m_beamOrigin.position, fSphereMag);
 
-        m_v3BeamDirection = (m_v3BeamEnd - m_player.transform.position).normalized;
+        if (m_beamLine.enabled)
+        {
+            float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
 
-        float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
+            float fTrackSpeed = m_fMinBeamTrackSpeed + (fBeamProgress * (m_fMaxBeamTrackSpeed - m_fMinBeamTrackSpeed));
 
-        // Move beam end towards target.
-        if(m_beamLine.enabled)
-            m_v3BeamEnd = Vector3.Lerp(m_v3BeamEnd, v3Target, Mathf.Clamp(fBeamProgress * m_fBeamTrackSpeed, 0.01f, m_fBeamTrackSpeed));
-        else // Tracking whilst inactive.
-            m_v3BeamEnd = Vector3.Lerp(m_v3BeamEnd, v3Target, 0.01f);
+            Vector3 v3PlayerDir = (m_player.transform.position - m_beamOrigin.transform.position).normalized;
+            m_v3BeamDirection = (m_v3BeamEnd - m_beamOrigin.transform.position).normalized;
+
+            if (Vector3.Dot(m_v3BeamDirection, v3PlayerDir) >= 0.85f)
+                m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, fTrackSpeed * Time.deltaTime);
+            else
+            {
+                m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, 500.0f * Time.deltaTime);
+                Debug.Log("HyperSpeed!");
+            }
+
+        }
+        else
+            m_v3BeamEnd = PointOnSphere(m_player.transform.position, m_beamOrigin.position, fSphereMag);
 
         return ENodeResult.NODE_SUCCESS;
     }
@@ -332,25 +356,19 @@ public class BossBehaviour : MonoBehaviour
         // Linerenderer points.
         Vector3[] beamLinePoints = new Vector3[2];
         beamLinePoints[0] = m_beamOrigin.position;
+        beamLinePoints[1] = m_beamOrigin.position + (m_v3BeamDirection * m_fBeamMaxRange);
 
         Ray beamRay = new Ray(m_beamOrigin.position, m_v3BeamDirection);
-
         RaycastHit beamHit;
         if(Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange))
         {
-            // Deal damage to the player.
-            if(beamHit.collider.gameObject == m_player)
+            if (beamHit.collider.gameObject == m_player)
             {
-                m_playerStats.DealDamage(m_fBeamDPS * Time.deltaTime);
-
-                beamLinePoints[1] = m_v3BeamEnd;
+                m_playerStats.DealDamage(3.0f * Time.deltaTime);
             }
-            else // Use ray hit point as the end point if the beam ray hits something other than the player.
+            else
                 beamLinePoints[1] = beamHit.point;
         }
-        else // Otherwise just use the existing beam end point.
-            beamLinePoints[1] = m_v3BeamEnd;
-
 
         m_beamLine.SetPositions(beamLinePoints);
 
@@ -411,6 +429,11 @@ public class BossBehaviour : MonoBehaviour
     {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(new Vector3(transform.position.x, transform.position.y + 100, transform.position.z), m_v3MeteorSummonExtents);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(m_v3BeamEnd, 1.0f);
     }
 
 }

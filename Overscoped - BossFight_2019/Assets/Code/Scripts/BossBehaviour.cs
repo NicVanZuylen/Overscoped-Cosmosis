@@ -41,7 +41,7 @@ public class BossBehaviour : MonoBehaviour
 
     [Tooltip("The Rectangular extents of the meteor summon area.")]
     [SerializeField]
-    private Vector3 m_v3MeteorSummonExtents;
+    private Vector3 m_v3MeteorSummonExtents = Vector3.zero;
 
     [Header("Portal Punch")]
     [Tooltip("Amount of time before portal punch attack can be used again.")]
@@ -96,6 +96,8 @@ public class BossBehaviour : MonoBehaviour
     private Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
     private float m_fBeamTime;
+
+    private static BoxCollider m_meteorSpawnVol;
 
     void Awake()
     {
@@ -187,6 +189,15 @@ public class BossBehaviour : MonoBehaviour
     }
 
     // Meteor
+
+    public ENodeResult CondMeteorAvailable()
+    {
+        if (m_meteorSpawnVol != null)
+            return ENodeResult.NODE_SUCCESS;
+
+        return ENodeResult.NODE_FAILURE;
+    }
+
     public ENodeResult CondMeteorCD()
     {
         if (m_fMeteorCDTimer <= 0.0f)
@@ -289,7 +300,19 @@ public class BossBehaviour : MonoBehaviour
             new Vector3(transform.position.x, transform.position.y + 100, transform.position.z) + 
             new Vector3(Random.Range(-m_v3MeteorSummonExtents.x / 2, m_v3MeteorSummonExtents.x / 2), Random.Range(-m_v3MeteorSummonExtents.y / 2, m_v3MeteorSummonExtents.y / 2), Random.Range(-m_v3MeteorSummonExtents.z / 2, m_v3MeteorSummonExtents.z / 2));
 
-        m_meteor.Summon(pos, m_player.transform.position);
+
+        if(m_meteorSpawnVol != null)
+        {
+            BoxCollider spawnBox = m_meteorSpawnVol.GetComponent<BoxCollider>();
+
+            Vector3 v3RandomSpawn = m_meteorSpawnVol.transform.position;
+
+            v3RandomSpawn.x += spawnBox.center.x + Random.Range(spawnBox.size.x * 0.5f, spawnBox.size.x * -0.5f);
+            v3RandomSpawn.y += spawnBox.center.y + Random.Range(spawnBox.size.y * 0.5f, spawnBox.size.y * -0.5f);
+            v3RandomSpawn.z += spawnBox.center.z + Random.Range(spawnBox.size.z * 0.5f, spawnBox.size.z * -0.5f);
+
+            m_meteor.Summon(v3RandomSpawn, m_player.transform.position);
+        }
 
         return ENodeResult.NODE_SUCCESS;
     }
@@ -327,12 +350,12 @@ public class BossBehaviour : MonoBehaviour
             Vector3 v3PlayerDir = (m_player.transform.position - m_beamOrigin.transform.position).normalized;
             m_v3BeamDirection = (m_v3BeamEnd - m_beamOrigin.transform.position).normalized;
 
-            if (Vector3.Dot(m_v3BeamDirection, v3PlayerDir) >= 0.85f)
+            // Keep beam within a tight cone of the player's position.
+            if (Vector3.Dot(m_v3BeamDirection, v3PlayerDir) >= 0.95f)
                 m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, fTrackSpeed * Time.deltaTime);
             else
             {
                 m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, 500.0f * Time.deltaTime);
-                Debug.Log("HyperSpeed!");
             }
 
         }
@@ -364,7 +387,7 @@ public class BossBehaviour : MonoBehaviour
         {
             if (beamHit.collider.gameObject == m_player)
             {
-                m_playerStats.DealDamage(3.0f * Time.deltaTime);
+                m_playerStats.DealDamage(m_fBeamDPS * Time.deltaTime);
             }
             else
                 beamLinePoints[1] = beamHit.point;
@@ -377,6 +400,16 @@ public class BossBehaviour : MonoBehaviour
 
     // ----------------------------------------------------------------------------------------------
     // Misc
+
+    /*
+    Description: Set the meteor spawn point for the meteor attack.
+    Param:
+        GameObject spawner: The spawner gameobject to use.
+    */
+    public static void SetMeteorSpawn(BoxCollider spawner)
+    {
+        m_meteorSpawnVol = spawner;
+    }
 
     public void ResetAnimToIdle()
     {
@@ -397,21 +430,23 @@ public class BossBehaviour : MonoBehaviour
         if (m_portalScript.IsActive())
             return;
 
-        Vector3 v3PortalOffset = Vector3.up * 10.0f;
+        Vector3 v3PortalOffset = Vector3.up * 20.0f;
         //float fRemainingMag = 1.0f;
 
         // Create random unit vector.
-        //v3RandomVec.x = Random.Range(-1.0f, 1.0f);
-        //v3RandomVec.y = Random.Range(0.0f, 1.0f);
-        //v3RandomVec.z = Random.Range(-1.0f, 1.0f);
+        v3PortalOffset.x = Random.Range(-1.0f, 1.0f);
+        v3PortalOffset.y = Random.Range(0.5f, 1.0f);
+        v3PortalOffset.z = Random.Range(-1.0f, 1.0f);
 
-        //v3RandomVec.Normalize();
+        v3PortalOffset.Normalize();
 
         m_portal.SetActive(true);
-        m_portal.transform.position = m_player.transform.position + m_playerController.GetVelocity() + v3PortalOffset;
+        m_portal.transform.position = m_player.transform.position + (m_playerController.GetVelocity() * 1.2f) + (v3PortalOffset * 50.0f);
 
         Vector3 v3PlayerDir = (m_player.transform.position - m_portal.transform.position).normalized;
-        m_portal.transform.rotation = Quaternion.LookRotation(Vector3.down, Vector3.up);
+        m_portal.transform.rotation = Quaternion.LookRotation(-v3PortalOffset, Vector3.up);
+
+        m_portalScript.SetPunchDirection(-v3PortalOffset);
 
         return;
     }

@@ -83,6 +83,13 @@
               <m_children>
                 <NodeData>
                   <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Meteor Available</m_name>
+                  <m_funcName>CondMeteorAvailable</m_funcName>
+                  <m_description>The player must reside within a valid meteor spawning volume for this attack to work.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
                   <m_name>Meteor Cooldown</m_name>
                   <m_funcName>CondMeteorCD</m_funcName>
                   <m_description>Don't attack if the meteor attack cooldown is still active.</m_description>

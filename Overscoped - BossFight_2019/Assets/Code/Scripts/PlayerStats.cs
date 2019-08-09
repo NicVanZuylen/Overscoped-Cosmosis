@@ -40,6 +40,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fManaRegenDelay = 1.0f;
 
+    [Tooltip("Amount of damage taken from the portal punch attack.")]
+    [SerializeField]
+    private float m_fPortalPunchDamage = 50.0f;
+
     [Tooltip("Regen mode for mana regen.")]
     [SerializeField]
     private ERegenMode m_manaRegenMode = ERegenMode.REGEN_LINEAR;
@@ -172,6 +176,41 @@ public class PlayerStats : MonoBehaviour
             m_fHealth = 0.0f;
 
             // Kill player...
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "MeteorSpawn")
+        {
+            BossBehaviour.SetMeteorSpawn(other.transform.GetChild(0).gameObject.GetComponent<BoxCollider>());
+        }
+
+        if(other.gameObject.tag == "PushPlayer")
+        {
+            Vector3 v3KnockDir = transform.position - other.transform.position;
+            v3KnockDir.y = 0.0f;
+
+            if (v3KnockDir == Vector3.zero)
+                v3KnockDir = m_controller.LookForward();
+            else
+                v3KnockDir.Normalize();
+
+            // Add knockback.
+            m_controller.AddImpulse(v3KnockDir * 75.0f);
+            m_controller.AddImpulse(Vector3.up * 30.0f);
+
+            // Deal damage.
+            DealDamage(m_fPortalPunchDamage);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "MeteorSpawn")
+        {
+            // Remove meteor spawn.
+            BossBehaviour.SetMeteorSpawn(null);
         }
     }
 }

@@ -61,6 +61,15 @@ public class Portal : MonoBehaviour
     }
 
     /*
+    Description: Get the direction the fist will punch in. 
+    Return Type: Vector3
+    */
+    public Vector3 GetPunchDirection()
+    {
+        return m_v3PunchDirection;
+    }
+
+    /*
     Description: Get whether or not the portal is active.
     Return Type: bool
     */

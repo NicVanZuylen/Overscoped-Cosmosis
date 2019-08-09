@@ -68,6 +68,7 @@ public class PlayerStats : MonoBehaviour
 
     private GrappleHook m_hookScript;
     private PlayerController m_controller;
+    private CameraEffects m_camEffects;
 
     private float m_fHealth;
     private float m_fMana;
@@ -77,6 +78,7 @@ public class PlayerStats : MonoBehaviour
     {
         m_hookScript = GetComponent<GrappleHook>();
         m_controller = GetComponent<PlayerController>();
+        m_camEffects = GetComponentInChildren<CameraEffects>(false);
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
@@ -188,17 +190,13 @@ public class PlayerStats : MonoBehaviour
 
         if(other.gameObject.tag == "PushPlayer")
         {
-            Vector3 v3KnockDir = transform.position - other.transform.position;
-            v3KnockDir.y = 0.0f;
+            Debug.Log("Portal Punch Hit!");
 
-            if (v3KnockDir == Vector3.zero)
-                v3KnockDir = m_controller.LookForward();
-            else
-                v3KnockDir.Normalize();
+            // Add force in the punch direction.
+            m_controller.AddImpulse(-other.transform.up * 200.0f);
 
-            // Add knockback.
-            m_controller.AddImpulse(v3KnockDir * 75.0f);
-            m_controller.AddImpulse(Vector3.up * 30.0f);
+            // Shake camera.
+            m_camEffects.ApplyShakeOverTime(0.5f, 2.0f, true);
 
             // Deal damage.
             DealDamage(m_fPortalPunchDamage);

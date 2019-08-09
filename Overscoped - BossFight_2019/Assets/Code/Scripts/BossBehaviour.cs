@@ -39,9 +39,9 @@ public class BossBehaviour : MonoBehaviour
     private float m_fMeteorCD = 10.0f;
     private float m_fMeteorCDTimer;
 
-    [Tooltip("The Rectangular extents of the meteor summon area.")]
+    [Tooltip("Random chance of a meteor attack striking a random location.")]
     [SerializeField]
-    private Vector3 m_v3MeteorSummonExtents = Vector3.zero;
+    private float m_fRandMeteorChance = 50.0f;
 
     [Header("Portal Punch")]
     [Tooltip("Amount of time before portal punch attack can be used again.")]
@@ -97,6 +97,9 @@ public class BossBehaviour : MonoBehaviour
     private Vector3 m_v3BeamDirection;
     private float m_fBeamTime;
 
+    private GameObject[] m_allMeteorSpawns;
+    private bool m_bRandomMeteor;
+
     private static BoxCollider m_meteorSpawnVol;
 
     void Awake()
@@ -115,6 +118,9 @@ public class BossBehaviour : MonoBehaviour
         // Beam
         m_fBeamTime = m_fBeamDuration;
         m_v3BeamEnd = m_player.transform.position;
+
+        // Meteor
+        m_allMeteorSpawns = GameObject.FindGameObjectsWithTag("MeteorSpawn");
 
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.SetActive(false);
@@ -192,8 +198,26 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondMeteorAvailable()
     {
-        if (m_meteorSpawnVol != null)
-            return ENodeResult.NODE_SUCCESS;
+        if (m_fMeteorCDTimer <= 0.0f)
+        {
+            m_fMeteorCDTimer = m_fMeteorCD;
+
+            // 50% chance for random strike.
+            m_bRandomMeteor = Random.Range(0.0f, 100.0f) >= m_fRandMeteorChance;
+
+            // Ensure the player is grounded or this is a random stike.
+            if(m_playerController.IsGrounded() && m_meteorSpawnVol != null)
+            {
+                // Make stikes when the player is in a volume not random.
+                m_bRandomMeteor = false;
+
+                return ENodeResult.NODE_SUCCESS;
+            }
+            else if(m_bRandomMeteor)
+            {
+                return ENodeResult.NODE_SUCCESS;
+            }
+        }
 
         return ENodeResult.NODE_FAILURE;
     }
@@ -203,15 +227,20 @@ public class BossBehaviour : MonoBehaviour
         if (m_fMeteorCDTimer <= 0.0f)
         {
             m_fMeteorCDTimer = m_fMeteorCD;
+
+            // Determine whether or not this is a random strike.
+            m_bRandomMeteor = true;
+
+
             return ENodeResult.NODE_SUCCESS;
         }
 
         return ENodeResult.NODE_FAILURE;
     }
 
-    public ENodeResult CondBeamCD ()
+    public ENodeResult CondBeamCD()
     {
-        if(m_fBeamAttackCDTimer <= 0.0f)
+        if (m_fBeamAttackCDTimer <= 0.0f)
         {
             m_fBeamAttackCDTimer = m_fBeamAttackCD;
             m_fBeamTime = m_fBeamDuration;
@@ -253,11 +282,11 @@ public class BossBehaviour : MonoBehaviour
     {
         m_fBeamTime -= Time.deltaTime;
 
-        if(CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
+        if (CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
         }
-        else if(m_fBeamTime <= 0.0f)
+        else if (m_fBeamTime <= 0.0f)
         {
             // Beam attack is complete.
             m_beamLine.enabled = false;
@@ -268,7 +297,7 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondBeamNotActive()
     {
-        if(CondBeamActive() == ENodeResult.NODE_SUCCESS)
+        if (CondBeamActive() == ENodeResult.NODE_SUCCESS)
         {
             return ENodeResult.NODE_FAILURE;
         }
@@ -291,20 +320,17 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult ActPlayMeteorAnim()
     {
-        Debug.Log("Meteor Attack!");
-
         m_animator.SetInteger("AttackID", 2);
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
-        Vector3 pos = 
-            new Vector3(transform.position.x, transform.position.y + 100, transform.position.z) + 
-            new Vector3(Random.Range(-m_v3MeteorSummonExtents.x / 2, m_v3MeteorSummonExtents.x / 2), Random.Range(-m_v3MeteorSummonExtents.y / 2, m_v3MeteorSummonExtents.y / 2), Random.Range(-m_v3MeteorSummonExtents.z / 2, m_v3MeteorSummonExtents.z / 2));
-
-
-        if(m_meteorSpawnVol != null)
+        if(m_meteorSpawnVol != null && !m_bRandomMeteor)
         {
+            Debug.Log("Meteor Attack!");
+
+            // Get spawn volume.
             BoxCollider spawnBox = m_meteorSpawnVol.GetComponent<BoxCollider>();
 
+            // Calculate random spawn point and summon meteor.
             Vector3 v3RandomSpawn = m_meteorSpawnVol.transform.position;
 
             v3RandomSpawn.x += spawnBox.center.x + Random.Range(spawnBox.size.x * 0.5f, spawnBox.size.x * -0.5f);
@@ -312,6 +338,27 @@ public class BossBehaviour : MonoBehaviour
             v3RandomSpawn.z += spawnBox.center.z + Random.Range(spawnBox.size.z * 0.5f, spawnBox.size.z * -0.5f);
 
             m_meteor.Summon(v3RandomSpawn, m_player.transform.position);
+        }
+        else if(m_bRandomMeteor)
+        {
+            Debug.Log("Random Meteor Attack!");
+
+            // Pick random spawn point object.
+            GameObject spawnObj = m_allMeteorSpawns[Random.Range(0, m_allMeteorSpawns.Length)].transform.GetChild(0).gameObject;
+
+            // Get the spawn volume.
+            BoxCollider spawnBox = spawnObj.GetComponent<BoxCollider>();
+
+            // Calculate random spawn point and summon meteor.
+            Vector3 v3RandomSpawn = spawnObj.transform.position;
+
+            v3RandomSpawn.x += spawnBox.center.x + Random.Range(spawnBox.size.x * 0.5f, spawnBox.size.x * -0.5f);
+            v3RandomSpawn.y += spawnBox.center.y + Random.Range(spawnBox.size.y * 0.5f, spawnBox.size.y * -0.5f);
+            v3RandomSpawn.z += spawnBox.center.z + Random.Range(spawnBox.size.z * 0.5f, spawnBox.size.z * -0.5f);
+
+            m_meteor.Summon(v3RandomSpawn, spawnObj.transform.parent.position);
+
+            m_bRandomMeteor = false;
         }
 
         return ENodeResult.NODE_SUCCESS;
@@ -430,18 +477,28 @@ public class BossBehaviour : MonoBehaviour
         if (m_portalScript.IsActive())
             return;
 
-        Vector3 v3PortalOffset = Vector3.up * 20.0f;
-        //float fRemainingMag = 1.0f;
-
+        // Get the player's flat forward vector.
+        Vector3 v3PlayerForward = m_playerController.LookForward();
+        Vector3 v3PlayerRight = m_playerController.LookRight();
+            
         // Create random unit vector.
-        v3PortalOffset.x = Random.Range(-1.0f, 1.0f);
-        v3PortalOffset.y = Random.Range(0.5f, 1.0f);
-        v3PortalOffset.z = Random.Range(-1.0f, 1.0f);
+        Vector3 v3PortalOffset = v3PlayerForward;
+
+        float fHorizontalOff = Random.Range(-1.0f, 1.0f);
+        v3PortalOffset.x += v3PlayerRight.x * fHorizontalOff;
+        v3PortalOffset.y += v3PlayerRight.y * fHorizontalOff;
+        v3PortalOffset.z += v3PlayerRight.z * fHorizontalOff;
+
+        v3PortalOffset += Vector3.up * Random.Range(0.5f, 1.0f);
+
+        //v3PortalOffset.x = Random.Range(-1.0f, 1.0f);
+        //v3PortalOffset.y = Random.Range(0.5f, 1.0f);
+        //v3PortalOffset.z = Random.Range(-1.0f, 1.0f);
 
         v3PortalOffset.Normalize();
 
         m_portal.SetActive(true);
-        m_portal.transform.position = m_player.transform.position + (m_playerController.GetVelocity() * 1.2f) + (v3PortalOffset * 50.0f);
+        m_portal.transform.position = m_player.transform.position + m_playerController.GetVelocity() + (v3PortalOffset * 50.0f);
 
         Vector3 v3PlayerDir = (m_player.transform.position - m_portal.transform.position).normalized;
         m_portal.transform.rotation = Quaternion.LookRotation(-v3PortalOffset, Vector3.up);
@@ -461,12 +518,6 @@ public class BossBehaviour : MonoBehaviour
     }
 
     private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(new Vector3(transform.position.x, transform.position.y + 100, transform.position.z), m_v3MeteorSummonExtents);
-    }
-
-    private void OnDrawGizmos()
     {
         Gizmos.DrawSphere(m_v3BeamEnd, 1.0f);
     }

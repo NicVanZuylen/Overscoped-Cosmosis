@@ -430,7 +430,7 @@ public class BossBehaviour : MonoBehaviour
 
         Ray beamRay = new Ray(m_beamOrigin.position, m_v3BeamDirection);
         RaycastHit beamHit;
-        if(Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange))
+        if(Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
         {
             if (beamHit.collider.gameObject == m_player)
             {
@@ -490,10 +490,6 @@ public class BossBehaviour : MonoBehaviour
         v3PortalOffset.z += v3PlayerRight.z * fHorizontalOff;
 
         v3PortalOffset += Vector3.up * Random.Range(0.5f, 1.0f);
-
-        //v3PortalOffset.x = Random.Range(-1.0f, 1.0f);
-        //v3PortalOffset.y = Random.Range(0.5f, 1.0f);
-        //v3PortalOffset.z = Random.Range(-1.0f, 1.0f);
 
         v3PortalOffset.Normalize();
 

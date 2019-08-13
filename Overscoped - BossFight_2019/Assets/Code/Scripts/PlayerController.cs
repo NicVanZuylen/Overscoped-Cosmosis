@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviour
     Transform m_cameraTransform;
     private float m_fLookEulerX;
     private float m_fLookEulerY;
+    float m_fFOVIncrease;
 
     // Overrides
     public delegate Vector3 OverrideFunction(PlayerController controller);
@@ -108,7 +109,7 @@ public class PlayerController : MonoBehaviour
     */
     public Vector3 JumpForce()
     {
-        return m_fJumpForce * m_v3SurfaceUp;
+        return m_fJumpForce * Vector3.up;
     }
 
     /*
@@ -285,7 +286,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     private void FixedUpdate()
     {
         // ------------------------------------------------------------------------------------------------------
@@ -299,11 +299,6 @@ public class PlayerController : MonoBehaviour
             // Respawn they player if they fall too far.
             RespawnBelowMinY();
 
-            //m_controller.Move(m_v3Velocity * Time.fixedDeltaTime);
-
-            // Set velocity to controller velocity output to apply any changes made by the controller physics.
-            // m_v3Velocity = m_controller.velocity;
-
             return;
         }
 
@@ -313,8 +308,7 @@ public class PlayerController : MonoBehaviour
         // Movement and dragging forces are added to this vector, which is added to the final velocity.
         Vector3 v3NetForce = Vector3.zero;
 
-        // Get intended movement direction of the player.
-        //Vector3 m_v3MoveDirection = this.m_v3MoveDirection;
+        m_fFOVIncrease = 0.0f;
 
         if (m_bOnGround)
         {
@@ -331,7 +325,7 @@ public class PlayerController : MonoBehaviour
 
                 if (Input.GetKey(KeyCode.LeftShift))
                 {
-                    m_cameraEffects.SetFOVOffset(10.0f);
+                    m_fFOVIncrease = 10.0f;
                     fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
                 }
                     
@@ -406,7 +400,6 @@ public class PlayerController : MonoBehaviour
             float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, m_v3MoveDirection), 0.0f, m_fMaxAirbornMoveSpeed);
             float fMoveAmount = m_fMaxAirbornMoveSpeed - fCompInVelocity;
 
-            
             Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fAirAcceleration;
             v3Acceleration.y = 0.0f;
 
@@ -493,7 +486,7 @@ public class PlayerController : MonoBehaviour
         // ---------------------------------------------------------------------------------------------------
         // FOV velocity effect.
 
-        m_cameraEffects.SetFOVOffset(Mathf.Clamp((Vector3.Dot(m_v3Velocity, m_cameraTransform.forward) - m_fMaxGroundMoveSpeed) * 3, 0.0f, 15.0f));
+        m_cameraEffects.SetFOVOffset(Mathf.Clamp((Vector3.Dot(m_v3Velocity, m_cameraTransform.forward) - m_fMaxGroundMoveSpeed) * 3 + m_fFOVIncrease, 0.0f, 15.0f));
 
         // ------------------------------------------------------------------------------------------------------
         // Jumping input

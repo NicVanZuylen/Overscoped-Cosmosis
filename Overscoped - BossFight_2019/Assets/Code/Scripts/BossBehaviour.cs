@@ -343,9 +343,6 @@ public class BossBehaviour : MonoBehaviour
         {
             Debug.Log("Random Meteor Attack!");
 
-            if (m_allMeteorSpawns.Length <= 0)
-                return ENodeResult.NODE_SUCCESS;
-
             // Pick random spawn point object.
             GameObject spawnObj = m_allMeteorSpawns[Random.Range(0, m_allMeteorSpawns.Length)].transform.GetChild(0).gameObject;
 

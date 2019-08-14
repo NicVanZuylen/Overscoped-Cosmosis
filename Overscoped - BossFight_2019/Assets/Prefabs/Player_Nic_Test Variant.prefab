@@ -82,18 +82,38 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.9783722
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.2068522
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
       propertyPath: m_LocalPosition.x
-      value: -95.2
+      value: -94.32
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -19.6
+      value: -19.8
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -19.4
+      value: -17.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449871, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 156.12401
+      objectReference: {fileID: 0}
+    - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fMaxMana
+      value: 1000000
       objectReference: {fileID: 0}
     - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -115,15 +135,75 @@ PrefabInstance:
       propertyPath: m_SlopeLimit
       value: 65
       objectReference: {fileID: 0}
+    - target: {fileID: 3812603302679706674, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fMaxGroundMoveSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fMaxSprintMoveSpeed
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fAirAcceleration
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fMaxAirbornMoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fAirDrag
-      value: 0.5
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fTerminalVelocity
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_bOnGround
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fFlyAcceleration
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fMaxFlySpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fDriftTolerance
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fLandMoveAcceleration
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fGrapplebreakDistance
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fReleaseForce
-      value: 3
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -168,6 +248,10 @@ PrefabInstance:
     - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
       propertyPath: m_Positions.Array.size
       value: 1024
+      objectReference: {fileID: 0}
+    - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
       propertyPath: m_Positions.Array.data[1].z
@@ -300,6 +384,11 @@ PrefabInstance:
         type: 3}
       propertyPath: near clip plane
       value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603301716786121, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: field of view
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 4971805156251471514, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}

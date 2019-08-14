@@ -403,10 +403,12 @@ public class PlayerController : MonoBehaviour
             // ------------------------------------------------------------------------------------------------------
             // Airborn movement
 
-            float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, m_v3MoveDirection), 0.0f, m_fMaxAirbornMoveSpeed);
-            float fMoveAmount = m_fMaxAirbornMoveSpeed - fCompInVelocity;
+            //float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, m_v3MoveDirection), 0.0f, m_fMaxAirbornMoveSpeed);
+            //float fMoveAmount = m_fMaxAirbornMoveSpeed - fCompInVelocity;
 
-            
+            float fCompInVelocity = Vector3.Dot(m_v3Velocity.normalized, m_v3MoveDirection);
+            float fMoveAmount = (1.0f - fCompInVelocity) * m_fMaxAirbornMoveSpeed;
+
             Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fAirAcceleration;
             v3Acceleration.y = 0.0f;
 

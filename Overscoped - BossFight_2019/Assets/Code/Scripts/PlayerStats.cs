@@ -40,6 +40,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fManaRegenDelay = 1.0f;
 
+    [Tooltip("Amount of damage taken from the portal punch attack.")]
+    [SerializeField]
+    private float m_fPortalPunchDamage = 50.0f;
+
     [Tooltip("Regen mode for mana regen.")]
     [SerializeField]
     private ERegenMode m_manaRegenMode = ERegenMode.REGEN_LINEAR;
@@ -64,6 +68,7 @@ public class PlayerStats : MonoBehaviour
 
     private GrappleHook m_hookScript;
     private PlayerController m_controller;
+    private CameraEffects m_camEffects;
 
     private float m_fHealth;
     private float m_fMana;
@@ -73,6 +78,7 @@ public class PlayerStats : MonoBehaviour
     {
         m_hookScript = GetComponent<GrappleHook>();
         m_controller = GetComponent<PlayerController>();
+        m_camEffects = GetComponentInChildren<CameraEffects>(false);
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
@@ -172,6 +178,37 @@ public class PlayerStats : MonoBehaviour
             m_fHealth = 0.0f;
 
             // Kill player...
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "MeteorSpawn")
+        {
+            BossBehaviour.SetMeteorSpawn(other.transform.GetChild(0).gameObject.GetComponent<BoxCollider>());
+        }
+
+        if(other.gameObject.tag == "PushPlayer")
+        {
+            Debug.Log("Portal Punch Hit!");
+
+            // Add force in the punch direction.
+            m_controller.AddImpulse(-other.transform.up * 200.0f);
+
+            // Shake camera.
+            m_camEffects.ApplyShakeOverTime(0.5f, 2.0f, true);
+
+            // Deal damage.
+            DealDamage(m_fPortalPunchDamage);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "MeteorSpawn")
+        {
+            // Remove meteor spawn.
+            BossBehaviour.SetMeteorSpawn(null);
         }
     }
 }

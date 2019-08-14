@@ -4,33 +4,59 @@ using UnityEngine;
 
 public class Meteor : MonoBehaviour
 {
-    private GameObject m_player;
-    private Vector3 m_target;
-    private bool m_bDelayOver;
+    [Tooltip("Reference to the player.")]
+    [SerializeField]
+    private GameObject m_player = null;
+
+    [Tooltip("Speed in which the meteor will travel.")]
+    [SerializeField]
+    private float m_fSpeed = 50.0f;
+
+    [Tooltip("Damage dealt to the player on a direct hit.")]
+    [SerializeField]
+    private float m_fDirectHitDamage = 30.0f;
+
+    private PlayerStats m_playerStats;
+    private Vector3 m_v3Target;
+    private Vector3 m_v3TravelDirection;
+
     // Start is called before the first frame update
     void Start()
     {
-        m_player = GameObject.Find("PlayerBody");
-        m_target = m_player.transform.position;
-        StartCoroutine(Delay());
+        m_playerStats = m_player.GetComponent<PlayerStats>();
+
+        m_v3Target = m_player.transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Make meteor move toward player
-        if(m_bDelayOver)
-            transform.position = Vector3.MoveTowards(transform.position, m_target, Time.deltaTime * 50);
+        // Make meteor move toward player
+        transform.position += m_v3TravelDirection * m_fSpeed * Time.deltaTime;
     }
 
-    IEnumerator Delay()
+    public void Summon(Vector3 v3Origin, Vector3 v3Target)
     {
-        yield return new WaitForSeconds(1);
-        m_bDelayOver = true;
+        gameObject.SetActive(true);
+
+        m_v3Target = v3Target;
+
+        // Initial position.
+        transform.position = v3Origin;
+
+        // Direction of travel.
+        m_v3TravelDirection = (m_v3Target - transform.position).normalized;
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        Destroy(gameObject);
+        // Deal damage to the player.
+        if(collision.gameObject == m_player)
+        {
+            m_playerStats.DealDamage(m_fDirectHitDamage);
+        }
+
+        // Disable.
+        gameObject.SetActive(false);
     }
 }

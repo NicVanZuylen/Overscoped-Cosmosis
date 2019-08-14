@@ -456,7 +456,7 @@ namespace BTreeEditor
                     break;
 
                 case ENodeType.NODE_CONDITION:
-                    nameTypeExtension = "= Condition =";
+                    nameTypeExtension = "? Condition ?";
                     break;
             }
 

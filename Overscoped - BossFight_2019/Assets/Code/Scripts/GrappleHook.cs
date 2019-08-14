@@ -517,16 +517,16 @@ public class GrappleHook : MonoBehaviour
         Vector3 v3NonPullComponent = controller.GetVelocity() - (v3GrappleDir * fPullComponent);
 
         if (fPullComponent < m_fMaxFlySpeed)
-            v3NetForce += v3GrappleDir * m_fFlyAcceleration * Time.deltaTime;
+            v3NetForce += v3GrappleDir * m_fFlyAcceleration * Time.fixedDeltaTime;
 
         // Controls
-        v3NetForce += m_controller.MoveDirection() * m_controller.m_fAirAcceleration * Time.deltaTime;
+        v3NetForce += m_controller.MoveDirectionFixed() * m_controller.m_fAirAcceleration * Time.fixedDeltaTime;
 
         // Lateral drag.
         if (v3NonPullComponent.sqrMagnitude < 1.0f)
-            v3NetForce -= v3NonPullComponent * m_fDriftTolerance * Time.deltaTime;
+            v3NetForce -= v3NonPullComponent * m_fDriftTolerance * Time.fixedDeltaTime;
         else
-            v3NetForce -= v3NonPullComponent.normalized * m_fDriftTolerance * Time.deltaTime;
+            v3NetForce -= v3NonPullComponent.normalized * m_fDriftTolerance * Time.fixedDeltaTime;
 
         // Stop when within radius and on ground.
         if (v3GrappleDif.sqrMagnitude <= m_fDestinationRadius * m_fDestinationRadius)
@@ -562,30 +562,30 @@ public class GrappleHook : MonoBehaviour
 
         // Movement during grapple landing phase.
         if (Input.GetKey(KeyCode.W))
-            v3NetForce += v3ForwardVec * m_fLandMoveAcceleration * Time.deltaTime;
+            v3NetForce += v3ForwardVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
         if (Input.GetKey(KeyCode.A))
-            v3NetForce -= v3RightVec * m_fLandMoveAcceleration * Time.deltaTime;
+            v3NetForce -= v3RightVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
         if (Input.GetKey(KeyCode.S))
-            v3NetForce -= v3ForwardVec * m_fLandMoveAcceleration * Time.deltaTime;
+            v3NetForce -= v3ForwardVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
         if (Input.GetKey(KeyCode.D))
-            v3NetForce += v3RightVec * m_fLandMoveAcceleration * Time.deltaTime;
+            v3NetForce += v3RightVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
 
         // Add gravity.
-        v3NetForce += Physics.gravity * Time.deltaTime;
+        v3NetForce += Physics.gravity * Time.fixedDeltaTime;
 
         Vector3 v3Velocity = controller.GetVelocity();
 
         // Drag
         if(v3Velocity.sqrMagnitude < 1.0f)
         {
-            v3Velocity.x -= v3Velocity.x * 5.0f * Time.deltaTime;
-            v3Velocity.z -= v3Velocity.x * 5.0f * Time.deltaTime;
+            v3Velocity.x -= v3Velocity.x * 5.0f * Time.fixedDeltaTime;
+            v3Velocity.z -= v3Velocity.x * 5.0f * Time.fixedDeltaTime;
         }
         else 
         {
             Vector3 v3VelNor = v3Velocity.normalized;
-            v3Velocity.x -= v3VelNor.x * 5.0f * Time.deltaTime;
-            v3Velocity.z -= v3VelNor.z * 5.0f * Time.deltaTime;
+            v3Velocity.x -= v3VelNor.x * 5.0f * Time.fixedDeltaTime;
+            v3Velocity.z -= v3VelNor.z * 5.0f * Time.fixedDeltaTime;
         }
 
         // Free override on landing.

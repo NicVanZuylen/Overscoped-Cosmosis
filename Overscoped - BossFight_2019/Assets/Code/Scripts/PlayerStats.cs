@@ -45,6 +45,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fPortalPunchDamage = 50.0f;
 
+    [Tooltip("Force applied to the player when they are hit by the portal punch attack.")]
+    [SerializeField]
+    private float m_fPortalPunchForce = 100.0f;
+
     [Tooltip("Regen mode for mana regen.")]
     [SerializeField]
     private ERegenMode m_manaRegenMode = ERegenMode.REGEN_LINEAR;
@@ -203,7 +207,7 @@ public class PlayerStats : MonoBehaviour
             Debug.Log("Portal Punch Hit!");
 
             // Add force in the punch direction.
-            m_controller.AddImpulse(-other.transform.up * 200.0f);
+            m_controller.AddImpulse(-other.transform.up * m_fPortalPunchForce);
 
             // Shake camera.
             m_camEffects.ApplyShakeOverTime(0.5f, 2.0f, true);

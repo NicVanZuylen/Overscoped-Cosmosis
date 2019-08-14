@@ -125,8 +125,12 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.SetActive(false);
 
+#if (UNITY_EDITOR)
         string treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
-        m_bossTree = BTreeEditor.BTreeEditor.LoadTree(treePath, this);
+#else
+        string treePath = Application.dataPath + "/BossTreePhase1.xml";
+#endif
+        m_bossTree = BTreeEditor.NodeData.LoadTree(treePath, this);
     }
 
     void Update()

@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
     public float m_fAirAcceleration = 0.1f;
 
     [Tooltip("Maximum input-induced movement speed whilst flying.")]
-    public float m_fMaxAirbornMoveSpeed = 2.5f;
+    public float m_fMaxAirborneMoveSpeed = 2.5f;
 
     [Tooltip("Movement drag while in the air.")]
     public float m_fAirDrag = 5.0f;
@@ -116,7 +116,7 @@ public class PlayerController : MonoBehaviour
     Description: Get the intended movement direction of the player.
     Return Type: Vector3
     */
-    public Vector3 MoveDirection()
+    private Vector3 MoveDirection()
     {
         Vector3 v3Direction = Vector3.zero;
         int nMoveDirectionCount = 0;
@@ -148,6 +148,15 @@ public class PlayerController : MonoBehaviour
             v3Direction = v3Direction.normalized;
 
         return v3Direction;
+    }
+
+    /*
+    Description: Get the intended movement direction of the player for fixed update functions.
+    Return Type: Vector3
+    */
+    public Vector3 MoveDirectionFixed()
+    {
+        return m_v3MoveDirection;
     }
 
     /*
@@ -200,9 +209,18 @@ public class PlayerController : MonoBehaviour
     */
     public Vector3 LookForward()
     {
-        Vector3 dir = m_cameraTransform.forward;
-        dir.y = 0.0f;
-        return dir.normalized;
+        //Vector3 dir = m_cameraTransform.forward;
+        //dir.y = 0.0f;
+        //return dir.normalized;
+
+        Vector3 v3Forward;
+        Vector3 v3Up;
+        Vector3 v3Right;
+
+        // Calculate flat vectors using worldspace up as the normal.
+        CalculateSurfaceAxesUnlimited(Vector3.up, out v3Forward, out v3Up, out v3Right);
+
+        return v3Forward;
     }
 
     /*
@@ -211,9 +229,18 @@ public class PlayerController : MonoBehaviour
     */
     public Vector3 LookRight()
     {
-        Vector3 dir = m_cameraTransform.right;
-        dir.y = 0.0f;
-        return dir.normalized;
+        //Vector3 dir = m_cameraTransform.right;
+        //dir.y = 0.0f;
+        //return dir.normalized;
+
+        Vector3 v3Forward;
+        Vector3 v3Up;
+        Vector3 v3Right;
+
+        // Calculate flat vectors using worldspace up as the normal.
+        CalculateSurfaceAxesUnlimited(Vector3.up, out v3Forward, out v3Up, out v3Right);
+
+        return v3Right;
     }
 
     /*
@@ -249,7 +276,7 @@ public class PlayerController : MonoBehaviour
     Param:
         Vector3 v3Normal: The surface normal used for calculating surface-parallel vectors.
     */
-    void CalculateSurfaceTransform(Vector3 v3Normal)
+    private void CalculateSurfaceAxes(Vector3 v3Normal)
     {
         Vector3 v3SlopeRight = Vector3.Cross(v3Normal, Vector3.up);
         Vector3 v3SlopeForward = Vector3.Cross(v3SlopeRight, v3Normal);
@@ -262,6 +289,21 @@ public class PlayerController : MonoBehaviour
         m_v3SurfaceUp = v3Normal;
         m_v3SurfaceForward = Vector3.Cross(m_cameraTransform.right, m_v3SurfaceUp);
         m_v3SurfaceRight = Vector3.Cross(m_v3SurfaceUp, m_v3SurfaceForward);
+    }
+
+    /*
+    Description: Calculate surface-parallel axis vectors.
+    Param:
+        Vector3 v3Normal: The surface normal used for calculating surface-parallel axes.
+        Vector3 v3Forward: The output forward axis.
+        Vector3 v3Up: The output up axis.
+        Vector3 v3Right: The output right axis.
+    */
+    public void CalculateSurfaceAxesUnlimited(Vector3 v3Normal, out Vector3 v3Forward, out Vector3 v3Up, out Vector3 v3Right)
+    {
+        v3Up = v3Normal;
+        v3Forward = Vector3.Cross(m_cameraTransform.right, v3Up);
+        v3Right = Vector3.Cross(v3Up, v3Forward);
     }
 
     /*
@@ -316,6 +358,8 @@ public class PlayerController : MonoBehaviour
 
         m_fFOVIncrease = 0.0f;
 
+        LookForward();
+
         if (m_bOnGround)
         {
             // ------------------------------------------------------------------------------------------------------
@@ -365,9 +409,9 @@ public class PlayerController : MonoBehaviour
                     v3SlideDrag -= m_v3Velocity * m_fSlideDrag * Time.fixedDeltaTime;
                 }
 
-                Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fGroundAcceleration;
+                Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fGroundAcceleration * Time.fixedDeltaTime;
 
-                v3NetForce += (v3Acceleration + v3SlideDrag) * Time.fixedDeltaTime;
+                v3NetForce += v3Acceleration + v3SlideDrag;
             }
             else
             {
@@ -398,24 +442,23 @@ public class PlayerController : MonoBehaviour
             // Reset movement vectors for airborn movement.
 
             // We're giving it the upward vector to represent a flat surface.
-            CalculateSurfaceTransform(Vector3.up);
+            CalculateSurfaceAxes(Vector3.up);
 
             // ------------------------------------------------------------------------------------------------------
-            // Airborn movement
+            // Airborne movement
 
-            //float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, m_v3MoveDirection), 0.0f, m_fMaxAirbornMoveSpeed);
-            //float fMoveAmount = m_fMaxAirbornMoveSpeed - fCompInVelocity;
+            Vector3 v3VelNor = m_v3Velocity.normalized;
 
-            float fCompInVelocity = Vector3.Dot(m_v3Velocity.normalized, m_v3MoveDirection);
-            float fMoveAmount = (1.0f - fCompInVelocity) * m_fMaxAirbornMoveSpeed;
+            float fCompInVelocity = Vector3.Dot(v3VelNor, m_v3MoveDirection);
+            float fMoveAmount = (1.0f - fCompInVelocity) * m_fMaxAirborneMoveSpeed;
 
-            Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fAirAcceleration;
+            Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fAirAcceleration * Time.fixedDeltaTime;
             v3Acceleration.y = 0.0f;
 
-            Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag;
+            Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag * Time.fixedDeltaTime;
             v3AirDrag.y = 0.0f;
             
-            v3NetForce += (v3Acceleration + v3AirDrag) * Time.fixedDeltaTime;
+            v3NetForce += v3Acceleration + v3AirDrag;
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -481,7 +524,7 @@ public class PlayerController : MonoBehaviour
         // So to be sure its updated we update it using the sphere case hit.
         if (m_bOnGround)
         {
-            CalculateSurfaceTransform(m_groundHit.normal);
+            CalculateSurfaceAxes(m_groundHit.normal);
 
             if (m_groundHit.collider.tag == "CheckPoint") // Set respawn checkpoint.
                 m_v3RespawnPosition = m_groundHit.collider.bounds.center + new Vector3(0.0f, (m_groundHit.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);

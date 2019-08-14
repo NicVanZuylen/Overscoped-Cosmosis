@@ -520,7 +520,7 @@ public class GrappleHook : MonoBehaviour
             v3NetForce += v3GrappleDir * m_fFlyAcceleration * Time.fixedDeltaTime;
 
         // Controls
-        v3NetForce += m_controller.MoveDirection() * m_controller.m_fAirAcceleration * Time.fixedDeltaTime;
+        v3NetForce += m_controller.MoveDirectionFixed() * m_controller.m_fAirAcceleration * Time.fixedDeltaTime;
 
         // Lateral drag.
         if (v3NonPullComponent.sqrMagnitude < 1.0f)

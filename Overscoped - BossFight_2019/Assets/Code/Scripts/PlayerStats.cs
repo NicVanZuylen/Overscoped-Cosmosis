@@ -134,7 +134,7 @@ public class PlayerStats : MonoBehaviour
         //m_healthFillMat.SetFloat("_Resource%", m_fHealth / m_fMaxHealth);
 
         m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
-        m_manaFillMat.SetFloat("_Resource %", m_fMana / m_fMaxMana);
+        m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
         //m_beamFillMat.SetFloat("_Resource%", m_fMana / m_fMaxMana);
     }
 

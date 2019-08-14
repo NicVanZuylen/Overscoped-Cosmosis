@@ -59,8 +59,8 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private Material m_manaFillMat = null;
 
-    [SerializeField]
-    private Material m_beamFillMat = null;
+    //[SerializeField]
+    //private Material m_beamFillMat = null;
 
     [SerializeField]
     private Material m_armHealthMat = null;

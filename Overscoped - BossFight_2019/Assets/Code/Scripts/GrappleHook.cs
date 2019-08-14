@@ -13,7 +13,10 @@ public class GrappleHook : MonoBehaviour
 
     [Header("Physics")]
     [Tooltip("Acceleration due to grapple pull.")]
-    public float m_fFlyAcceleration = 30.0f;
+    public float m_fPullAcceleration = 30.0f;
+
+    [Tooltip("Acceleration due to grapple pull.")]
+    public float m_fAirAcceleration = 30.0f;
 
     [Tooltip("Maximum speed in the direction of the grapple line the player can travel.")]
     public float m_fMaxFlySpeed = 40.0f;
@@ -118,7 +121,7 @@ public class GrappleHook : MonoBehaviour
     private float m_fGrapRopeLength;
     private float m_fShakeTime;
     private float m_fLineThickness;
-    private float fRippleMult;
+    private float m_fRippleMult;
     private float m_fImpactShakeTime;
     private float m_fCurrentLineThickness;
     private float m_fGrappleTime;
@@ -427,7 +430,7 @@ public class GrappleHook : MonoBehaviour
         // When hooked-in tension should be high so remove the wobble effect.
         if (bHookLodged)
         {
-            if (m_fImpactShakeTime > 0.0f && fRippleMult <= 0.1f)
+            if (m_fImpactShakeTime > 0.0f && m_fRippleMult <= 0.1f)
             {
                 // Rope shake during impact shake time.
                 float fImpactShakeMult = Mathf.Clamp(m_fImpactShakeTime / m_fImpactShakeDuration, 0.0f, 1.0f);
@@ -440,11 +443,11 @@ public class GrappleHook : MonoBehaviour
             }
             
             // Lerp ripple multiplier to zero.
-            fRippleMult = Mathf.Lerp(fRippleMult, 0.0f, 0.4f);
+            m_fRippleMult = Mathf.Lerp(m_fRippleMult, 0.0f, 0.4f);
         }
         else
         {
-            fRippleMult = m_fRippleWaveAmp;
+            m_fRippleMult = m_fRippleWaveAmp;
 
             m_fImpactShakeTime = m_fImpactShakeDuration;
         }
@@ -480,7 +483,7 @@ public class GrappleHook : MonoBehaviour
 
         // Set compute shader globals...
         m_lineCompute.SetFloat("inFlyProgress", m_graphookScript.FlyProgress());
-        m_lineCompute.SetFloat("inRippleMagnitude", fRippleMult);
+        m_lineCompute.SetFloat("inRippleMagnitude", m_fRippleMult);
 
         // Set compute shader buffer data...
         m_bezierPointBuffer.SetData(m_ropeCurve.m_v3Points, 0, 0, m_ropeCurve.m_v3Points.Length);
@@ -517,10 +520,10 @@ public class GrappleHook : MonoBehaviour
         Vector3 v3NonPullComponent = controller.GetVelocity() - (v3GrappleDir * fPullComponent);
 
         if (fPullComponent < m_fMaxFlySpeed)
-            v3NetForce += v3GrappleDir * m_fFlyAcceleration * Time.fixedDeltaTime;
+            v3NetForce += v3GrappleDir * m_fPullAcceleration * Time.fixedDeltaTime;
 
         // Controls
-        v3NetForce += m_controller.MoveDirectionFixed() * m_controller.m_fAirAcceleration * Time.fixedDeltaTime;
+        v3NetForce += m_controller.MoveDirectionFixed() * m_fAirAcceleration * Time.fixedDeltaTime;
 
         // Lateral drag.
         if (v3NonPullComponent.sqrMagnitude < 1.0f)

@@ -42,6 +42,7 @@ public class PullObject : MonoBehaviour
     {
         m_rigidbody.isKinematic = false;
         m_coupled = false;
+        transform.parent = null;
 
         if(m_decoupleVector != null)
             m_rigidbody.AddForce((m_decoupleVector.forward + playerDirection) * m_decoupleForce, ForceMode.Impulse);

@@ -138,6 +138,9 @@ public class BossBehaviour : MonoBehaviour
         if (CondIsIdleAnimation() == ENodeResult.NODE_FAILURE)
             m_animator.SetInteger("AttackID", 0);
 
+        if (Input.GetKeyDown(KeyCode.G))
+            m_bIsStuck = true;
+
         m_bossTree.Run();
 
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
@@ -258,8 +261,18 @@ public class BossBehaviour : MonoBehaviour
     {
         if (m_bIsStuck)
         {
-            m_animator.enabled = false;
+            // Reset to idle state.
+            m_animator.SetBool("isStunned", true);
+
+            // Disable beam & reset attack.
+            m_beamLine.enabled = false;
+            m_fBeamTime = 0.0f;
+
+            m_animator.SetInteger("AttackID", 0);
+            m_fTimeSinceGlobalAttack = 0.0f;
+
             m_armour.tag = "PullObj";
+
             StartCoroutine(ResetStuck());
             return ENodeResult.NODE_SUCCESS;
         }
@@ -474,7 +487,8 @@ public class BossBehaviour : MonoBehaviour
     {
         yield return new WaitForSeconds(m_fStuckTime);
         m_bIsStuck = false;
-        m_animator.enabled = true;
+
+        m_animator.SetBool("isStunned", false);
         m_armour.tag = "Untagged";
     }
 

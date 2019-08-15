@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Maximum input-induced movement speed whilst grounded.")]
     public float m_fMaxGroundMoveSpeed = 5.0f;
 
+    [Tooltip("Maximum input-induced movement speed whilst grounded and sprinting.")]
+    public float m_fMaxSprintMoveSpeed = 8.0f;
+
     [Tooltip("Maximum movement velocity when on a ground surface.")]
     public float m_fMaxGroundVelocity = 30.0f;
 
@@ -27,6 +30,9 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("Movement drag when on the ground and still under momentum from flight.")]
     public float m_fMomentumDrag = 5.0f;
+
+    [Tooltip("Drag applied when moving in the direction of velocity and exceeding max speed.")]
+    public float m_fSlideDrag = 5.0f;
 
     [Header("In-air")]
     [Space(10)]
@@ -54,6 +60,8 @@ public class PlayerController : MonoBehaviour
 
     // Movement
     private CharacterController m_controller;
+    private CameraEffects m_cameraEffects;
+    private Animator m_animController;
     private Vector3 m_v3RespawnPosition;
     private Vector3 m_v3SurfaceRight;
     private Vector3 m_v3SurfaceUp;
@@ -78,6 +86,8 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         m_controller = GetComponent<CharacterController>();
+        m_cameraEffects = GetComponentInChildren<CameraEffects>();
+        m_animController = GetComponentInChildren<Animator>();
         m_cameraTransform = GetComponentInChildren<Camera>().transform;
         m_v3RespawnPosition = transform.position;
 
@@ -203,12 +213,48 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
-    Description: Calculate surface-parallel movement vectors.
+    Description: Get the standing surface-relative forward vector of the player.
+    Return Type: Vector3
+    */
+    public Vector3 SurfaceForward()
+    {
+        return m_v3SurfaceForward;
+    }
+
+    /*
+    Description: Get the standing surface-relative right vector of the player.
+    Return Type: Vector3
+    */
+    public Vector3 SurfaceRight()
+    {
+        return m_v3SurfaceRight;
+    }
+
+    /*
+    Description: Add an impulse to the velocity of the controller.
+    Param:
+        Vector3 v3Impulse: The impulse to be applied to velocity.
+    */
+    public void AddImpulse(Vector3 v3Impulse)
+    {
+        m_v3Velocity += v3Impulse;
+    }
+
+    /*
+    Description: Calculate surface-parallel movement vectors, flat if beyond the slope limit.
     Param:
         Vector3 v3Normal: The surface normal used for calculating surface-parallel vectors.
     */
     void CalculateSurfaceTransform(Vector3 v3Normal)
     {
+        Vector3 v3SlopeRight = Vector3.Cross(v3Normal, Vector3.up);
+        Vector3 v3SlopeForward = Vector3.Cross(v3SlopeRight, v3Normal);
+        float fSurfaceAngle = Vector3.Dot(v3SlopeForward, Vector3.up);
+
+        // If the slope is too steep the surface vectors will be flattened.
+        if((Mathf.Abs(fSurfaceAngle) * 90.0f) >= m_controller.slopeLimit)
+            v3Normal = Vector3.up;
+
         m_v3SurfaceUp = v3Normal;
         m_v3SurfaceForward = Vector3.Cross(m_cameraTransform.right, m_v3SurfaceUp);
         m_v3SurfaceRight = Vector3.Cross(m_v3SurfaceUp, m_v3SurfaceForward);
@@ -261,14 +307,14 @@ public class PlayerController : MonoBehaviour
         float fSphereRadius = m_controller.radius * 0.5f;
 
         // Sphere case down to the nearest surface below. Sphere cast is ignored if not falling.
-        if (this.m_v3Velocity.y <= 0.0f || m_bOnGround)
+        if (m_v3Velocity.y <= 0.0f || m_bOnGround)
         {
             bool bSphereCastHit = Physics.SphereCast(sphereRay, fSphereRadius, out hit);
             m_bOnGround = bSphereCastHit && hit.distance < (m_controller.height * 0.5f);
 
             // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
             // So to be sure its updated we update it using the sphere case hit.
-            if (bSphereCastHit)
+            if (m_bOnGround)
             {
                 CalculateSurfaceTransform(hit.normal);
 
@@ -282,9 +328,14 @@ public class PlayerController : MonoBehaviour
         {
             m_bOnGround = false;
         }
-            
+
         // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
         m_bOnGround |= m_controller.isGrounded;
+
+        // ---------------------------------------------------------------------------------------------------
+        // FOV velocity effect.
+
+        m_cameraEffects.SetFOVOffset(Mathf.Clamp((Vector3.Dot(m_v3Velocity, m_cameraTransform.forward) - m_fMaxGroundMoveSpeed) * 3, 0.0f, 15.0f));
 
         // ------------------------------------------------------------------------------------------------------
         // Movement override
@@ -333,6 +384,21 @@ public class PlayerController : MonoBehaviour
             if (v3MoveDir.sqrMagnitude > 0.0f)
             {
                 // ------------------------------------------------------------------------------------------------------
+                // Sprinting.
+                float fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
+
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    m_cameraEffects.SetFOVOffset(10.0f);
+                    fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
+                }
+                    
+                // ------------------------------------------------------------------------------------------------------
+                // Play animation...
+
+                m_animController.SetBool("isRunning", true);
+
+                // ------------------------------------------------------------------------------------------------------
                 // Movement lateral tolerance.
 
                 // Component magnitude of the current velocity in the direction of movement.
@@ -347,12 +413,19 @@ public class PlayerController : MonoBehaviour
                 // ------------------------------------------------------------------------------------------------------
                 // Running
 
-                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, v3MoveDir), 0.0f, m_fMaxGroundMoveSpeed);
-                float fMoveAmount = m_fMaxGroundMoveSpeed - fCompInVelocity;
+                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, v3MoveDir), 0.0f, fCurrentGroundMaxSpeed);
+                float fMoveAmount = fCurrentGroundMaxSpeed - fCompInVelocity;
+
+                Vector3 v3SlideDrag = Vector3.zero;
+
+                if(m_v3Velocity.sqrMagnitude > fCurrentGroundMaxSpeed * fCurrentGroundMaxSpeed)
+                {
+                    v3SlideDrag -= m_v3Velocity * m_fSlideDrag * Time.deltaTime;
+                }
 
                 Vector3 v3Acceleration = v3MoveDir * fMoveAmount * m_fGroundAcceleration;
 
-                v3NetForce += v3Acceleration * Time.deltaTime;
+                v3NetForce += (v3Acceleration + v3SlideDrag) * Time.deltaTime;
             }
             else
             {
@@ -369,10 +442,16 @@ public class PlayerController : MonoBehaviour
                     // Slide drag.
                     v3NetForce -= m_v3Velocity * m_fMomentumDrag * Time.deltaTime;
                 }
+
+                m_animController.SetBool("isRunning", false);
             }
         }
         else
         {
+            // ------------------------------------------------------------------------------------------------------
+            // Play flying animation...
+            m_animController.SetBool("isRunning", false);
+
             // ------------------------------------------------------------------------------------------------------
             // Reset movement vectors for airborn movement.
 
@@ -384,11 +463,15 @@ public class PlayerController : MonoBehaviour
 
             float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, v3MoveDir), 0.0f, m_fMaxAirbornMoveSpeed);
             float fMoveAmount = m_fMaxAirbornMoveSpeed - fCompInVelocity;
+
             
             Vector3 v3Acceleration = v3MoveDir * fMoveAmount * m_fAirAcceleration;
             v3Acceleration.y = 0.0f;
 
-            v3NetForce += v3Acceleration * Time.deltaTime;
+            Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag;
+            v3AirDrag.y = 0.0f;
+            
+            v3NetForce += (v3Acceleration + v3AirDrag) * Time.deltaTime;
         }
 
         // Gravity.

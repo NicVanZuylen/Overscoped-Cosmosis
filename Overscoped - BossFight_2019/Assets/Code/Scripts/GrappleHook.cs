@@ -515,15 +515,53 @@ public class GrappleHook : MonoBehaviour
         Vector3 v3GrappleDif = m_v3GrapplePoint - transform.position;
         Vector3 v3GrappleDir = v3GrappleDif.normalized;
         
+        // Component of velocity in the direction of the grapple.
         float fPullComponent = Vector3.Dot(controller.GetVelocity(), v3GrappleDir);
         
+        // Component of velocity not in the direction of the grapple.
         Vector3 v3NonPullComponent = controller.GetVelocity() - (v3GrappleDir * fPullComponent);
 
         if (fPullComponent < m_fMaxFlySpeed)
-            v3NetForce += v3GrappleDir * m_fPullAcceleration * Time.fixedDeltaTime;
+          v3NetForce += v3GrappleDir * m_fPullAcceleration * Time.fixedDeltaTime;
+
+        Vector3 v3MoveDir = Vector3.zero;
+
+        // Calculate local movement axes.
+        Vector3 v3Forward;
+        Vector3 v3Up;
+        Vector3 v3Right;
+        int nDirCount = 0;
+
+        m_controller.CalculateSurfaceAxesUnlimited(Vector3.up, out v3Forward, out v3Up, out v3Right);
+
+        // Get player movement direction.
+        if (Input.GetKey(KeyCode.W))
+        {
+            v3MoveDir += m_controller.LookForward();
+            ++nDirCount;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            v3MoveDir -= m_controller.LookRight();
+            ++nDirCount;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            v3MoveDir -= m_controller.LookForward();
+            ++nDirCount;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            v3MoveDir += m_controller.LookRight();
+            ++nDirCount;
+        }
+
+        // Normalize only if necessary.
+        if (nDirCount > 1)
+            v3MoveDir.Normalize();
 
         // Controls
-        v3NetForce += m_controller.MoveDirectionFixed() * m_fAirAcceleration * Time.fixedDeltaTime;
+        v3NetForce += v3MoveDir * m_fAirAcceleration * Time.fixedDeltaTime;
 
         // Lateral drag.
         if (v3NonPullComponent.sqrMagnitude < 1.0f)
@@ -538,12 +576,14 @@ public class GrappleHook : MonoBehaviour
             m_grappleHook.SetActive(false);
             m_bGrappleHookActive = false;
 
-            m_controller.OverrideMovement(GrappleLand);
+            //m_controller.OverrideMovement(GrappleLand);
 
-            if(m_v3GrapplePoint.y > transform.position.y)
+            //if(m_v3GrapplePoint.y > transform.position.y)
                 v3NetForce += Vector3.up * m_fPushUpForce;
 
-            v3NetForce += m_controller.LookForward() * m_fPushUpForce;
+            //v3NetForce += m_controller.LookForward() * m_fPushUpForce;
+
+            m_controller.FreeOverride();
         }
 
         float tension = Vector3.Dot(m_controller.GetVelocity() + v3NetForce, v3GrappleDir);

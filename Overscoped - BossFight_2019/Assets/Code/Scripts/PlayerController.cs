@@ -6,57 +6,78 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    // Public:
+    // Private:
 
     [Header("Grounded")]
     [Space(10)]
     [Tooltip("Rate of acceleration when on a ground surface.")]
-    public float m_fGroundAcceleration = 40.0f;
+    [SerializeField]
+    private float m_fGroundAcceleration = 40.0f;
 
     [Tooltip("Maximum input-induced movement speed whilst grounded.")]
-    public float m_fMaxGroundMoveSpeed = 5.0f;
+    [SerializeField]
+    private float m_fMaxGroundMoveSpeed = 5.0f;
 
     [Tooltip("Maximum input-induced movement speed whilst grounded and sprinting.")]
-    public float m_fMaxSprintMoveSpeed = 8.0f;
+    [SerializeField]
+    private float m_fMaxSprintMoveSpeed = 8.0f;
 
-    [Tooltip("Maximum movement velocity when on a ground surface.")]
-    public float m_fMaxGroundVelocity = 30.0f;
+    [Tooltip("Maximum angle offset from directly forwards sprinting is allowed.")]
+    [SerializeField]
+    private float m_fSprintAngleOffset = 30.0f;
 
     [Tooltip("Velocity drag when on the ground & below maximum movement speed.")]
-    public float m_fGroundDrag = 10.0f;
-
-    [Tooltip("Movement velocity drag multiplier when on the ground.")]
-    public float m_fMovementDrag = 1.0f;
+    [SerializeField]
+    private float m_fGroundDrag = 10.0f;
 
     [Tooltip("Movement drag when on the ground and still under momentum from flight.")]
-    public float m_fMomentumDrag = 5.0f;
+    [SerializeField]
+    private float m_fMomentumDrag = 5.0f;
 
     [Tooltip("Drag applied when moving in the direction of velocity and exceeding max speed.")]
-    public float m_fSlideDrag = 5.0f;
+    [SerializeField]
+    private float m_fSlideDrag = 5.0f;
 
     [Header("In-air")]
     [Space(10)]
     [Tooltip("Rate of acceleration when jumping/falling.")]
-    public float m_fAirAcceleration = 0.1f;
+    [SerializeField]
+    private float m_fAirAcceleration = 0.1f;
 
     [Tooltip("Maximum input-induced movement speed whilst flying.")]
-    public float m_fMaxAirborneMoveSpeed = 2.5f;
+    [SerializeField]
+    private float m_fMaxAirborneMoveSpeed = 2.5f;
 
     [Tooltip("Movement drag while in the air.")]
-    public float m_fAirDrag = 5.0f;
+    [SerializeField]
+    private float m_fAirDrag = 5.0f;
 
-    [Tooltip("Maximum velocity whilst flying.")]
-    public float m_fTerminalVelocity = 53.0f;
+    [Header("Jumping")]
+    [Tooltip("Maximum horizontal distance travelled whilst jumping before landing.")]
+    [SerializeField]
+    private float m_fJumpDistance = 5.0f;
+
+    [Tooltip("Maximum height reached whilst jumping.")]
+    [SerializeField]
+    private float m_fJumpHeight = 3.0f;
 
     [Header("Misc.")]
     [Space(10)]
     [Tooltip("Force applied upwards when jumping.")]
-    public float m_fJumpForce = 5.0f;
+    [SerializeField]
+    private float m_fJumpForce = 5.0f;
 
     [Tooltip("Height of the player above the ground when they respawn.")]
-    public float m_fRespawnHeight = 10.0f;
+    [SerializeField]
+    private float m_fRespawnHeight = 10.0f;
 
-    // Private:
+    [Tooltip("Whether or not the player is standing on a walkable surface.")]
+    [SerializeField]
+    private bool m_bOnGround = false;
+
+    //[Tooltip("Whether or not Unity's character controller component is grounded.")]
+    //[SerializeField]
+    //private bool m_bCharControllerGrounded = false;
 
     // Movement
     private CharacterController m_controller;
@@ -69,11 +90,15 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_v3SurfaceUp;
     private Vector3 m_v3SurfaceForward;
     private Vector3 m_v3Velocity;
+    private float m_fSprintDot;
+    private bool m_bShouldSprint;
     private bool m_bShouldJump;
 
-    [Tooltip("Whether or not the player is standing on a walkable surface.")]
-    [SerializeField]
-    private bool m_bOnGround;
+    // Jumping
+    private float m_fJumpGravity; // Gravity used when jumping.
+    private float m_fJumpDuration; // Jump time duration.
+    private float m_fJumpInitialVelocity; // Initial impulse applied when jumping.
+    private int m_nJumpFrame;
 
     // Looking
     Transform m_cameraTransform;
@@ -87,7 +112,7 @@ public class PlayerController : MonoBehaviour
     OverrideFunction m_overrideFunction;
     bool m_bOverridden;
 
-    void Awake()
+    private void Awake()
     {
         m_controller = GetComponent<CharacterController>();
         m_cameraEffects = GetComponentInChildren<CameraEffects>();
@@ -99,6 +124,20 @@ public class PlayerController : MonoBehaviour
         m_v3SurfaceForward = transform.forward;
         m_v3SurfaceRight = transform.right;
 
+        // Convert the sprint angle to a dot product value.
+        m_fSprintDot = 1.0f - (m_fSprintAngleOffset / 90.0f);
+
+        m_fJumpGravity = Physics.gravity.y;
+        m_fJumpDuration = m_fJumpDistance / m_fMaxGroundMoveSpeed;
+
+        // Next two jumping variables are determined using the kinematic formula: D = 1/2at^2 + vt for projectile motion.
+
+        // Determine gravity level used when jumping.
+        m_fJumpGravity = (-2 * m_fJumpHeight) / ((m_fJumpDuration * 0.5f) * (m_fJumpDuration * 0.5f));
+
+        // Determine initial impulse added to vertical velocity when jumping.
+        m_fJumpInitialVelocity = (2 * m_fJumpHeight) / (m_fJumpDuration * 0.5f);
+    
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -209,10 +248,6 @@ public class PlayerController : MonoBehaviour
     */
     public Vector3 LookForward()
     {
-        //Vector3 dir = m_cameraTransform.forward;
-        //dir.y = 0.0f;
-        //return dir.normalized;
-
         Vector3 v3Forward;
         Vector3 v3Up;
         Vector3 v3Right;
@@ -229,10 +264,6 @@ public class PlayerController : MonoBehaviour
     */
     public Vector3 LookRight()
     {
-        //Vector3 dir = m_cameraTransform.right;
-        //dir.y = 0.0f;
-        //return dir.normalized;
-
         Vector3 v3Forward;
         Vector3 v3Up;
         Vector3 v3Right;
@@ -328,7 +359,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     private void FixedUpdate()
     {
         // ------------------------------------------------------------------------------------------------------
@@ -342,11 +372,6 @@ public class PlayerController : MonoBehaviour
             // Respawn they player if they fall too far.
             RespawnBelowMinY();
 
-            //m_controller.Move(m_v3Velocity * Time.fixedDeltaTime);
-
-            // Set velocity to controller velocity output to apply any changes made by the controller physics.
-            // m_v3Velocity = m_controller.velocity;
-
             return;
         }
 
@@ -357,8 +382,6 @@ public class PlayerController : MonoBehaviour
         Vector3 v3NetForce = Vector3.zero;
 
         m_fFOVIncrease = 0.0f;
-
-        LookForward();
 
         if (m_bOnGround)
         {
@@ -371,9 +394,12 @@ public class PlayerController : MonoBehaviour
             {
                 // ------------------------------------------------------------------------------------------------------
                 // Sprinting.
+
                 float fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
 
-                if (Input.GetKey(KeyCode.LeftShift))
+                float fMoveDirDot = Vector3.Dot(m_v3MoveDirection, LookForward());
+
+                if (m_bShouldSprint && fMoveDirDot >= m_fSprintDot)
                 {
                     m_fFOVIncrease = 10.0f;
                     fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
@@ -464,21 +490,34 @@ public class PlayerController : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------
         // Jumping
 
-        if (m_bOnGround && m_bShouldJump)
+        if (m_nJumpFrame > 0)
         {
             // Remove external Y velocity factors affecting jumping.
             m_v3Velocity.y = 0.0f;
-            v3NetForce.y = 0.0f;
 
             // Add jumping force.
-            v3NetForce += JumpForce();
+            //v3NetForce += JumpForce();
+
+            v3NetForce.y = m_fJumpInitialVelocity;
+
             m_bShouldJump = false;
+            m_bOnGround = false;
+
+            --m_nJumpFrame;
         }
+        
 
         // ------------------------------------------------------------------------------------------------------
         // Gravity.
-        m_v3Velocity += Physics.gravity * Time.fixedDeltaTime;
 
+        //if (!m_bOnGround)
+        //{
+
+        m_v3Velocity.y += m_fJumpGravity * Time.fixedDeltaTime;
+        //}
+        //else
+            //m_v3Velocity.y += Physics.gravity.y * Time.fixedDeltaTime;
+            
         // ------------------------------------------------------------------------------------------------------
         // Final forces.
 
@@ -499,8 +538,9 @@ public class PlayerController : MonoBehaviour
 
         m_fLookEulerX = Mathf.Clamp(m_fLookEulerX, -89.9f, 89.9f);
 
-        Quaternion targetCamRotation = Quaternion.Euler(m_fLookEulerX, m_fLookEulerY, 0.0f);
-        m_cameraTransform.rotation = Quaternion.Slerp(m_cameraTransform.rotation, targetCamRotation, 0.7f);
+        //Quaternion targetCamRotation = Quaternion.Euler(m_fLookEulerX, m_fLookEulerY, 0.0f);
+        m_cameraTransform.rotation = Quaternion.Euler(m_fLookEulerX, m_fLookEulerY, 0.0f);
+        //m_cameraTransform.rotation = Quaternion.Slerp(m_cameraTransform.rotation, targetCamRotation, 1.0f);
 
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceUp * 3.0f), Color.green);
@@ -513,6 +553,8 @@ public class PlayerController : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------------
         // Ground check
+
+        bool bPrevGrounded = m_bOnGround;
 
         Ray sphereRay = new Ray(transform.position, -transform.up);
 
@@ -541,13 +583,17 @@ public class PlayerController : MonoBehaviour
         m_cameraEffects.SetFOVOffset(Mathf.Clamp((Vector3.Dot(m_v3Velocity, m_cameraTransform.forward) - m_fMaxGroundMoveSpeed) * 3 + m_fFOVIncrease, 0.0f, 15.0f));
 
         // ------------------------------------------------------------------------------------------------------
-        // Jumping input
-        if (Input.GetKey(KeyCode.Space) && m_bOnGround)
+        // Sprint & jumping input
+
+        bool bPrevShouldJump = m_bShouldJump;
+
+        m_bShouldSprint = m_bOnGround && Input.GetKey(KeyCode.LeftShift);
+        m_bShouldJump = m_bOnGround && Input.GetKey(KeyCode.Space);
+
+        if (!bPrevShouldJump && m_bShouldJump)
         {
-            m_bShouldJump = true;
+            m_nJumpFrame = 4; // Give multiple frames to clear the ground.
         }
-        else if (!m_bOnGround)
-            m_bShouldJump = false;
 
         // ------------------------------------------------------------------------------------------------------
         // Movement

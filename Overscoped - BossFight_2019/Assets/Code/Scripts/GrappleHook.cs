@@ -354,7 +354,8 @@ public class GrappleHook : MonoBehaviour
                 {
                     m_controller.FreeOverride();
 
-                    m_pullObj.LetGo();
+                    if(m_pullObj != null)
+                        m_pullObj.LetGo();
 
                     m_bGrappleHookActive = false;
                     m_graphookScript.UnLodge();
@@ -372,7 +373,8 @@ public class GrappleHook : MonoBehaviour
                 // Cancel if the rope becomes too long, or the player released the left mouse button.
                 if (bForceRelease || m_fGrapRopeLength >= m_fGrapplebreakDistance * m_fGrapplebreakDistance)
                 {
-                    m_pullObj.LetGo();
+                    if(m_pullObj)
+                        m_pullObj.LetGo();
 
                     m_controller.FreeOverride();
                     m_grappleHook.SetActive(false);
@@ -495,6 +497,7 @@ public class GrappleHook : MonoBehaviour
         // Set compute shader globals...
         m_lineCompute.SetFloat("inFlyProgress", m_graphookScript.FlyProgress());
         m_lineCompute.SetFloat("inRippleMagnitude", m_fRippleMult);
+        m_lineCompute.SetFloat("inDeltaTime", Time.deltaTime);
 
         // Set compute shader buffer data...
         m_bezierPointBuffer.SetData(m_ropeCurve.m_v3Points, 0, 0, m_ropeCurve.m_v3Points.Length);

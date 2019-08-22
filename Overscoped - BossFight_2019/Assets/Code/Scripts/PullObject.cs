@@ -90,7 +90,7 @@ public class PullObject : MonoBehaviour
             transform.localRotation = Quaternion.Euler(m_v3StartEuler);
     }
 
-    public void Decouple(Vector3 playerDirection)
+    public virtual void Trigger(Vector3 playerDirection)
     {
         m_rigidbody.isKinematic = false;
         m_bCoupled = false;

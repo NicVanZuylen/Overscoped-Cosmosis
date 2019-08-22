@@ -98,6 +98,7 @@ public class PlayerController : MonoBehaviour
     private float m_fJumpGravity; // Gravity used when jumping.
     private float m_fJumpDuration; // Jump time duration.
     private float m_fJumpInitialVelocity; // Initial impulse applied when jumping.
+    private float m_fCurrentGravity;
     private int m_nJumpFrame;
 
     // Looking
@@ -134,6 +135,8 @@ public class PlayerController : MonoBehaviour
 
         // Determine gravity level used when jumping.
         m_fJumpGravity = (-2 * m_fJumpHeight) / ((m_fJumpDuration * 0.5f) * (m_fJumpDuration * 0.5f));
+
+        m_fCurrentGravity = m_fJumpGravity;
 
         // Determine initial impulse added to vertical velocity when jumping.
         m_fJumpInitialVelocity = (2 * m_fJumpHeight) / (m_fJumpDuration * 0.5f);
@@ -240,6 +243,33 @@ public class PlayerController : MonoBehaviour
     public bool IsOverridden()
     {
         return m_bOverridden;
+    }
+
+    /*
+    Description: Set the acceleration due to gravity of the player. 
+    Param:
+        float fGravity: The acceleration due to gravity to use.
+    */
+    public void SetGravity(float fGravity)
+    {
+        m_fCurrentGravity = fGravity;
+    }
+
+    /*
+    Description: Get the acceleration due to gravity of the player.
+    Return Type: float
+    */
+    public float GetGravity()
+    {
+        return m_fCurrentGravity;
+    }
+
+    /*
+    Description: Get the default acceleration due to gravity calculated from jump height and distance.
+    */
+    public float JumpGravity()
+    {
+        return m_fJumpGravity;
     }
 
     /*
@@ -513,7 +543,7 @@ public class PlayerController : MonoBehaviour
         //if (!m_bOnGround)
         //{
 
-        m_v3Velocity.y += m_fJumpGravity * Time.fixedDeltaTime;
+        m_v3Velocity.y += m_fCurrentGravity * Time.fixedDeltaTime;
         //}
         //else
             //m_v3Velocity.y += Physics.gravity.y * Time.fixedDeltaTime;
@@ -567,6 +597,9 @@ public class PlayerController : MonoBehaviour
         if (m_bOnGround)
         {
             CalculateSurfaceAxes(m_groundHit.normal);
+
+            // Reset gravity.
+            m_fCurrentGravity = m_fJumpGravity;
 
             if (m_groundHit.collider.tag == "CheckPoint") // Set respawn checkpoint.
                 m_v3RespawnPosition = m_groundHit.collider.bounds.center + new Vector3(0.0f, (m_groundHit.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);

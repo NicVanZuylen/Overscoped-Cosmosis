@@ -8,6 +8,10 @@ public class Meteor : MonoBehaviour
     [SerializeField]
     private GameObject m_player = null;
 
+    [Tooltip("Reference to the Meteror's AOE")]
+    [SerializeField]
+    private MeteorAOE m_meteorAOE;
+
     [Tooltip("Speed in which the meteor will travel.")]
     [SerializeField]
     private float m_fSpeed = 50.0f;
@@ -50,6 +54,8 @@ public class Meteor : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        m_meteorAOE.AOE(transform.position);
+
         // Deal damage to the player.
         if(collision.gameObject == m_player)
         {

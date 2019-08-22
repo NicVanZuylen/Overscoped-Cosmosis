@@ -17,18 +17,34 @@ public class MeteorAOE : MonoBehaviour
     [SerializeField]
     private ParticleSystem m_AoeParticle;
 
+    [SerializeField]
+    private float m_fWaitForParticleTimer;
+
+    private float m_fWaitForParticleCooldown;
+
     void Start()
     {
         m_playerStats = m_player.GetComponent<PlayerStats>();
+        m_fWaitForParticleCooldown = m_AoeParticle.main.duration;
+        m_fWaitForParticleTimer = m_fWaitForParticleCooldown;
     }
 
-    public void AOE(Vector3 v3Position)
+    public void AOE()
     {
+        m_fWaitForParticleTimer = m_fWaitForParticleCooldown;
         gameObject.SetActive(true);
-        transform.position = v3Position;
         m_AoeParticle.Play();
     }
-    
+
+    private void Update()
+    {
+        m_fWaitForParticleTimer -= Time.deltaTime;
+        if(m_fWaitForParticleTimer <= 0)
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
     void OnTriggerStay(Collider other)
     {
         // Deal damage to the player.
@@ -37,10 +53,4 @@ public class MeteorAOE : MonoBehaviour
             m_playerStats.DealDamage(m_fAoeDPS * Time.deltaTime);
         }
     }
-
-    IEnumerator WaitForParticle()
-    {
-        yield return new WaitForSeconds(m_AoeParticle.main.duration);
-        gameObject.SetActive(false);
-    } 
 }

@@ -98,6 +98,7 @@ public class BossBehaviour : MonoBehaviour
     private float m_fBeamTime;
 
     private GameObject[] m_allMeteorSpawns;
+    private EnergyPillar[] m_energyPillers;
     private bool m_bRandomMeteor;
 
     private static BoxCollider m_meteorSpawnVol;
@@ -455,6 +456,10 @@ public class BossBehaviour : MonoBehaviour
             if (beamHit.collider.gameObject == m_player)
             {
                 m_playerStats.DealDamage(m_fBeamDPS * Time.deltaTime);
+            }
+            else if (beamHit.collider.GetComponent<EnergyPillar>())
+            {
+                beamHit.collider.GetComponent<EnergyPillar>().Charge(this.transform.GetComponent<BossBehaviour>());
             }
             else
                 beamLinePoints[1] = beamHit.point;

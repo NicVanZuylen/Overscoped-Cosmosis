@@ -14,9 +14,11 @@ public class EnergyPillar : MonoBehaviour
 
     private float m_fCharge = 0.0f;
 
+    private EnergyPillar[] m_energyPillars;
+
     private void Awake()
     {
-        
+        m_energyPillars = FindObjectsOfType<EnergyPillar>();
     }
 
     public void Charge(BossBehaviour bossScript)
@@ -32,7 +34,17 @@ public class EnergyPillar : MonoBehaviour
         // Stun boss.
         bossScript.m_bIsStuck = true;
 
+        foreach(EnergyPillar energyPiller in m_energyPillars)
+        {
+            m_fCharge = 0;
+        }
+
         // Deactivate object. (Will have effects for destruction later.)
         gameObject.SetActive(false);
+    }
+
+    private void ResetCharge()
+    {
+        m_fCharge = 0;
     }
 }

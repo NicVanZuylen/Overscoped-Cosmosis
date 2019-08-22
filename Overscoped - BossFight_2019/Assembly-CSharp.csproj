@@ -69,6 +69,7 @@
     <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
     <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
     <Compile Include="Assets\Code\Scripts\CameraEffects.cs" />
+    <Compile Include="Assets\Code\Scripts\EnergyPillar.cs" />
     <Compile Include="Assets\Code\Scripts\GameManager.cs" />
     <Compile Include="Assets\Code\Scripts\GrappleHook.cs" />
     <Compile Include="Assets\Code\Scripts\Hook.cs" />
@@ -82,9 +83,10 @@
     <Compile Include="Assets\Code\Scripts\PullObject.cs" />
     <Compile Include="Assets\Code\Scripts\RBPlayerController.cs" />
     <Compile Include="Assets\Code\Scripts\Respawn.cs" />
+    <Compile Include="Assets\Code\Scripts\Switch.cs" />
     <Compile Include="Assets\ThirdParty\PlayModeComponentSaver\UnityPlayModeSaverSceneUtils.cs" />
     <None Include="Assets\Code\BossBehaviours\BossTree.xml" />
-    <None Include="Assets\3rd Party\tripolygon\UModeler\Materials\Basic\UModeler_UnlitVertexColorShader.shader" />
+    <None Include="Assets\ThirdParty\3rd Party\tripolygon\UModeler\Materials\Basic\UModeler_UnlitVertexColorShader.shader" />
     <None Include="Assets\Code\ComputeShaders\CalcLinePoints.compute" />
     <None Include="Assets\BURT\Materials\Shaders\AMP_Player.shader" />
     <None Include="Assets\BURT\Materials\Shaders\AMP_Line_03.shader" />
@@ -95,7 +97,11 @@
     <None Include="Assets\BURT\Materials\Shaders\AMP_Boss_Beam.shader" />
     <None Include="Assets\BURT\Materials\Shaders\AMP_Parallax_UL.shader" />
     <None Include="Assets\BTreeTemp.xml" />
+    <None Include="Assets\BURT\Materials\Shaders\AMP_Sprite.shader" />
     <None Include="Assets\BURT\Materials\Shaders\AMP_Portal.shader" />
+    <None Include="Assets\BURT\Materials\Shaders\AMP_UI.shader" />
+    <None Include="Assets\BURT\Materials\Shaders\AMP_Projectile_Energy.shader" />
+    <None Include="Assets\BURT\Materials\Shaders\Amp_Projectile.shader" />
     <None Include="Assets\Code\BossBehaviours\BossTreeExample.xml" />
     <None Include="Assets\BURT\Materials\Shaders\AMP_Crosshair.shader" />
     <None Include="Assets\BURT\Materials\Shaders\AMP_Line.shader" />
@@ -332,7 +338,7 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.8f1/Editor/Data/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="UModelerCommon">
-      <HintPath>C:/Users/s173069/Desktop/Overscoped/Overscoped - BossFight_2019/Assets/3rd Party/tripolygon/UModeler/Scripts/UModelerCommon.dll</HintPath>
+      <HintPath>C:/Users/s173069/Desktop/Overscoped/Overscoped - BossFight_2019/Assets/ThirdParty/3rd Party/tripolygon/UModeler/Scripts/UModelerCommon.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>C:/Users/s173069/Desktop/Overscoped/Overscoped - BossFight_2019/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>

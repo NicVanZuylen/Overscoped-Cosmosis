@@ -21,15 +21,27 @@ public class Meteor : MonoBehaviour
     private float m_fDirectHitDamage = 30.0f;
 
     private PlayerStats m_playerStats;
+    private Transform m_childPlane;
+    private Rigidbody m_rigidBody;
     private Vector3 m_v3Target;
     private Vector3 m_v3TravelDirection;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         m_playerStats = m_player.GetComponent<PlayerStats>();
+        m_rigidBody = GetComponent<Rigidbody>();
+        m_childPlane = transform.GetChild(0);
 
         m_v3Target = m_player.transform.position;
+
+        GameObject[] m_targetObjects = GameObject.FindGameObjectsWithTag("MeteorSpawn");
+
+        SphereCollider thisCollider = GetComponent<SphereCollider>();
+
+        for (int i = 0; i < m_targetObjects.Length; ++i)
+            Physics.IgnoreCollision(m_targetObjects[i].GetComponent<BoxCollider>(), thisCollider, true);
+
+        gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -37,6 +49,11 @@ public class Meteor : MonoBehaviour
     {
         // Make meteor move toward player
         transform.position += m_v3TravelDirection * m_fSpeed * Time.deltaTime;
+
+        // Make the plane effect always face the player.
+        m_childPlane.transform.LookAt(m_player.transform, Vector3.up);
+
+        m_rigidBody.velocity = Vector3.zero;
     }
 
     public void Summon(Vector3 v3Origin, Vector3 v3Target)
@@ -52,12 +69,12 @@ public class Meteor : MonoBehaviour
         m_v3TravelDirection = (m_v3Target - transform.position).normalized;
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider other)
     {
         m_meteorAOE.AOE(transform.position);
 
         // Deal damage to the player.
-        if(collision.gameObject == m_player)
+        if(other.gameObject == m_player)
         {
             m_playerStats.DealDamage(m_fDirectHitDamage);
         }

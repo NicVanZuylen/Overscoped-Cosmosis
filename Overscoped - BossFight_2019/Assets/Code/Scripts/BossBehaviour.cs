@@ -125,14 +125,21 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.SetActive(false);
 
+#if (UNITY_EDITOR)
         string treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
-        m_bossTree = BTreeEditor.BTreeEditor.LoadTree(treePath, this);
+#else
+        string treePath = Application.dataPath + "/BossTreePhase1.xml";
+#endif
+        m_bossTree = BTreeEditor.NodeData.LoadTree(treePath, this);
     }
 
     void Update()
     {
         if (CondIsIdleAnimation() == ENodeResult.NODE_FAILURE)
             m_animator.SetInteger("AttackID", 0);
+
+        if (Input.GetKeyDown(KeyCode.G))
+            m_bIsStuck = true;
 
         m_bossTree.Run();
 
@@ -254,8 +261,18 @@ public class BossBehaviour : MonoBehaviour
     {
         if (m_bIsStuck)
         {
-            m_animator.enabled = false;
+            // Reset to idle state.
+            m_animator.SetBool("isStunned", true);
+
+            // Disable beam & reset attack.
+            m_beamLine.enabled = false;
+            m_fBeamTime = 0.0f;
+
+            m_animator.SetInteger("AttackID", 0);
+            m_fTimeSinceGlobalAttack = 0.0f;
+
             m_armour.tag = "PullObj";
+
             StartCoroutine(ResetStuck());
             return ENodeResult.NODE_SUCCESS;
         }
@@ -342,6 +359,9 @@ public class BossBehaviour : MonoBehaviour
         else if(m_bRandomMeteor)
         {
             Debug.Log("Random Meteor Attack!");
+
+            if (m_allMeteorSpawns.Length <= 0)
+                return ENodeResult.NODE_SUCCESS;
 
             // Pick random spawn point object.
             GameObject spawnObj = m_allMeteorSpawns[Random.Range(0, m_allMeteorSpawns.Length)].transform.GetChild(0).gameObject;
@@ -467,7 +487,8 @@ public class BossBehaviour : MonoBehaviour
     {
         yield return new WaitForSeconds(m_fStuckTime);
         m_bIsStuck = false;
-        m_animator.enabled = true;
+
+        m_animator.SetBool("isStunned", false);
         m_armour.tag = "Untagged";
     }
 

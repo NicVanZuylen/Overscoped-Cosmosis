@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -44,6 +45,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fPortalPunchDamage = 50.0f;
 
+    [Tooltip("Force applied to the player when they are hit by the portal punch attack.")]
+    [SerializeField]
+    private float m_fPortalPunchForce = 100.0f;
+
     [Tooltip("Regen mode for mana regen.")]
     [SerializeField]
     private ERegenMode m_manaRegenMode = ERegenMode.REGEN_LINEAR;
@@ -53,16 +58,19 @@ public class PlayerStats : MonoBehaviour
     [Space(10)]
 
     [SerializeField]
-    private RectTransform m_healthFillRect = null;
+    private Image m_healthFill = null;
 
     [SerializeField]
-    private RectTransform m_manaFillRect = null;
+    private Material m_manaFillMat = null;
+
+    //[SerializeField]
+    //private Material m_beamFillMat = null;
 
     [SerializeField]
-    private Material m_manaMat = null;
+    private Material m_armHealthMat = null;
 
     [SerializeField]
-    private Material m_healthMat = null;
+    private Material m_armManaMat = null;
 
     // Private:
 
@@ -121,11 +129,17 @@ public class PlayerStats : MonoBehaviour
         m_fHealth = Mathf.Clamp(m_fHealth, 0.0f, m_fMaxHealth);
         m_fMana = Mathf.Clamp(m_fMana, 0.0f, m_fMaxMana);
 
-        m_healthMat.SetFloat("_Mana", 1.0f - (m_fHealth / m_fMaxHealth));
-        m_manaMat.SetFloat("_Mana", 1.0f - (m_fMana / m_fMaxMana));
+        m_armHealthMat.SetFloat("_Mana", 1.0f - (m_fHealth / m_fMaxHealth));
+        m_armManaMat.SetFloat("_Mana", 1.0f - (m_fMana / m_fMaxMana));
 
-        m_healthFillRect.sizeDelta = new Vector2((m_fHealth / m_fMaxHealth) * 300.0f, m_healthFillRect.sizeDelta.y);
-        m_manaFillRect.sizeDelta = new Vector3((m_fMana / m_fMaxMana) * 300.0f, m_manaFillRect.sizeDelta.y);
+        //m_healthFillMat.sizeDelta = new Vector2((m_fHealth / m_fMaxHealth) * 300.0f, m_healthFillMat.sizeDelta.y);
+        //m_manaFillMat.sizeDelta = new Vector3((m_fMana / m_fMaxMana) * 300.0f, m_manaFillMat.sizeDelta.y);
+
+        //m_healthFillMat.SetFloat("_Resource%", m_fHealth / m_fMaxHealth);
+
+        m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
+        m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
+        //m_beamFillMat.SetFloat("_Resource%", m_fMana / m_fMaxMana);
     }
 
     /*
@@ -193,7 +207,7 @@ public class PlayerStats : MonoBehaviour
             Debug.Log("Portal Punch Hit!");
 
             // Add force in the punch direction.
-            m_controller.AddImpulse(-other.transform.up * 200.0f);
+            m_controller.AddImpulse(-other.transform.up * m_fPortalPunchForce);
 
             // Shake camera.
             m_camEffects.ApplyShakeOverTime(0.5f, 2.0f, true);

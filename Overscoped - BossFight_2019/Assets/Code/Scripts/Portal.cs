@@ -45,7 +45,7 @@ public class Portal : MonoBehaviour
     private bool m_bActive;
 
     private Rigidbody m_rigidBody;
-    private Transform m_visualTransform; // Transform of the visible part of the portal.
+    private Material m_portalMat;
     private Vector3 m_v3PunchDirection;
     private float m_fCurrentTime;
     public float m_fCollisionFreeTime;
@@ -84,7 +84,11 @@ public class Portal : MonoBehaviour
         Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_arm.GetComponent<CapsuleCollider>());
         m_rigidBody = GetComponent<Rigidbody>();
 
-        m_visualTransform = transform.GetChild(0);
+        m_portalMat = transform.GetChild(0).GetComponent<MeshRenderer>().material;
+
+        // Set initial opacity.
+        m_portalMat.SetFloat("_Opacity", 0.0f);
+
         m_stage = OpenStage;
         m_bActive = false;
     }
@@ -113,9 +117,9 @@ public class Portal : MonoBehaviour
 
         float fScaleProgress = (1.0f - (m_fCurrentTime / m_fCloseTime));
 
-        m_visualTransform.localScale = new Vector3(fScaleProgress, fScaleProgress, 1.0f); // Scale portal opening.
+        m_portalMat.SetFloat("_Opacity", fScaleProgress);
 
-        if(m_fCurrentTime <= 0.0f)
+        if (m_fCurrentTime <= 0.0f)
         {
             m_arm.SetActive(true);
             m_arm.transform.rotation = (Quaternion.LookRotation(m_v3PunchDirection, Vector3.up) * Quaternion.Euler(-90.0f, 0.0f, 0.0f));
@@ -141,7 +145,6 @@ public class Portal : MonoBehaviour
         m_fCurrentTime -= Time.deltaTime;
 
         float fArmOut = (1.0f - (m_fCurrentTime / m_fArmEnterTime)) * m_fArmLength;
-        //fArmOut -= m_fArmLength;
 
         m_arm.transform.position = transform.position + (m_v3PunchDirection * fArmOut);
 
@@ -161,7 +164,6 @@ public class Portal : MonoBehaviour
         m_fCurrentTime -= Time.deltaTime;
 
         float fArmOut = (m_fCurrentTime / m_fArmExitTime) * m_fArmLength;
-        //fArmOut -= m_fArmLength;
 
         m_arm.transform.position = transform.position + (m_v3PunchDirection * fArmOut);
 
@@ -184,7 +186,7 @@ public class Portal : MonoBehaviour
 
         float fScaleProgress = (m_fCurrentTime / m_fCloseTime);
 
-        m_visualTransform.localScale = new Vector3(fScaleProgress, fScaleProgress, 1.0f); // Scale portal closure.
+        m_portalMat.SetFloat("_Opacity", fScaleProgress);
 
         if (m_fCurrentTime <= 0.0f)
         {
@@ -213,7 +215,7 @@ public class Portal : MonoBehaviour
     {
         // Reset open time, scale and collision time.
         m_fCurrentTime = m_fOpenTime;
-        m_visualTransform.localScale = Vector3.zero;
+        m_portalMat.SetFloat("_Opacity", 0.0f);
         m_fCollisionFreeTime = 0.0f;
     }
 }

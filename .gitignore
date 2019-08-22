@@ -357,6 +357,15 @@ MigrationBackup/
 [Bb]uilds/
 [Ll]ogs/
 
+*/[Ll]ibrary/StateCache
+*/[Ll]ibrary/[Ee]ditorInstance.json
+# */[Ll]ibrary/[Aa]ssetDatabase3
+*/[Ll]ibrary/[Ss]ceneVisibilityState.asset
+*/[Ll]ibrary/CrashedAssetImports.txt
+*/[Ll]ibrary/PlayerDataCache/
+*/[Ll]ibrary/LastBuild.buildreport
+*/[Bb]uilds/
+
 # Never ignore Asset meta data
 ![Aa]ssets/**/*.meta
 
@@ -380,6 +389,9 @@ ExportedObj/
 
 # Unity3D generated file on crash reports
 sysinfo.txt
+
+# Unity Editor window layout
+*.dwlt
 
 # Builds
 *.apk

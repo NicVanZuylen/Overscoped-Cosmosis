@@ -63,9 +63,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("Misc.")]
     [Space(10)]
-    [Tooltip("Force applied upwards when jumping.")]
-    [SerializeField]
-    private float m_fJumpForce = 5.0f;
 
     [Tooltip("Height of the player above the ground when they respawn.")]
     [SerializeField]
@@ -74,10 +71,6 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Whether or not the player is standing on a walkable surface.")]
     [SerializeField]
     private bool m_bOnGround = false;
-
-    //[Tooltip("Whether or not Unity's character controller component is grounded.")]
-    //[SerializeField]
-    //private bool m_bCharControllerGrounded = false;
 
     // Movement
     private CharacterController m_controller;
@@ -146,12 +139,12 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
-    Description: Get a force to be applied as a result of jumping.
-    Return Type: Vector3
+    Description: Get a quaternion describing the look rotation of the player.
+    Return Type: Quaternion
     */
-    public Vector3 JumpForce()
+    public Quaternion LookRotation()
     {
-        return m_fJumpForce * Vector3.up;
+        return Quaternion.Euler(m_fLookEulerX, m_fLookEulerY, 0.0f);
     }
 
     /*
@@ -569,7 +562,7 @@ public class PlayerController : MonoBehaviour
         m_fLookEulerX = Mathf.Clamp(m_fLookEulerX, -89.9f, 89.9f);
 
         //Quaternion targetCamRotation = Quaternion.Euler(m_fLookEulerX, m_fLookEulerY, 0.0f);
-        m_cameraTransform.rotation = Quaternion.Euler(m_fLookEulerX, m_fLookEulerY, 0.0f);
+        m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler());
         //m_cameraTransform.rotation = Quaternion.Slerp(m_cameraTransform.rotation, targetCamRotation, 1.0f);
 
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);

@@ -42,6 +42,12 @@ public class GrappleHook : MonoBehaviour
     [Tooltip("The magnitude of the forward force applied to the player upon rope release.")]
     public float m_fReleaseForce = 20.0f;
 
+    [Tooltip("The magnitude of the foward force applied to the player when grappling from the ground.")]
+    public float m_fForwardGroundGrappleForce = 10.0f;
+
+    [Tooltip("The magnitude of the upward force applied to the player when grappling from the ground.")]
+    public float m_fUpGroundGrappleForce = 5.0f;
+
     [Tooltip("Whether or not to use the default jumping gravity whilst flying after grapple.")]
     public bool m_bJumpGravOnRelease = false;
 
@@ -113,6 +119,7 @@ public class GrappleHook : MonoBehaviour
     private bool m_bJustImpacted;
 
     // Rope & Grapple function
+    private PlayerBeam m_beamScript;
     private GradientColorKey[] m_colorKeys;
     private RaycastHit m_fireHit;
     private Bezier m_ropeCurve;
@@ -121,6 +128,7 @@ public class GrappleHook : MonoBehaviour
     private Vector3[] m_v3ShakeVectors;
     private Vector3 m_v3GrapplePoint;
     private Vector3 m_v3GrappleNormal;
+    private Vector3 m_v3GrappleBoost;
     private float m_fGrapRopeLength;
     private float m_fShakeTime;
     private float m_fLineThickness;
@@ -139,6 +147,8 @@ public class GrappleHook : MonoBehaviour
 
     void Awake()
     {
+        m_beamScript = GetComponent<PlayerBeam>();
+
         const int nPointCount = 4;
 
         m_outputPointBuffer = new ComputeBuffer(m_grappleLine.positionCount * 2, sizeof(float) * 3); // Multiplied by two to include wobble effect vectors.
@@ -214,7 +224,8 @@ public class GrappleHook : MonoBehaviour
 
         const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
 
-        if(bPlayerHasEnoughMana && !m_bGrappleHookActive && Input.GetMouseButtonDown(0) && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
+        if(bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButtonDown(0) 
+            && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
         {
             m_hitTransform = m_fireHit.transform;
 
@@ -242,7 +253,8 @@ public class GrappleHook : MonoBehaviour
 
             m_bGrappleHookActive = true;
         }
-        else if (bPlayerHasEnoughMana && !m_bGrappleHookActive && Input.GetMouseButtonDown(1) && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
+        else if (bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButtonDown(1) 
+            && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
         {
             if (m_fireHit.collider.tag == "PullObj")
             {
@@ -304,13 +316,23 @@ public class GrappleHook : MonoBehaviour
             {
                 if (m_bJustImpacted)
                 {
-                    m_cameraEffects.ApplyShakeOverTime(0.05f, 1.0f, true);
+                    m_cameraEffects.ApplyShake(0.05f, 1.0f, true);
                     m_grappleHook.transform.parent = m_hitTransform;
+
+                    // Apply initial force if grounded.
+                    if(m_controller.IsGrounded())
+                    {
+                        m_v3GrappleBoost = m_cameraTransform.forward * m_fForwardGroundGrappleForce;
+                        m_v3GrappleBoost += m_cameraTransform.up * m_fUpGroundGrappleForce;
+                    }
 
                     m_bJustImpacted = false;
                 }
                 else
-                    m_cameraEffects.ApplyShakeOverTime(0.1f, 0.1f);
+                {
+                    m_cameraEffects.ApplyShake(0.1f, 0.1f);
+                    m_v3GrappleBoost = Vector3.zero;
+                }
 
                 // Increment grapple time.
                 m_fGrappleTime += Time.deltaTime;
@@ -345,7 +367,7 @@ public class GrappleHook : MonoBehaviour
                 if(m_bJustImpacted)
                 {
                     m_grappleHook.transform.parent = m_hitTransform;
-                    m_cameraEffects.ApplyShakeOverTime(0.05f, 1.0f, true);
+                    m_cameraEffects.ApplyShake(0.05f, 1.0f, true);
 
                     m_bJustImpacted = false;
                 }
@@ -536,7 +558,7 @@ public class GrappleHook : MonoBehaviour
 
     Vector3 GrappleFly(PlayerController controller)
     {
-        Vector3 v3NetForce = Vector3.zero;
+        Vector3 v3NetForce = m_v3GrappleBoost;
 
         Vector3 v3GrappleDif = m_v3GrapplePoint - transform.position;
         Vector3 v3GrappleDir = v3GrappleDif.normalized;

@@ -12,6 +12,10 @@ public class EnergyPillar : MonoBehaviour
     [SerializeField]
     private float m_fChargeRate = 25.0f;
 
+    [Tooltip("Reference to Explosion Particle")]
+    [SerializeField]
+    private ParticleSystem m_explosion;
+
     private float m_fCharge = 0.0f;
 
     private EnergyPillar[] m_energyPillars;
@@ -19,6 +23,7 @@ public class EnergyPillar : MonoBehaviour
     private void Awake()
     {
         m_energyPillars = FindObjectsOfType<EnergyPillar>();
+        m_explosion.Stop();
     }
 
     public void Charge(BossBehaviour bossScript)
@@ -31,13 +36,18 @@ public class EnergyPillar : MonoBehaviour
 
     public void Explode(BossBehaviour bossScript)
     {
+        m_explosion.transform.position = new Vector3(transform.position.x,transform.position.y + 70, transform.position.z);
         // Stun boss.
         bossScript.m_bIsStuck = true;
 
+        m_explosion.Play();
+
         foreach(EnergyPillar energyPiller in m_energyPillars)
         {
-            m_fCharge = 0;
+            energyPiller.ResetCharge();
         }
+
+        //Add explosion effect, don't destory
 
         // Deactivate object. (Will have effects for destruction later.)
         gameObject.SetActive(false);

@@ -103,6 +103,8 @@ public class BossBehaviour : MonoBehaviour
 
     private static BoxCollider m_meteorSpawnVol;
 
+    public string treePath;
+
     void Awake()
     {
         m_playerController = m_player.GetComponent<PlayerController>();
@@ -127,9 +129,9 @@ public class BossBehaviour : MonoBehaviour
         m_portal.SetActive(false);
 
 #if (UNITY_EDITOR)
-        string treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
+        treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
 #else
-        string treePath = Application.dataPath + "/BossTreePhase1.xml";
+        treePath = Application.dataPath + "/BossTreePhase1.xml";
 #endif
         m_bossTree = BTreeEditor.NodeData.LoadTree(treePath, this);
     }
@@ -273,6 +275,25 @@ public class BossBehaviour : MonoBehaviour
             m_fTimeSinceGlobalAttack = 0.0f;
 
             m_armour.tag = "PullObj";
+
+            if(!m_armour.GetComponent<PullObject>().enabled)
+            {
+                m_bIsStuck = false;
+
+                //Load next boss behaviour
+
+
+#if (UNITY_EDITOR)
+                treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase2.xml";
+#else
+        treePath = Application.dataPath + "/BossTreePhase2.xml";
+#endif
+                m_bossTree = BTreeEditor.NodeData.LoadTree(treePath, this);
+
+                m_bossTree.Run();
+
+                return ENodeResult.NODE_SUCCESS;
+            }
 
             StartCoroutine(ResetStuck());
             return ENodeResult.NODE_SUCCESS;

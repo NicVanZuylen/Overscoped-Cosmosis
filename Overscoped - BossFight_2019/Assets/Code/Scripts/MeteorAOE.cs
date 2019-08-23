@@ -14,10 +14,10 @@ public class MeteorAOE : MonoBehaviour
 
     private PlayerStats m_playerStats;
 
+    [Tooltip("Reference to the particle effect")]
     [SerializeField]
     private ParticleSystem m_AoeParticle;
 
-    [SerializeField]
     private float m_fWaitForParticleTimer;
 
     private float m_fWaitForParticleCooldown;

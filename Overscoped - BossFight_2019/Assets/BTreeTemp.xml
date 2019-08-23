@@ -89,64 +89,6 @@
                 </NodeData>
               </m_children>
             </NodeData>
-            <NodeData>
-              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-              <m_name>Beam</m_name>
-              <m_funcName>NO_FUNCTION</m_funcName>
-              <m_description>Long range tracking beam aimed towards the player with some lag to allow the player to escape at high speeds.</m_description>
-              <m_children>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>Beam Cooldown/Active</m_name>
-                  <m_funcName>CondBeamActive</m_funcName>
-                  <m_description>Make sure the beam cooldown is zero, or proceed if the beam is already active.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_ACTION</m_eType>
-                  <m_name>Beam Attack Action</m_name>
-                  <m_funcName>ActUseBeam</m_funcName>
-                  <m_description>Use the beam attack on the player.</m_description>
-                  <m_children />
-                </NodeData>
-              </m_children>
-            </NodeData>
-            <NodeData>
-              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
-              <m_name>Portal Punch</m_name>
-              <m_funcName>NO_FUNCTION</m_funcName>
-              <m_description>Punches the ground which spawn portals that punch through around the map</m_description>
-              <m_children>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>Punch Cooldown</m_name>
-                  <m_funcName>CondSlamCD</m_funcName>
-                  <m_description>Makes sure the portal punch cooldown is zero.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>PortalNotInUse</m_name>
-                  <m_funcName>CondPortalNotActive</m_funcName>
-                  <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>Beam Not Active</m_name>
-                  <m_funcName>CondBeamNotActive</m_funcName>
-                  <m_description>Ensures the beam attack is not currently active.</m_description>
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_ACTION</m_eType>
-                  <m_name>Portal Punch Action</m_name>
-                  <m_funcName>ActPlayPortalPunchAnim</m_funcName>
-                  <m_description>Plays the portal punch animation.</m_description>
-                  <m_children />
-                </NodeData>
-              </m_children>
-            </NodeData>
           </m_children>
         </NodeData>
       </m_children>

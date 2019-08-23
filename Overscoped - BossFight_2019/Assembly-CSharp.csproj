@@ -76,6 +76,7 @@
     <Compile Include="Assets\Code\AnimBehaviours\ResetToIdle.cs" />
     <Compile Include="Assets\Code\Classes\BehaviourNode.cs" />
     <Compile Include="Assets\Code\Classes\Bezier.cs" />
+    <Compile Include="Assets\Code\Classes\Node.cs" />
     <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
     <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
     <Compile Include="Assets\Code\Scripts\CameraEffects.cs" />
@@ -86,6 +87,8 @@
     <Compile Include="Assets\Code\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerController_old.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerStats.cs" />
+    <Compile Include="Assets\Code\Scripts\Portal.cs" />
+    <Compile Include="Assets\Code\Scripts\PortalPunch.cs" />
     <Compile Include="Assets\Code\Scripts\PullObject.cs" />
     <Compile Include="Assets\Code\Scripts\RBPlayerController.cs" />
     <Compile Include="Assets\Code\Scripts\Respawn.cs" />
@@ -134,7 +137,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_DecodeFloatRGBAHlpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\ObjectNormalRefraction\ObjectNormalRefraction.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\UVLightReveal\UV light.shader" />
-    <None Include="Assets\3rd Party\tripolygon\UModeler\Materials\Basic\UModeler_UnlitVertexColorShader.shader" />
+    <None Include="Assets\ThirdParty\3rd Party\tripolygon\UModeler\Materials\Basic\UModeler_UnlitVertexColorShader.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WorldToObjectTransfNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ObjSpaceViewDirHlpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\README SRP Samples.txt" />
@@ -170,6 +173,7 @@
     <None Include="Assets\BURT\Materials\Shaders\Test_Arm.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\ShaderLibrary\ShaderLibrary.txt" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TFHCIf.shader" />
+    <None Include="Assets\Code\BossBehaviours\TestTree.xml" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\Skybox Cubemap Extended\Shaders\Skybox Cubemap Extended.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Projectors\ProjectorShadow.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_VertexTangentNode.shader" />
@@ -184,6 +188,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TexturePropertyNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SinOpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WorldNormalVector.shader" />
+    <None Include="Assets\Code\BossBehaviours\BossTreePhase1.xml" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SimpleContrastNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\Volumetric Pixelization\Combine Layers.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_RefractOpVec.shader" />
@@ -420,34 +425,34 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_DesaturateNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Mosaic Effect PPS\Readme.txt" />
     <Reference Include="Unity.RenderPipelines.Core.Editor">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualEffectGraph.Runtime">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Runtime.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualEffectGraph.Editor">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Editor.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.ShaderGraph.Editor">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Editor">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Editor.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -633,7 +638,7 @@
       <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="UModelerCommon">
-      <HintPath>C:/Users/s181257/Documents/Overscoped/Overscoped - BossFight_2019/Assets/3rd Party/tripolygon/UModeler/Scripts/UModelerCommon.dll</HintPath>
+      <HintPath>C:/Users/s181296/Desktop/Cosmosis - Project/Overscoped - BossFight_2019/Assets/ThirdParty/3rd Party/tripolygon/UModeler/Scripts/UModelerCommon.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:/Program Files/Unity/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.07494859, g: 0.042404205, b: 0.34220636, a: 1}
+  m_IndirectSpecularColor: {r: 4.97747, g: 5.5306263, b: 8.515218, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,8 +97,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
-  m_LightingDataAsset: {fileID: 112000000, guid: 459bb8d41e6b3d142913f85249481b94,
-    type: 2}
+  m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -765,11 +764,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (10)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -840,6 +834,11 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 5.3928194
       objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (10)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
 --- !u!1001 &101919904
@@ -849,11 +848,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (17)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -923,6 +917,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1.7128
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (17)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -1061,6 +1060,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8297265494495834074, guid: ad7403fb653241b4bb4f2ebbd63c7705,
     type: 3}
   m_PrefabInstance: {fileID: 725677129}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &146817021 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8851529901205164514, guid: 15224bf2b194e9c47af1aa65c1964291,
+    type: 3}
+  m_PrefabInstance: {fileID: 2074501776}
   m_PrefabAsset: {fileID: 0}
 --- !u!43 &147626984
 Mesh:
@@ -1324,21 +1329,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1297003904}
     m_Modifications:
-    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Boss_Pillars_001
-      objectReference: {fileID: 0}
-    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4996631372940962068, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_SelectedEditorRenderState
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4996631372940962069, guid: 2a422931cf7eb4344aa06a758107f71d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1409,6 +1399,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Boss_Pillars_001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4996631372940962073, guid: 2a422931cf7eb4344aa06a758107f71d,
         type: 3}
       propertyPath: latestID_
@@ -1424,6 +1424,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1782450841}
+    - target: {fileID: 4996631372940962068, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_SelectedEditorRenderState
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a422931cf7eb4344aa06a758107f71d, type: 3}
 --- !u!1 &165655200 stripped
@@ -1883,6 +1888,18 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 8321685774571456786, guid: 00009cb822807e840b130a26ff237800, type: 3}
+--- !u!114 &283599430 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6786971553733758947, guid: a79dd3800fbead54690329d9fb26154d,
+    type: 3}
+  m_PrefabInstance: {fileID: 955204646}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &290668725
 GameObject:
   m_ObjectHideFlags: 0
@@ -3558,6 +3575,11 @@ PrefabInstance:
       propertyPath: m_fMaxMana
       value: 1000000
       objectReference: {fileID: 0}
+    - target: {fileID: 1868095780736795280, guid: 08267407a60da1046ac8f6f1de23b161,
+        type: 3}
+      propertyPath: m_healthFill
+      value: 
+      objectReference: {fileID: 283599430}
     - target: {fileID: 5528784100453227279, guid: 08267407a60da1046ac8f6f1de23b161,
         type: 3}
       propertyPath: m_CastShadows
@@ -4005,24 +4027,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 14
   m_Mesh: {fileID: -5511996699474248536, guid: 00009cb822807e840b130a26ff237800, type: 3}
---- !u!1 &518243235 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4603646113938403454, guid: 15224bf2b194e9c47af1aa65c1964291,
-    type: 3}
-  m_PrefabInstance: {fileID: 2074501776}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &518243236 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4930031413184278945, guid: 15224bf2b194e9c47af1aa65c1964291,
-    type: 3}
-  m_PrefabInstance: {fileID: 2074501776}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 518243235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b6db3ad64e817446859a65e7399ae57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &530873473
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6379,11 +6383,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (12)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6438,6 +6437,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (12)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -7468,11 +7472,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (3)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7543,6 +7542,11 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 2.975615
       objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (3)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
 --- !u!1001 &805083595
@@ -7552,11 +7556,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7626,6 +7625,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 2.7198
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -7871,11 +7875,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (18)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7945,6 +7944,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1.7128
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (18)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -9011,6 +9015,12 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &907047919 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1042704758854634759, guid: 15224bf2b194e9c47af1aa65c1964291,
+    type: 3}
+  m_PrefabInstance: {fileID: 2074501776}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &914051063 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: e9cb0dc811f1eba4393537b12452b59e,
@@ -9380,11 +9390,13 @@ MonoBehaviour:
     _prefab: Assets/Meshes/SK_BOSSDUMMY_Again.fbx
   - _gameObject: {fileID: 1409080937}
     _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 907047919}
+    _prefab: Assets/Prefabs/Boss/Meteor.prefab
   - _gameObject: {fileID: 2074501779}
     _prefab: Assets/Prefabs/Boss/Portal.prefab
   - _gameObject: {fileID: 1580502696}
     _prefab: Assets/BURT/Meshes/TestPunch-02.fbx
-  - _gameObject: {fileID: 518243235}
+  - _gameObject: {fileID: 146817021}
     _prefab: Assets/Prefabs/Meteor Variant.prefab
   - _gameObject: {fileID: 805083597}
     _prefab: Assets/Prefabs/Environment/SM_Debris_Small_001.prefab
@@ -10732,21 +10744,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1297003904}
     m_Modifications:
-    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Boss_Pillars_001
-      objectReference: {fileID: 0}
-    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4996631372940962068, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_SelectedEditorRenderState
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4996631372940962069, guid: 2a422931cf7eb4344aa06a758107f71d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -10817,6 +10814,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Boss_Pillars_001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4996631372940962073, guid: 2a422931cf7eb4344aa06a758107f71d,
         type: 3}
       propertyPath: latestID_
@@ -10832,6 +10839,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1357053026}
+    - target: {fileID: 4996631372940962068, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_SelectedEditorRenderState
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a422931cf7eb4344aa06a758107f71d, type: 3}
 --- !u!1 &1057312527
@@ -15617,11 +15629,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (11)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -15692,6 +15699,11 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 2.5584133
       objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (11)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
 --- !u!1 &1437150996
@@ -15758,11 +15770,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (7)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -15817,6 +15824,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (7)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -16170,11 +16182,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (14)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -16229,6 +16236,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (14)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -16435,11 +16447,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (1)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -16509,6 +16516,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 2.57472
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -17261,11 +17273,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (15)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -17321,6 +17328,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (15)
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
 --- !u!1001 &1737880135
@@ -17330,11 +17342,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (13)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -17389,6 +17396,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (13)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -17653,11 +17665,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (2)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -17727,6 +17734,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 4.2759314
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -17951,11 +17963,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (8)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -18025,6 +18032,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 2.5588
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (8)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -18349,11 +18361,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (5)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -18423,6 +18430,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 2.367
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (5)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -18961,11 +18973,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (16)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -19020,6 +19027,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (16)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -19334,11 +19346,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (6)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -19408,6 +19415,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1.6509
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (6)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -19834,11 +19846,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4930031413184278945, guid: 15224bf2b194e9c47af1aa65c1964291,
-        type: 3}
-      propertyPath: m_player
-      value: 
-      objectReference: {fileID: 792711217}
     - target: {fileID: 1052553494790951508, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -19909,21 +19916,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 4603646113938404226, guid: 15224bf2b194e9c47af1aa65c1964291,
+    - target: {fileID: 1042704758854634759, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
-      propertyPath: m_LocalScale.x
-      value: 50
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4603646113938404226, guid: 15224bf2b194e9c47af1aa65c1964291,
+    - target: {fileID: 4206464966205436444, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
-      propertyPath: m_LocalScale.y
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603646113938404226, guid: 15224bf2b194e9c47af1aa65c1964291,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 50
-      objectReference: {fileID: 0}
+      propertyPath: m_player
+      value: 
+      objectReference: {fileID: 792711217}
     - target: {fileID: 9048526173686419721, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_player
@@ -19943,7 +19945,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_meteor
       value: 
-      objectReference: {fileID: 518243236}
+      objectReference: {fileID: 0}
     - target: {fileID: 9048526173686419721, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_fMeteorCD
@@ -19964,16 +19966,6 @@ PrefabInstance:
       propertyPath: m_fTimeBetweenAttacks
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 4603646113938403455, guid: 15224bf2b194e9c47af1aa65c1964291,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603646113938403455, guid: 15224bf2b194e9c47af1aa65c1964291,
-        type: 3}
-      propertyPath: m_Radius
-      value: 0.1
-      objectReference: {fileID: 0}
     - target: {fileID: 1052553495887856270, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_playerCollider
@@ -19989,15 +19981,35 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: 240a198202cc0cd4d8613720f900b454, type: 2}
-    - target: {fileID: 4206464966205436444, guid: 15224bf2b194e9c47af1aa65c1964291,
+    - target: {fileID: 4930031413184278945, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_player
       value: 
       objectReference: {fileID: 792711217}
-    - target: {fileID: 1042704758854634759, guid: 15224bf2b194e9c47af1aa65c1964291,
+    - target: {fileID: 4603646113938404226, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
-      propertyPath: m_IsActive
-      value: 0
+      propertyPath: m_LocalScale.x
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4603646113938404226, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4603646113938404226, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4603646113938403455, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4603646113938403455, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4603646113637128950, guid: 15224bf2b194e9c47af1aa65c1964291, type: 3}
@@ -20218,11 +20230,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (9)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -20292,6 +20299,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1.7967
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (9)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -20517,21 +20529,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1297003904}
     m_Modifications:
-    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Boss_Pillars_001
-      objectReference: {fileID: 0}
-    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4996631372940962068, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_SelectedEditorRenderState
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4996631372940962069, guid: 2a422931cf7eb4344aa06a758107f71d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -20602,6 +20599,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Boss_Pillars_001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4996631372940962073, guid: 2a422931cf7eb4344aa06a758107f71d,
         type: 3}
       propertyPath: latestID_
@@ -20617,6 +20624,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 857779544}
+    - target: {fileID: 4996631372940962068, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_SelectedEditorRenderState
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a422931cf7eb4344aa06a758107f71d, type: 3}
 --- !u!1001 &2129413591
@@ -20626,11 +20638,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 744439728}
     m_Modifications:
-    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Debris_Small_001 (4)
-      objectReference: {fileID: 0}
     - target: {fileID: 1614094792829216813, guid: 0078818e2ca4a2e4e94b892a60d795bc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -20700,6 +20707,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1.7128
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614094792829216810, guid: 0078818e2ca4a2e4e94b892a60d795bc,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Debris_Small_001 (4)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0078818e2ca4a2e4e94b892a60d795bc, type: 3}
@@ -22153,21 +22165,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1297003904}
     m_Modifications:
-    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_Name
-      value: SM_Boss_Pillars_001
-      objectReference: {fileID: 0}
-    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4996631372940962068, guid: 2a422931cf7eb4344aa06a758107f71d,
-        type: 3}
-      propertyPath: m_SelectedEditorRenderState
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4996631372940962069, guid: 2a422931cf7eb4344aa06a758107f71d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -22238,6 +22235,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.4
       objectReference: {fileID: 0}
+    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_Name
+      value: SM_Boss_Pillars_001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4996631372940962074, guid: 2a422931cf7eb4344aa06a758107f71d,
         type: 3}
       propertyPath: m_Mesh
@@ -22248,6 +22255,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 2065547093}
+    - target: {fileID: 4996631372940962068, guid: 2a422931cf7eb4344aa06a758107f71d,
+        type: 3}
+      propertyPath: m_SelectedEditorRenderState
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a422931cf7eb4344aa06a758107f71d, type: 3}
 --- !u!4 &5080288906323674872

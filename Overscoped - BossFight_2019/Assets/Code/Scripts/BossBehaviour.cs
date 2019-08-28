@@ -95,7 +95,7 @@ public class BossBehaviour : MonoBehaviour
     private Portal m_portalScript;
     private Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
-    private float m_fBeamTime;
+    public float m_fBeamTime;
 
     private GameObject[] m_allMeteorSpawns;
     private EnergyPillar[] m_energyPillers;
@@ -129,7 +129,7 @@ public class BossBehaviour : MonoBehaviour
         m_portal.SetActive(false);
 
 #if (UNITY_EDITOR)
-        treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
+        treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase2.xml";
 #else
         treePath = Application.dataPath + "/BossTreePhase1.xml";
 #endif
@@ -321,7 +321,7 @@ public class BossBehaviour : MonoBehaviour
     {
         m_fBeamTime -= Time.deltaTime;
 
-        if (CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
+        if (m_fBeamTime > 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
         }

@@ -42,14 +42,12 @@ Shader "Shaders_Burt/CVS"
         
             HLSLPROGRAM
         
-				#define _SURFACE_TYPE_TRANSPARENT 1
-				#define _BLENDMODE_ALPHA 1
-
-        
 				#pragma vertex Vert
 				#pragma fragment Frag
         
 				#define ASE_SRP_VERSION 50702
+				#define _SURFACE_TYPE_TRANSPARENT 1
+				#define _BLENDMODE_ALPHA 1
 
         
 				#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
@@ -212,14 +210,12 @@ Shader "Shaders_Burt/CVS"
 			
             HLSLPROGRAM
         
-				#define _SURFACE_TYPE_TRANSPARENT 1
-				#define _BLENDMODE_ALPHA 1
-
-        
 				#pragma vertex Vert
 				#pragma fragment Frag
 
 				#define ASE_SRP_VERSION 50702
+				#define _SURFACE_TYPE_TRANSPARENT 1
+				#define _BLENDMODE_ALPHA 1
 
         
 				#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
@@ -374,10 +370,6 @@ Shader "Shaders_Burt/CVS"
         
             HLSLPROGRAM
         
-				#define _SURFACE_TYPE_TRANSPARENT 1
-				#define _BLENDMODE_ALPHA 1
-
-        
 				#pragma instancing_options renderinglayer
                 #pragma multi_compile _ LOD_FADE_CROSSFADE
 
@@ -385,6 +377,8 @@ Shader "Shaders_Burt/CVS"
 				#pragma fragment Frag
         
 				#define ASE_SRP_VERSION 50702
+				#define _SURFACE_TYPE_TRANSPARENT 1
+				#define _BLENDMODE_ALPHA 1
 
 
 				#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
@@ -584,14 +578,12 @@ Shader "Shaders_Burt/CVS"
         
             HLSLPROGRAM
         
-				#define _SURFACE_TYPE_TRANSPARENT 1
-				#define _BLENDMODE_ALPHA 1
-
-        
 				#pragma vertex Vert
 				#pragma fragment Frag
         
 				#define ASE_SRP_VERSION 50702
+				#define _SURFACE_TYPE_TRANSPARENT 1
+				#define _BLENDMODE_ALPHA 1
 
 				
 				#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
@@ -773,8 +765,8 @@ Shader "Shaders_Burt/CVS"
 	
 }
 /*ASEBEGIN
-Version=16900
-1;1;1678;987;641.472;253.6581;1;True;True
+Version=16800
+1921;1;1918;1017;1115.472;154.6581;1;True;False
 Node;AmplifyShaderEditor.TextureCoordinatesNode;22;-769.2413,-94.6566;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.RangedFloatNode;23;-810.4938,18.93005;Float;False;Property;_Mana;Mana;1;0;Create;True;0;0;False;0;1.1;0.9;0.1;0.9;0;1;FLOAT;0
 Node;AmplifyShaderEditor.TexturePropertyNode;8;-664,124;Float;True;Property;_Sprite;Sprite;0;0;Create;True;0;0;False;0;None;c5a3064829f93fe44bbbbc1bc4f67e2b;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
@@ -790,7 +782,7 @@ Node;AmplifyShaderEditor.ColorNode;29;-520.4722,-534.6581;Float;False;Property;_
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;34;104.5278,73.34192;Float;False;2;2;0;FLOAT;0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.LerpOp;30;-220.4722,-304.6581;Float;True;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT;0;False;1;COLOR;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;Depth prepass;0;0;Depth prepass;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=DepthForwardOnly;False;0;Hidden/InternalErrorShader;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;286.6812,-55.84285;Float;False;True;2;Float;ASEMaterialInspector;0;4;Shaders_Burt/CVS;dfe2f27ac20b08c469b2f95c236be0c3;True;Forward Unlit;0;1;Forward Unlit;5;True;2;5;False;-1;10;False;-1;2;5;False;-1;10;False;-1;False;False;True;0;False;-1;False;False;True;2;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;True;5;0;False;False;False;False;True;True;True;True;True;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=ForwardOnly;False;0;Hidden/InternalErrorShader;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;4;True;True;True;True;False;5;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;286.6812,-55.84285;Float;False;True;2;Float;ASEMaterialInspector;0;4;Shaders_Burt/CVS;dfe2f27ac20b08c469b2f95c236be0c3;True;Forward Unlit;0;1;Forward Unlit;5;True;2;5;False;-1;10;False;-1;2;5;False;-1;10;False;-1;False;False;True;0;False;-1;False;False;True;2;False;-1;True;0;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;True;5;0;False;False;False;False;True;True;True;True;True;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=ForwardOnly;False;0;Hidden/InternalErrorShader;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;4;True;True;True;True;False;5;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2;-149,-26;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;ShadowCaster;0;2;ShadowCaster;1;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;False;False;False;False;True;1;LightMode=ShadowCaster;False;0;Hidden/InternalErrorShader;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;3;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;META;0;3;META;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;True;2;False;-1;False;False;False;False;False;True;1;LightMode=Meta;False;0;Hidden/InternalErrorShader;0;0;Standard;0;5;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
 WireConnection;37;0;22;2
@@ -809,4 +801,4 @@ WireConnection;30;2;37;0
 WireConnection;1;0;30;0
 WireConnection;1;1;34;0
 ASEEND*/
-//CHKSM=CA55D0CBD6173F95BFCC2E5AD27A2BDEA73B7132
+//CHKSM=FAEDDA099CABB64DBA93BD8CBE54807A95EE9B06

@@ -8,8 +8,11 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
+#if (UNITY_EDITOR)
+
 namespace BTreeEditor
 {
+
     public enum EActionType
     {
         ACTION_ADD_NODE,
@@ -38,8 +41,10 @@ namespace BTreeEditor
         public Node m_nodeParent;
     }
 
+
     public class BTreeEditor : EditorWindow
     {
+
         static Node m_baseNode = null;
         static NodeData m_data = null;
         static Stack<BTreeEditAction> m_actions = new Stack<BTreeEditAction>();
@@ -424,3 +429,5 @@ namespace BTreeEditor
         }
     }
 }
+
+#endif

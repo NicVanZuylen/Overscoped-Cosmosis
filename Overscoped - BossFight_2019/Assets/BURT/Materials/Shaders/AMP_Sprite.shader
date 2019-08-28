@@ -51,7 +51,6 @@ Shader "Shaders_Burt/Sprite"
 		{
 			Name "Default"
 		CGPROGRAM
-			
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 3.0
@@ -130,8 +129,8 @@ Shader "Shaders_Burt/Sprite"
 	
 }
 /*ASEBEGIN
-Version=16900
-7;1;1666;981;1054;498;1;True;True
+Version=16800
+1920;1;1906;1011;1174;513;1;True;False
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;0,0;Float;False;True;2;Float;ASEMaterialInspector;0;7;Shaders_Burt/Sprite;5056123faa0c79b47ab6ad7e8bf059a4;True;Default;0;0;Default;2;True;2;5;False;-1;10;False;-1;0;1;False;-1;0;False;-1;False;False;True;2;False;-1;True;True;True;True;True;0;True;-9;True;True;0;True;-5;255;True;-8;255;True;-7;0;True;-4;0;True;-6;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;True;2;False;-1;True;0;False;-1;False;True;5;Queue=Transparent=Queue=0;IgnoreProjector=True;RenderType=Transparent=RenderType;PreviewType=Plane;CanUseSpriteAtlas=True;False;0;False;False;False;False;False;False;False;False;False;False;True;2;0;;0;0;Standard;0;0;1;True;False;2;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0,0,0;False;0
 ASEEND*/
-//CHKSM=A3836208D9E1B216BFA5DCA8DE094405E8313F25
+//CHKSM=23BE24544712D69F4DD37DE3503BE5CD8488E52A

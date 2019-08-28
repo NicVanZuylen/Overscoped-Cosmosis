@@ -53,7 +53,7 @@ public class BossBehaviour : MonoBehaviour
     [Tooltip("Amount of time before the beam attac k can be used again.")]
     [SerializeField]
     private float m_fBeamAttackCD = 7.0f;
-    private float m_fBeamAttackCDTimer;
+    public float m_fBeamAttackCDTimer;
 
     [Tooltip("Maximum range of the beam attack.")]
     [SerializeField]
@@ -95,10 +95,10 @@ public class BossBehaviour : MonoBehaviour
     private Portal m_portalScript;
     private Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
-    public float m_fBeamTime;
+    private float m_fBeamTime;
 
     private GameObject[] m_allMeteorSpawns;
-    private EnergyPillar[] m_energyPillers;
+    private EnergyPillar[] m_energyPillars;
     private bool m_bRandomMeteor;
 
     private static BoxCollider m_meteorSpawnVol;
@@ -129,7 +129,7 @@ public class BossBehaviour : MonoBehaviour
         m_portal.SetActive(false);
 
 #if (UNITY_EDITOR)
-        treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase2.xml";
+        treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
 #else
         treePath = Application.dataPath + "/BossTreePhase1.xml";
 #endif
@@ -267,6 +267,8 @@ public class BossBehaviour : MonoBehaviour
             // Reset to idle state.
             m_animator.SetBool("isStunned", true);
 
+            m_armour.GetComponent<Renderer>().material.SetFloat("_FresnelOnOff", 1.0f);
+
             // Disable beam & reset attack.
             m_beamLine.enabled = false;
             m_fBeamTime = 0.0f;
@@ -320,8 +322,8 @@ public class BossBehaviour : MonoBehaviour
     public ENodeResult CondBeamActive()
     {
         m_fBeamTime -= Time.deltaTime;
-
-        if (m_fBeamTime > 0.0f)
+    
+        if (CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
         }
@@ -330,17 +332,31 @@ public class BossBehaviour : MonoBehaviour
             // Beam attack is complete.
             m_beamLine.enabled = false;
         }
-
+    
         return ENodeResult.NODE_FAILURE;
     }
 
     public ENodeResult CondBeamNotActive()
     {
-        if (CondBeamActive() == ENodeResult.NODE_SUCCESS)
+        if (m_fBeamTime > 0.0f)
         {
             return ENodeResult.NODE_FAILURE;
         }
 
+        return ENodeResult.NODE_SUCCESS;
+    }
+
+    public ENodeResult CondNearEnergyPillar()
+    {
+        if(m_fBeamTime > 0.0f)
+        {
+            return ENodeResult.NODE_SUCCESS;
+        }
+        if (EnergyPillar.PlayerWithinVicinity() == true)
+        {
+            return ENodeResult.NODE_FAILURE;
+        }
+        
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -513,7 +529,7 @@ public class BossBehaviour : MonoBehaviour
     {
         yield return new WaitForSeconds(m_fStuckTime);
         m_bIsStuck = false;
-
+        m_armour.GetComponent<Renderer>().material.SetFloat("_FresnelOnOff", 1.0f);
         m_animator.SetBool("isStunned", false);
         m_armour.tag = "Untagged";
     }

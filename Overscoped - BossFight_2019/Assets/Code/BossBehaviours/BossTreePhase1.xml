@@ -61,6 +61,13 @@
               <m_children>
                 <NodeData>
                   <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Near Energy Pillars</m_name>
+                  <m_funcName>CondNearEnergyPillar</m_funcName>
+                  <m_description>Check if player is near a energy pillar, if so don't use beam attack</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
                   <m_name>Beam Cooldown/Active</m_name>
                   <m_funcName>CondBeamActive</m_funcName>
                   <m_description>Make sure the beam cooldown is zero, or proceed if the beam is already active.</m_description>

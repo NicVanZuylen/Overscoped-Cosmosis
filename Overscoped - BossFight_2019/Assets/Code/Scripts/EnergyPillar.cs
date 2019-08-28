@@ -18,6 +18,8 @@ public class EnergyPillar : MonoBehaviour
 
     private float m_fCharge = 0.0f;
 
+    private GameObject m_player;
+
     private EnergyPillar[] m_energyPillars;
     private SphereCollider m_vicinityCollider;
 
@@ -25,6 +27,7 @@ public class EnergyPillar : MonoBehaviour
 
     private void Awake()
     {
+        m_player = GameObject.FindGameObjectWithTag("Player");
         m_energyPillars = FindObjectsOfType<EnergyPillar>();
         m_explosion.Stop();
     }
@@ -49,11 +52,6 @@ public class EnergyPillar : MonoBehaviour
         {
             energyPiller.ResetCharge();
         }
-
-        //Add explosion effect, don't destory
-
-        // Deactivate object. (Will have effects for destruction later.)
-        gameObject.SetActive(false);
     }
 
     /*
@@ -66,8 +64,8 @@ public class EnergyPillar : MonoBehaviour
         bool bResult = m_bPlayerWithinVicinity;
 
         // Reset if true.
-        if (m_bPlayerWithinVicinity)
-            m_bPlayerWithinVicinity = false;
+        //if (m_bPlayerWithinVicinity)
+        //    m_bPlayerWithinVicinity = false;
 
         return bResult;
     }
@@ -81,4 +79,11 @@ public class EnergyPillar : MonoBehaviour
     {
         m_bPlayerWithinVicinity |= (other.tag == "Player");
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other = m_player.GetComponent<Collider>())
+            m_bPlayerWithinVicinity = false;
+    }
+
 }

@@ -55,10 +55,53 @@
           <m_children>
             <NodeData>
               <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+              <m_name>Meteor</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Attempt to summon and hurl a meteor towards the player, when they enter a valid meteor location.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Meteor Available</m_name>
+                  <m_funcName>CondMeteorAvailable</m_funcName>
+                  <m_description>The player must reside within a valid meteor spawning volume, the cooldown must be zero and the player must be grounded to proceed.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>PortalNotInUse</m_name>
+                  <m_funcName>CondPortalNotActive</m_funcName>
+                  <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Beam Not Active</m_name>
+                  <m_funcName>CondBeamNotActive</m_funcName>
+                  <m_description>Ensures the beam attack is not currently active.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Meteor Summon Action</m_name>
+                  <m_funcName>ActPlayMeteorAnim</m_funcName>
+                  <m_description>Play meteor summon animation.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
               <m_name>Beam</m_name>
               <m_funcName>NO_FUNCTION</m_funcName>
               <m_description>Long range tracking beam aimed towards the player with some lag to allow the player to escape at high speeds.</m_description>
               <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Near Energy Pillars</m_name>
+                  <m_funcName>CondNearEnergyPillar</m_funcName>
+                  <m_description>Check if player is near a energy pillar, if so don't use beam attack</m_description>
+                  <m_children />
+                </NodeData>
                 <NodeData>
                   <m_eType>NODE_CONDITION</m_eType>
                   <m_name>Beam Cooldown/Active</m_name>

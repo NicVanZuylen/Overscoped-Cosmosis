@@ -68,8 +68,4 @@ public class PortalPunch : MonoBehaviour
         gameObject.SetActive(false);
         m_bPunch = false;
     }
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    m_player.GetComponent<PlayerStats>().
-    //}
 }

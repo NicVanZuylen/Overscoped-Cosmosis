@@ -53,7 +53,7 @@ public class BossBehaviour : MonoBehaviour
     [Tooltip("Amount of time before the beam attac k can be used again.")]
     [SerializeField]
     private float m_fBeamAttackCD = 7.0f;
-    private float m_fBeamAttackCDTimer;
+    public float m_fBeamAttackCDTimer;
 
     [Tooltip("Maximum range of the beam attack.")]
     [SerializeField]
@@ -98,9 +98,12 @@ public class BossBehaviour : MonoBehaviour
     private float m_fBeamTime;
 
     private GameObject[] m_allMeteorSpawns;
+    private EnergyPillar[] m_energyPillars;
     private bool m_bRandomMeteor;
 
     private static BoxCollider m_meteorSpawnVol;
+
+    public string treePath;
 
     void Awake()
     {
@@ -126,9 +129,9 @@ public class BossBehaviour : MonoBehaviour
         m_portal.SetActive(false);
 
 #if (UNITY_EDITOR)
-        string treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
+        treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
 #else
-        string treePath = Application.dataPath + "/BossTreePhase1.xml";
+        treePath = Application.dataPath + "/BossTreePhase1.xml";
 #endif
         m_bossTree = BTreeEditor.NodeData.LoadTree(treePath, this);
     }
@@ -264,6 +267,8 @@ public class BossBehaviour : MonoBehaviour
             // Reset to idle state.
             m_animator.SetBool("isStunned", true);
 
+            m_armour.GetComponent<Renderer>().material.SetFloat("_FresnelOnOff", 1.0f);
+
             // Disable beam & reset attack.
             m_beamLine.enabled = false;
             m_fBeamTime = 0.0f;
@@ -272,6 +277,25 @@ public class BossBehaviour : MonoBehaviour
             m_fTimeSinceGlobalAttack = 0.0f;
 
             m_armour.tag = "PullObj";
+
+            if(!m_armour.GetComponent<PullObject>().enabled)
+            {
+                m_bIsStuck = false;
+
+                //Load next boss behaviour
+
+
+#if (UNITY_EDITOR)
+                treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase2.xml";
+#else
+        treePath = Application.dataPath + "/BossTreePhase2.xml";
+#endif
+                m_bossTree = BTreeEditor.NodeData.LoadTree(treePath, this);
+
+                m_bossTree.Run();
+
+                return ENodeResult.NODE_SUCCESS;
+            }
 
             StartCoroutine(ResetStuck());
             return ENodeResult.NODE_SUCCESS;
@@ -298,7 +322,7 @@ public class BossBehaviour : MonoBehaviour
     public ENodeResult CondBeamActive()
     {
         m_fBeamTime -= Time.deltaTime;
-
+    
         if (CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
@@ -308,17 +332,31 @@ public class BossBehaviour : MonoBehaviour
             // Beam attack is complete.
             m_beamLine.enabled = false;
         }
-
+    
         return ENodeResult.NODE_FAILURE;
     }
 
     public ENodeResult CondBeamNotActive()
     {
-        if (CondBeamActive() == ENodeResult.NODE_SUCCESS)
+        if (m_fBeamTime > 0.0f)
         {
             return ENodeResult.NODE_FAILURE;
         }
 
+        return ENodeResult.NODE_SUCCESS;
+    }
+
+    public ENodeResult CondNearEnergyPillar()
+    {
+        if(m_fBeamTime > 0.0f)
+        {
+            return ENodeResult.NODE_SUCCESS;
+        }
+        if (EnergyPillar.PlayerWithinVicinity() == true)
+        {
+            return ENodeResult.NODE_FAILURE;
+        }
+        
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -456,6 +494,10 @@ public class BossBehaviour : MonoBehaviour
             {
                 m_playerStats.DealDamage(m_fBeamDPS * Time.deltaTime);
             }
+            else if (beamHit.collider.GetComponent<EnergyPillar>())
+            {
+                beamHit.collider.GetComponent<EnergyPillar>().Charge(this.transform.GetComponent<BossBehaviour>());
+            }
             else
                 beamLinePoints[1] = beamHit.point;
         }
@@ -487,7 +529,7 @@ public class BossBehaviour : MonoBehaviour
     {
         yield return new WaitForSeconds(m_fStuckTime);
         m_bIsStuck = false;
-
+        m_armour.GetComponent<Renderer>().material.SetFloat("_FresnelOnOff", 1.0f);
         m_animator.SetBool("isStunned", false);
         m_armour.tag = "Untagged";
     }

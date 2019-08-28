@@ -53,9 +53,7 @@ public class PlayerBeam : MonoBehaviour
     {
         m_controller = GetComponent<PlayerController>();
         m_camEffects = GetComponentInChildren<CameraEffects>();
-        m_beamLine.enabled = false;
-
-        m_bBeamUnlocked = true;        
+        m_beamLine.enabled = false; 
     }
     
     void LateUpdate()

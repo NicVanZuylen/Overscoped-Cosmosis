@@ -45,55 +45,6 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 1
     min: 0.001
---- !u!114 &-4610533873763209904
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59b6606ef2548734bb6d11b9d160bc7e, type: 3}
-  m_Name: HDRISky
-  m_EditorClassIdentifier: 
-  active: 1
-  m_AdvancedMode: 0
-  rotation:
-    m_OverrideState: 0
-    m_Value: 0
-    min: 0
-    max: 360
-  skyIntensityMode:
-    m_OverrideState: 0
-    m_Value: 0
-  exposure:
-    m_OverrideState: 1
-    m_Value: 3.43
-  multiplier:
-    m_OverrideState: 0
-    m_Value: 1
-    min: 0
-  upperHemisphereLuxValue:
-    m_OverrideState: 0
-    m_Value: 0.69322586
-    min: 0
-  desiredLuxValue:
-    m_OverrideState: 0
-    m_Value: 20000
-  updateMode:
-    m_OverrideState: 0
-    m_Value: 0
-  updatePeriod:
-    m_OverrideState: 0
-    m_Value: 0
-    min: 0
-  includeSunInBaking:
-    m_OverrideState: 0
-    m_Value: 0
-  hdriSky:
-    m_OverrideState: 1
-    m_Value: {fileID: 8900000, guid: a9f053d430424adb925523ba78342596, type: 3}
 --- !u!114 &-3817069074234097293
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -110,17 +61,17 @@ MonoBehaviour:
   m_AdvancedMode: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 1.27
+    m_Value: 1.24
     min: 0
     max: 4
   thicknessModifier:
     m_OverrideState: 1
-    m_Value: 1.11
+    m_Value: 1.87
     min: 1
     max: 10
   directLightingStrength:
     m_OverrideState: 1
-    m_Value: 0.063
+    m_Value: 0.422
     min: 0
     max: 1
   noiseFilterTolerance:
@@ -154,7 +105,6 @@ MonoBehaviour:
   - {fileID: 8711377374188185572}
   - {fileID: 3109681608999342120}
   - {fileID: 396278178000043239}
-  - {fileID: -4610533873763209904}
   - {fileID: -3817069074234097293}
   - {fileID: -6772867823918249607}
   - {fileID: 6582504038087801994}
@@ -279,8 +229,8 @@ MonoBehaviour:
     min: 0
     max: 1
   tint:
-    m_OverrideState: 0
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_OverrideState: 1
+    m_Value: {r: 0.1779548, g: 0.7996469, b: 0.8773585, a: 1}
     hdr: 0
     showAlpha: 0
     showEyeDropper: 1
@@ -322,7 +272,7 @@ MonoBehaviour:
     m_Value: 0
   color:
     m_OverrideState: 1
-    m_Value: {r: 0.3301887, g: 0.16665184, b: 0.1823766, a: 1}
+    m_Value: {r: 0.2830189, g: 0.18556428, b: 0.24843825, a: 1}
     hdr: 0
     showAlpha: 0
     showEyeDropper: 1

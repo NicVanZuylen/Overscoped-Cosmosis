@@ -8,12 +8,12 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: AMP_UI_H
-  m_Shader: {fileID: 4800000, guid: abe3601caa19c664a97860472bb51afc, type: 3}
-  m_ShaderKeywords: 
+  m_Shader: {fileID: 4800000, guid: 02cb3283ca016a34fbbe130c6437bec9, type: 3}
+  m_ShaderKeywords: _USEALPHAMASK_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3002
+  m_CustomRenderQueue: 3001
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -23,7 +23,19 @@ Material:
         m_Texture: {fileID: 2800000, guid: ee74f7e81c1ba6c49b44117daf247b43, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _AlphaMask:
+        m_Texture: {fileID: 2800000, guid: ee74f7e81c1ba6c49b44117daf247b43, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HNoise:
+        m_Texture: {fileID: 2800000, guid: cd460ee4ac5c1e746b7a734cc7cc64dd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Noise:
+        m_Texture: {fileID: 2800000, guid: cd460ee4ac5c1e746b7a734cc7cc64dd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _VNoise:
         m_Texture: {fileID: 2800000, guid: cd460ee4ac5c1e746b7a734cc7cc64dd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -32,12 +44,26 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _ColourIntensity: 3.5
+    - _ColourIntensity: 3
+    - _EdgeIntensity: 1
     - _Mana: 1.05
+    - _Opacity: 1
+    - _PeakIntensity: 1
     - _Resource: 1
+    - _ResourcePercentage: 0
+    - _UseAlphaMask: 1
+    - _YEEE: 0
+    - _test: 0
     m_Colors:
-    - _ColorHigh: {r: 1, g: 0.046096347, b: 0, a: 0}
-    - _ColorLow: {r: 0.2924528, g: 0.03126854, b: 0, a: 0}
+    - _ColorHigh: {r: 0.69803923, g: 0.04487504, b: 0, a: 0}
+    - _ColorLow: {r: 0.4056604, g: 0, b: 0, a: 0}
     - _Colorlow: {r: 0.49056602, g: 0, b: 0.02115854, a: 0}
+    - _EdgeColour: {r: 0, g: 0, b: 0, a: 0}
+    - _HNoisePanning: {r: -2.3, g: 0, b: 0, a: 0}
+    - _HNoiseTiling: {r: 1, g: 2, b: 0, a: 0}
+    - _NoiseOffset: {r: -0.1, g: -0.3, b: 0, a: 0}
+    - _NoiseTiling: {r: 3, g: 3, b: 0, a: 0}
     - _Offset: {r: 0, g: -0.1, b: 0, a: 0}
     - _Tiling: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _VNoisePanning: {r: -0.33, g: -1, b: 0, a: 0}
+    - _VNoiseTiling: {r: 1, g: 1, b: 0, a: 0}

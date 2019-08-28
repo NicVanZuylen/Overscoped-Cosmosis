@@ -14,11 +14,14 @@ public class EnergyPillar : MonoBehaviour
 
     [Tooltip("Reference to Explosion Particle")]
     [SerializeField]
-    private ParticleSystem m_explosion;
+    private ParticleSystem m_explosion = null;
 
     private float m_fCharge = 0.0f;
 
     private EnergyPillar[] m_energyPillars;
+    private SphereCollider m_vicinityCollider;
+
+    private static bool m_bPlayerWithinVicinity;
 
     private void Awake()
     {
@@ -53,8 +56,29 @@ public class EnergyPillar : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    /*
+    Description: Get whether or not the player is within the vicinity of any of the energy pillars.
+                 This function should only be used by the BossBehaviour script.
+    Return Type: bool
+    */
+    public static bool PlayerWithinVicinity()
+    {
+        bool bResult = m_bPlayerWithinVicinity;
+
+        // Reset if true.
+        if (m_bPlayerWithinVicinity)
+            m_bPlayerWithinVicinity = false;
+
+        return bResult;
+    }
+
     private void ResetCharge()
     {
         m_fCharge = 0;
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        m_bPlayerWithinVicinity |= (other.tag == "Player");
     }
 }

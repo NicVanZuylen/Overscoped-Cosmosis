@@ -6,7 +6,7 @@ public class PlayerBeam : MonoBehaviour
 {
     [Tooltip("Beam GUI material.")]
     [SerializeField]
-    private Material m_guiMaterial;
+    private Material m_guiMaterial = null;
 
     [Tooltip("Maximum beam charge value.")]
     [SerializeField]
@@ -55,7 +55,7 @@ public class PlayerBeam : MonoBehaviour
         m_camEffects = GetComponentInChildren<CameraEffects>();
         m_beamLine.enabled = false;
 
-        m_bBeamUnlocked = true;        
+        //m_bBeamUnlocked = true;        
     }
     
     void LateUpdate()

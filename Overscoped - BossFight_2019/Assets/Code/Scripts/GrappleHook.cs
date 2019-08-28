@@ -9,7 +9,9 @@ public class GrappleHook : MonoBehaviour
     // Public:
     public GameObject m_grappleHook;
     public LineRenderer m_grappleLine;
+    public LineRenderer m_pullLine;
     public Transform m_grappleNode;
+    public Transform m_pullNode;
 
     [Header("Physics")]
     [Tooltip("Acceleration due to grapple pull.")]
@@ -51,10 +53,18 @@ public class GrappleHook : MonoBehaviour
     [Tooltip("Whether or not to use the default jumping gravity whilst flying after grapple.")]
     public bool m_bJumpGravOnRelease = false;
 
+    [Header("Grapple Mode")]
+
+    [Tooltip("Rate in which the pull line will travel towards its destination.")]
+    public float m_fGrappleLineSpeed = 30.0f;
+
     [Header("Pull Mode")]
 
     [Tooltip("The distance the pull hook must be extended beyond the initial rope length on impact to decouple the target object.")]
     public float m_fPullBreakDistance = 8.0f;
+
+    [Tooltip("Rate in which the pull line will travel towards its destination.")]
+    public float m_fPullLineSpeed = 30.0f;
 
     [Header("Misc.")]
     [Tooltip("Whether or not the player will be restricted a spherical volume with the rope length as the radius when grappling.")]
@@ -94,53 +104,46 @@ public class GrappleHook : MonoBehaviour
     [Tooltip("Multiplier for the impact shake effect.")]
     public float m_fImpactShakeMult = 5.0f;
 
-    public GameObject m_handEffect;
+    public GameObject m_grappleHandEffect;
     public GameObject m_impactEffect;
     public Material m_grappleLineMat;
     public Material m_pullLineMat;
 
     public ComputeShader m_lineCompute;
 
-    // Private:
-
-    private ComputeBuffer m_outputPointBuffer;
-    private ComputeBuffer m_bezierPointBuffer; // Contains points for the main and wobble bezier curves.
-    private ComputeBuffer m_bezierIntPointBuffer;
-    private int m_nPointKernelIndex;
-    private const int m_nWobbleBezierCount = 16;
+    // Private: 
 
     private PlayerController m_controller;
     private PlayerStats m_stats;
     private Animator m_animController;
     private CameraEffects m_cameraEffects;
     private Transform m_cameraTransform;
-    private Hook m_graphookScript;
-    private bool m_bGrappleHookActive;
-    private bool m_bJustImpacted;
+    private bool m_bPullHookActive;
 
-    // Rope & Grapple function
+    // Grapple function
     private PlayerBeam m_beamScript;
-    private GradientColorKey[] m_colorKeys;
     private RaycastHit m_fireHit;
-    private Bezier m_ropeCurve;
-    private Transform m_hitTransform;
-    private Vector3[] m_v3GrapLinePoints;
-    private Vector3[] m_v3ShakeVectors;
     private Vector3 m_v3GrapplePoint;
     private Vector3 m_v3GrappleNormal;
     private Vector3 m_v3GrappleBoost;
-    private float m_fGrapRopeLength;
-    private float m_fShakeTime;
-    private float m_fLineThickness;
-    private float m_fRippleMult;
-    private float m_fImpactShakeTime;
-    private float m_fCurrentLineThickness;
-    private float m_fGrappleTime;
+    private float m_fGrapLineLength; // Distance from casting point to destination, (linear unlike the rope itself).
+    private float m_fGrappleLineProgress; // Distance along the linear rope distance currently covered by the rope while casting.
+    private float m_fGrappleTime; // Elapsed time from the point of grappling.
+    private bool m_bGrappleHookActive;
+    private bool m_bGrappleLocked;
+    private bool m_bGrappleJustImpacted;
+
+    // Effects
+    private LineEffects m_grapLineEffects;
+    private LineEffects m_pullLineEffects;
 
     // Pull function
     private PullObject m_pullObj;
     private Vector3 m_v3PullTension;
-    private float m_fPullRopeLength;
+    private Vector3 m_v3PullPoint;
+    private float m_fPullLineLength;
+    private float m_fPullLineProgress;
+    private bool m_bPullLocked;
 
     // Misc.
     private float m_fReleaseGravity;
@@ -149,19 +152,23 @@ public class GrappleHook : MonoBehaviour
     {
         m_beamScript = GetComponent<PlayerBeam>();
 
-        const int nPointCount = 4;
+        LineEffectParameters lineEffectParams;
+        lineEffectParams.m_nWaveCount = m_nWaveCount;
+        lineEffectParams.m_fRopeShakeDelay = m_fRopeShakeDelay;
+        lineEffectParams.m_fShakeSpeed = m_fShakeSpeed;
+        lineEffectParams.m_fShakeMagnitude = m_fShakeMagnitude;
+        lineEffectParams.m_fRippleWaveAmp = m_fRippleWaveAmp;
+        lineEffectParams.m_fPopThickness = m_fPopThickness;
+        lineEffectParams.m_fPopRate = m_fPopRate;
+        lineEffectParams.m_fImpactShakeDuration = m_fImpactShakeDuration;
+        lineEffectParams.m_fImpactShakeMult = m_fImpactShakeMult;
+        lineEffectParams.m_fLineThickness = m_grappleLine.startWidth;
 
-        m_outputPointBuffer = new ComputeBuffer(m_grappleLine.positionCount * 2, sizeof(float) * 3); // Multiplied by two to include wobble effect vectors.
-        m_bezierPointBuffer = new ComputeBuffer(nPointCount + m_nWobbleBezierCount, sizeof(float) * 3); // Contains points for the main and wobble bezier curves.
-        m_bezierIntPointBuffer = new ComputeBuffer((nPointCount + m_nWobbleBezierCount) * m_grappleLine.positionCount, sizeof(float) * 3);
+        m_grapLineEffects = new LineEffects(Instantiate(m_lineCompute), lineEffectParams, m_grappleLine.positionCount);
 
-        m_nPointKernelIndex = m_lineCompute.FindKernel("CSMain");
-        m_lineCompute.SetBuffer(m_nPointKernelIndex, "outPoints", m_outputPointBuffer);
-        m_lineCompute.SetBuffer(m_nPointKernelIndex, "bezierPoints", m_bezierPointBuffer);
-        m_lineCompute.SetBuffer(m_nPointKernelIndex, "bezierIntPoints", m_bezierIntPointBuffer);
+        lineEffectParams.m_fLineThickness = m_pullLine.startWidth;
 
-        m_lineCompute.SetInt("inPointCount", nPointCount);
-        m_lineCompute.SetInt("inWobblePointCount", m_nWobbleBezierCount);
+        m_pullLineEffects = new LineEffects(Instantiate(m_lineCompute), lineEffectParams, m_pullLine.positionCount);
 
         // Component retreival.
         m_controller = GetComponent<PlayerController>();
@@ -172,21 +179,6 @@ public class GrappleHook : MonoBehaviour
 
         m_cameraEffects = cam.GetComponent<CameraEffects>();
         m_cameraTransform = cam.transform;
-        m_graphookScript = m_grappleHook.GetComponent<Hook>();
-
-        // Line color and curve.
-        m_colorKeys = new GradientColorKey[m_grappleLine.colorGradient.colorKeys.Length];
-        m_ropeCurve = new Bezier(nPointCount);
-
-        for (int i = 0; i < m_grappleLine.colorGradient.colorKeys.Length; ++i)
-            m_colorKeys[i] = m_grappleLine.colorGradient.colorKeys[i];
-
-        // Rope points.
-        m_v3GrapLinePoints = new Vector3[m_grappleLine.positionCount];
-        m_v3ShakeVectors = new Vector3[m_nWobbleBezierCount];
-
-        m_v3ShakeVectors[0] = Vector3.zero;
-        m_v3ShakeVectors[m_v3ShakeVectors.Length - 1] = Vector3.zero;
 
         // Line material
         m_grappleLine.materials[0] = m_grappleLineMat;
@@ -195,8 +187,6 @@ public class GrappleHook : MonoBehaviour
 
         // Misc.
         m_v3GrapplePoint = Vector3.zero;
-        m_fLineThickness = m_grappleLine.startWidth;
-        m_fShakeTime = 0.0f;
         m_fGrappleTime = 0.0f;
         m_bGrappleHookActive = false;
 
@@ -208,9 +198,8 @@ public class GrappleHook : MonoBehaviour
 
     private void OnDestroy()
     {
-        m_bezierIntPointBuffer.Release();
-        m_bezierPointBuffer.Release();
-        m_outputPointBuffer.Release();
+        m_grapLineEffects.DestroyBuffers();
+        m_pullLineEffects.DestroyBuffers();
     }
 
     void Update()
@@ -224,36 +213,24 @@ public class GrappleHook : MonoBehaviour
 
         const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
 
+        // Grapple casting.
         if(bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButtonDown(0) 
             && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
         {
-            m_hitTransform = m_fireHit.transform;
-
             m_v3GrapplePoint = m_fireHit.point;
             m_v3GrappleNormal = m_fireHit.normal;
-            m_fGrapRopeLength = m_fireHit.distance;
-
-            // Fire hook in grapple mode.
-            m_grappleHook.SetActive(true);
-            m_graphookScript.SetPullType(Hook.EHookPullMode.PULL_FLY_TOWARDS);
+            m_fGrapLineLength = m_fireHit.distance;
 
             // Fly time.
             m_fGrappleTime = 0.0f;
-
-            // Material
-            m_grappleLine.material = m_grappleLineMat;
-
-            m_grappleHook.transform.position = m_grappleNode.position;
-            m_grappleHook.transform.rotation = m_grappleNode.parent.rotation;
-
-            m_grappleLine.startColor = m_grappleModeColor;
-            m_grappleLine.endColor = m_grappleModeColor;
 
             m_controller.FreeOverride();
 
             m_bGrappleHookActive = true;
         }
-        else if (bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButtonDown(1) 
+
+        // Pull casting.
+        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButtonDown(1) 
             && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
         {
             if (m_fireHit.collider.tag == "PullObj")
@@ -265,38 +242,19 @@ public class GrappleHook : MonoBehaviour
             else
                 m_pullObj = null;
 
-            m_hitTransform = m_fireHit.transform;
+            m_v3PullPoint = m_fireHit.point;
+            m_fPullLineLength = m_fireHit.distance;
 
-            m_v3GrapplePoint = m_fireHit.point;
-            m_v3GrappleNormal = m_fireHit.normal;
-            m_fGrapRopeLength = m_fireHit.distance;
-
-            // Fire hook in pull mode.
-            m_grappleHook.SetActive(true);
-            m_graphookScript.SetPullType(Hook.EHookPullMode.PULL_PULL_TOWARDS_PLAYER);
-
-            // Material
-            m_grappleLine.material = m_pullLineMat;
-
-            m_grappleHook.transform.position = m_grappleNode.position;
-            m_grappleHook.transform.rotation = m_grappleNode.parent.rotation;
-
-            // Revert hook color back to original.
-            m_grappleLine.colorGradient.SetKeys(m_colorKeys, m_grappleLine.colorGradient.alphaKeys);
-            m_grappleLine.startColor = m_colorKeys[0].color;
-            m_grappleLine.endColor = m_colorKeys[0].color;
-
-            m_bGrappleHookActive = true;
+            m_bPullHookActive = true;
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------
         // Effects & Animations
 
         // Line will disable when the pop effect finishes.
-        m_grappleLine.enabled = m_bGrappleHookActive || m_fCurrentLineThickness < (m_fPopThickness - 0.1f);
-        m_handEffect.SetActive(m_bGrappleHookActive);
+        m_grappleHandEffect.SetActive(m_bGrappleHookActive);
 
-        bool bImpacted = m_graphookScript.IsLodged() && m_bGrappleHookActive;
+        bool bImpacted = m_bGrappleLocked && m_bGrappleHookActive;
 
         // Animations
         m_animController.SetBool("isCasting", m_bGrappleHookActive);
@@ -309,15 +267,97 @@ public class GrappleHook : MonoBehaviour
 
         if (m_bGrappleHookActive)
         {
-            m_graphookScript.SetCurve(m_ropeCurve);
-            m_graphookScript.SetTarget(m_v3GrapplePoint, m_fGrapRopeLength);
+            m_fGrappleLineProgress += m_fGrappleLineSpeed * Time.deltaTime;
+            m_fGrappleLineProgress = Mathf.Clamp(m_fGrappleLineProgress, 0.0f, m_fGrapLineLength);
 
-            if (m_graphookScript.IsLodged() && m_graphookScript.GetPullType() == Hook.EHookPullMode.PULL_FLY_TOWARDS) // Hook is stuck in an object.
+            m_bGrappleLocked = m_fGrappleLineProgress >= m_fGrapLineLength;
+
+            if (m_bGrappleLocked)
             {
-                if (m_bJustImpacted)
+                if (m_bGrappleJustImpacted)
                 {
                     m_cameraEffects.ApplyShake(0.05f, 1.0f, true);
-                    m_grappleHook.transform.parent = m_hitTransform;
+
+                    // Apply initial force if grounded.
+                    if (m_controller.IsGrounded())
+                    {
+                        m_v3GrappleBoost = m_cameraTransform.forward * m_fForwardGroundGrappleForce;
+                        m_v3GrappleBoost += m_cameraTransform.up * m_fUpGroundGrappleForce;
+                    }
+
+                    m_bGrappleJustImpacted = false;
+                }
+                else
+                {
+                    m_cameraEffects.ApplyShake(0.1f, 0.1f);
+                    m_v3GrappleBoost = Vector3.zero;
+                }
+
+                // Increment grapple time.
+                m_fGrappleTime += Time.deltaTime;
+
+                // Add small FOV offset.
+                m_cameraEffects.SetFOVOffset(5.0f);
+
+                // Impact particle effect.
+                m_impactEffect.transform.position = m_v3GrapplePoint;
+                m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
+
+                m_controller.OverrideMovement(GrappleFly);
+
+                // Exit when releasing the left mouse button.
+                if (!Input.GetMouseButton(0) || m_stats.GetMana() <= 0.0f)
+                {
+                    m_controller.FreeOverride();
+                    m_controller.SetGravity(m_fReleaseGravity);
+
+                    m_bGrappleHookActive = false;
+                    m_fGrappleLineProgress = 0.0f;
+
+                    // Release impulse.
+                    if (m_fGrappleTime >= m_fMinReleaseBoostTime)
+                        m_controller.AddImpulse(m_controller.SurfaceForward() * m_fReleaseForce);
+                }
+            }
+        }
+
+        if(m_bPullHookActive)
+        {
+            m_fPullLineProgress += m_fPullLineSpeed * Time.deltaTime;
+            m_fPullLineProgress = Mathf.Clamp(m_fPullLineProgress, 0.0f, m_fPullLineLength);
+
+            m_bPullLocked = m_fPullLineProgress >= m_fPullLineLength;
+
+            if(m_bPullLocked)
+            {
+                // Impact particle effect.
+                //m_impactEffect.transform.position = m_v3PullPoint;
+                //m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
+
+                // Pulling...
+                PullObject();
+
+                // Exit when releasing the right mouse button.
+                if (!Input.GetMouseButton(1) || m_stats.GetMana() <= 0.0f)
+                {
+                    if (m_pullObj != null)
+                        m_pullObj.LetGo();
+
+                    m_bPullHookActive = false;
+                    m_fPullLineProgress = 0.0f;
+                }
+            }
+        }
+        
+
+        /*
+        if (m_bGrappleHookActive)
+        {
+            if (m_fGrappleLineProgress >= m_fGrapLineLength && m_graphookScript.GetPullType() == Hook.EHookPullMode.PULL_FLY_TOWARDS) // Hook is stuck in an object.
+            {
+                if (m_bGrappleJustImpacted)
+                {
+                    m_cameraEffects.ApplyShake(0.05f, 1.0f, true);
 
                     // Apply initial force if grounded.
                     if(m_controller.IsGrounded())
@@ -326,7 +366,7 @@ public class GrappleHook : MonoBehaviour
                         m_v3GrappleBoost += m_cameraTransform.up * m_fUpGroundGrappleForce;
                     }
 
-                    m_bJustImpacted = false;
+                    m_bGrappleJustImpacted = false;
                 }
                 else
                 {
@@ -364,12 +404,11 @@ public class GrappleHook : MonoBehaviour
             }
             else if(m_graphookScript.IsLodged() && m_graphookScript.GetPullType() == Hook.EHookPullMode.PULL_PULL_TOWARDS_PLAYER) // Hook is lodged in pull mode.
             {
-                if(m_bJustImpacted)
+                if(m_bGrappleJustImpacted)
                 {
-                    m_grappleHook.transform.parent = m_hitTransform;
                     m_cameraEffects.ApplyShake(0.05f, 1.0f, true);
 
-                    m_bJustImpacted = false;
+                    m_bGrappleJustImpacted = false;
                 }
 
                 m_v3GrapplePoint = m_grappleHook.transform.position;
@@ -395,7 +434,15 @@ public class GrappleHook : MonoBehaviour
             }
             else // Hook is still flying.
             {
-                m_bJustImpacted = true;
+                m_bGrappleJustImpacted = true;
+
+
+                m_fGrappleLineProgress += 3 * Time.deltaTime;
+                
+                if(m_fGrappleLineProgress >= m_fGrapLineLength)
+                {
+                    m_fGrappleLineProgress = m_fGrapLineLength;
+                }
 
                 m_grappleHook.transform.parent = null;
 
@@ -403,7 +450,7 @@ public class GrappleHook : MonoBehaviour
                     || (m_graphookScript.GetPullType() == Hook.EHookPullMode.PULL_PULL_TOWARDS_PLAYER && Input.GetMouseButtonUp(1));
 
                 // Cancel if the rope becomes too long, or the player released the left mouse button.
-                if (bForceRelease || m_fGrapRopeLength >= m_fGrapplebreakDistance * m_fGrapplebreakDistance)
+                if (bForceRelease || m_fGrapLineLength >= m_fGrapplebreakDistance * m_fGrapplebreakDistance)
                 {
                     if(m_pullObj)
                         m_pullObj.LetGo();
@@ -416,12 +463,17 @@ public class GrappleHook : MonoBehaviour
                 }
             }
         }
+        */
 
         // ------------------------------------------------------------------------------------------------------------------------------
     }
 
     private void LateUpdate()
     {
+        m_grapLineEffects.ProcessLine(m_grappleLine, m_controller, m_grappleNode, m_v3GrapplePoint, m_fGrappleLineProgress / m_fGrapLineLength, m_bGrappleHookActive);
+        m_pullLineEffects.ProcessLine(m_pullLine, m_controller, m_pullNode, m_v3PullPoint, m_fPullLineProgress / m_fPullLineLength, m_bPullHookActive);
+
+        /*
         // ------------------------------------------------------------------------------------------------------------------------------
         // Effects
 
@@ -553,6 +605,7 @@ public class GrappleHook : MonoBehaviour
         m_grappleLine.SetPositions(m_v3GrapLinePoints);
 
         // ------------------------------------------------------------------------------------------------------------------------------
+        */
     }
 
 
@@ -623,6 +676,7 @@ public class GrappleHook : MonoBehaviour
             // Disable hook visuals.
             m_grappleHook.SetActive(false);
             m_bGrappleHookActive = false;
+            m_fGrappleLineProgress = 0.0f;
 
             m_controller.FreeOverride();
             m_controller.SetGravity(m_controller.JumpGravity());
@@ -631,7 +685,7 @@ public class GrappleHook : MonoBehaviour
         float tension = Vector3.Dot(m_controller.GetVelocity() + v3NetForce, v3GrappleDir);
 
         // Prevent the rope from stretching beyond the rope length when initially grappling.
-        if (m_bRestrictToRopeLength && v3GrappleDif.sqrMagnitude > m_fGrapRopeLength && tension < 0.0f)
+        if (m_bRestrictToRopeLength && v3GrappleDif.sqrMagnitude > m_fGrapLineLength && tension < 0.0f)
             v3NetForce -= tension * v3GrappleDir;
 
         return m_controller.GetVelocity() + v3NetForce;
@@ -691,8 +745,7 @@ public class GrappleHook : MonoBehaviour
         if(m_pullObj == null)
         {
             // Free the pull hook.
-            m_bGrappleHookActive = false;
-            m_graphookScript.UnLodge();
+            //m_bPullHookActive = false;
 
             return;
         }
@@ -704,7 +757,7 @@ public class GrappleHook : MonoBehaviour
         // Distance beyond initial rope distance on impact the rope must be pulled to to decouple the pull object. (Squared)
         float fBreakDistSqr = m_fPullBreakDistance * m_fPullBreakDistance;
 
-        float fDistBeyondThreshold = fRopeDistSqr - m_fGrapRopeLength; // Distance beyond inital rope length.
+        float fDistBeyondThreshold = fRopeDistSqr - m_fGrapLineLength; // Distance beyond inital rope length.
         float fTension = fDistBeyondThreshold / m_fPullBreakDistance; // Tension value used to sample the color gradient and detect when the pull object should decouple.
 
         m_pullObj.SetTension(fTension);
@@ -724,8 +777,8 @@ public class GrappleHook : MonoBehaviour
             m_pullObj.SetTension(0.0f);
         
             // Free the pull hook.
-            m_bGrappleHookActive = false;
-            m_graphookScript.UnLodge();
+            m_bPullHookActive = false;
+            m_fPullLineProgress = 0.0f;
         }
     }
 

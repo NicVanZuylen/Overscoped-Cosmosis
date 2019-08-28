@@ -88,7 +88,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	float3 f3RippleVec = float3(0.0f, 0.0f, 0.0f);
 
-	if (id.x > 0 && id.x < nOutPointCount - 1) 
+	if (id.x > 0 && id.x < nOutPointCount) 
 	{
 		outPoints[nOutPointCount + id.x] = MoveTowards(outPoints[nOutPointCount + id.x], EvaluateCurve(bezierPoints, id.x, inPointCount, inWobblePointCount, fProgress), inDeltaTime * 0.3f);
 

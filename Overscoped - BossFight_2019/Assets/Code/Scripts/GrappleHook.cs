@@ -7,108 +7,144 @@ using UnityEngine;
 public class GrappleHook : MonoBehaviour
 {
     // Public:
-    public GameObject m_grappleHook;
+
+    [SerializeField]
     public LineRenderer m_grappleLine;
+
+    [SerializeField]
     public LineRenderer m_pullLine;
+
+    [SerializeField]
     public Transform m_grappleNode;
+
+    [SerializeField]
     public Transform m_pullNode;
 
     [Header("Physics")]
+
     [Tooltip("Acceleration due to grapple pull.")]
+    [SerializeField]
     public float m_fPullAcceleration = 30.0f;
 
     [Tooltip("Acceleration due to grapple pull.")]
+    [SerializeField]
     public float m_fAirAcceleration = 30.0f;
 
     [Tooltip("Maximum speed in the direction of the grapple line the player can travel.")]
+    [SerializeField]
     public float m_fMaxFlySpeed = 40.0f;
 
     [Tooltip("Radius from the hook in which the player will detach.")]
+    [SerializeField]
     public float m_fDestinationRadius = 2.0f;
 
     [Tooltip("Allowance of lateral movement when grappling.")]
+    [SerializeField]
     public float m_fDriftTolerance = 8.0f;
 
     [Tooltip("Force exerted upwards upon the player when they reach the grapple destination.")]
+    [SerializeField]
     public float m_fPushUpForce = 4.0f;
 
     [Tooltip("Player move acceleration when landing after successfully reaching the grapple hook.")]
+    [SerializeField]
     public float m_fLandMoveAcceleration = 5.0f;
 
     [Tooltip("The distance the grapple hook will travel before cancelling.")]
+    [SerializeField]
     public float m_fGrapplebreakDistance = 20.0f;
 
     [Tooltip("The minimum time grappling before the release boost can be applied.")]
+    [SerializeField]
     public float m_fMinReleaseBoostTime = 0.3f;
 
     [Tooltip("The magnitude of the forward force applied to the player upon rope release.")]
+    [SerializeField]
     public float m_fReleaseForce = 20.0f;
 
     [Tooltip("The magnitude of the foward force applied to the player when grappling from the ground.")]
+    [SerializeField]
     public float m_fForwardGroundGrappleForce = 10.0f;
 
     [Tooltip("The magnitude of the upward force applied to the player when grappling from the ground.")]
+    [SerializeField]
     public float m_fUpGroundGrappleForce = 5.0f;
 
     [Tooltip("Whether or not to use the default jumping gravity whilst flying after grapple.")]
+    [SerializeField]
     public bool m_bJumpGravOnRelease = false;
 
     [Header("Grapple Mode")]
 
     [Tooltip("Rate in which the pull line will travel towards its destination.")]
+    [SerializeField]
     public float m_fGrappleLineSpeed = 30.0f;
 
     [Header("Pull Mode")]
 
     [Tooltip("The distance the pull hook must be extended beyond the initial rope length on impact to decouple the target object.")]
+    [SerializeField]
     public float m_fPullBreakDistance = 8.0f;
 
     [Tooltip("Rate in which the pull line will travel towards its destination.")]
+    [SerializeField]
     public float m_fPullLineSpeed = 30.0f;
 
     [Header("Misc.")]
+
     [Tooltip("Whether or not the player will be restricted a spherical volume with the rope length as the radius when grappling.")]
+    [SerializeField]
     public bool m_bRestrictToRopeLength = true;
 
     [Tooltip("Spherecast radius for firing the grapple hook.")]
+    [SerializeField]
     public float m_fHookRadius = 0.5f;
 
     [Header("Effects")]
-    [Tooltip("Color of the grapple line when in grapple mode.")]
-    public Color m_grappleModeColor;
 
     [Tooltip("Delay between getting a new set of random points for the rope shake effect.")]
+    [SerializeField]
     public float m_fRopeShakeDelay = 0.1f;
 
     [Tooltip("Speed of rope point movement between random points.")]
+    [SerializeField]
     public float m_fShakeSpeed = 0.1f;
 
     [Tooltip("Maximum offset of rope points from thier position on the curve.")]
+    [SerializeField]
     public float m_fShakeMagnitude = 0.05f;
 
     [Tooltip("Amount of waves in the rope whilst it flies.")]
+    [SerializeField]
     public int m_nWaveCount = 3;
 
     [Tooltip("Wave amplitude multiplier of the wobble effect.")]
+    [SerializeField]
     public float m_fRippleWaveAmp = 0.15f;
 
     [Tooltip("Thickness the line will expand to when popping.")]
+    [SerializeField]
     public float m_fPopThickness = 2.0f;
 
     [Tooltip("Rate in which the line will expand and pop after use.")]
+    [SerializeField]
     public float m_fPopRate = 3.0f;
 
     [Tooltip("Amount of time shake is amplified following rope impact.")]
+    [SerializeField]
     public float m_fImpactShakeDuration = 0.6f;
 
     [Tooltip("Multiplier for the impact shake effect.")]
+    [SerializeField]
     public float m_fImpactShakeMult = 5.0f;
 
+    [SerializeField]
     public GameObject m_grappleHandEffect;
-    public GameObject m_impactEffect;
-    public Material m_grappleLineMat;
-    public Material m_pullLineMat;
 
+    [SerializeField]
+    public GameObject m_impactEffect;
+
+    [SerializeField]
     public ComputeShader m_lineCompute;
 
     // Private: 
@@ -180,11 +216,6 @@ public class GrappleHook : MonoBehaviour
 
         m_cameraEffects = cam.GetComponent<CameraEffects>();
         m_cameraTransform = cam.transform;
-
-        // Line material
-        m_grappleLine.materials[0] = m_grappleLineMat;
-
-        m_grappleHook.SetActive(false);
 
         // Misc.
         m_v3GrapplePoint = Vector3.zero;
@@ -691,8 +722,7 @@ public class GrappleHook : MonoBehaviour
         // Stop when within radius of the hook.
         if (v3GrappleDif.sqrMagnitude <= m_fDestinationRadius * m_fDestinationRadius)
         {
-            // Disable hook visuals.
-            m_grappleHook.SetActive(false);
+            // Disable grapple.
             m_bGrappleHookActive = false;
             m_fGrappleLineProgress = 0.0f;
 
@@ -769,23 +799,17 @@ public class GrappleHook : MonoBehaviour
             return;
         }
 
-        Vector3 v3ObjDiff = transform.position - m_grappleHook.transform.position;
+        Vector3 v3ObjDiff = transform.position - m_v3PullPoint;
         Vector3 v3ObjDir = v3ObjDiff.normalized;
         float fRopeDistSqr = v3ObjDiff.magnitude; // Current rope length squared.
 
         // Distance beyond initial rope distance on impact the rope must be pulled to to decouple the pull object. (Squared)
         float fBreakDistSqr = m_fPullBreakDistance * m_fPullBreakDistance;
 
-        float fDistBeyondThreshold = fRopeDistSqr - m_fGrapLineLength; // Distance beyond inital rope length.
+        float fDistBeyondThreshold = fRopeDistSqr - m_fPullLineLength; // Distance beyond inital rope length.
         float fTension = fDistBeyondThreshold / m_fPullBreakDistance; // Tension value used to sample the color gradient and detect when the pull object should decouple.
 
         m_pullObj.SetTension(fTension);
-
-        Color ropeColor = m_grappleLine.colorGradient.Evaluate(Mathf.Clamp(fTension, 0.0f, 1.0f));
-
-        // Set color to sampled color.
-        m_grappleLine.startColor = ropeColor;
-        m_grappleLine.endColor = ropeColor;
 
         if (fTension >= 1.0f)
         {

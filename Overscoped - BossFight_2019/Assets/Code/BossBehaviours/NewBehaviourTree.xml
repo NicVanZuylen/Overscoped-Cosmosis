@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<NodeData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+  <m_name>Base</m_name>
+  <m_funcName>NO_FUNCTION</m_funcName>
+  <m_description />
+  <m_children>
+    <NodeData>
+      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+      <m_name>Boss Stuck</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description />
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_CONDITION</m_eType>
+          <m_name>Boss Stuck</m_name>
+          <m_funcName>CondBossStuck</m_funcName>
+          <m_description>Checks if the boss is stuck</m_description>
+          <m_children />
+        </NodeData>
+      </m_children>
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+      <m_name>Attacks Master</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description>All attack logic is under here.</m_description>
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Beam Track</m_name>
+          <m_funcName>ActBeamTrack</m_funcName>
+          <m_description>Beam attack tracking occurs even when the beam is not in use.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_CONDITION</m_eType>
+          <m_name>Is Idle</m_name>
+          <m_funcName>CondIsIdleAnimation</m_funcName>
+          <m_description>Attacks can only be performed from the idle animation state.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_CONDITION</m_eType>
+          <m_name>Global Attack Cooldown</m_name>
+          <m_funcName>CondGlobalAttackCD</m_funcName>
+          <m_description>Make sure global attack cooldown is zero.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+          <m_name>Attacks</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Attempt first usable attack. Track the player if no attacks can be used.</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+              <m_name>Meteor</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Attempt to summon and hurl a meteor towards the player, when they enter a valid meteor location.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Meteor Available</m_name>
+                  <m_funcName>CondMeteorAvailable</m_funcName>
+                  <m_description>The player must reside within a valid meteor spawning volume, the cooldown must be zero and the player must be grounded to proceed.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>PortalNotInUse</m_name>
+                  <m_funcName>CondPortalNotActive</m_funcName>
+                  <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Beam Not Active</m_name>
+                  <m_funcName>CondBeamNotActive</m_funcName>
+                  <m_description>Ensures the beam attack is not currently active.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Meteor Summon Action</m_name>
+                  <m_funcName>ActPlayMeteorAnim</m_funcName>
+                  <m_description>Play meteor summon animation.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+              <m_name>Beam</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Long range tracking beam aimed towards the player with some lag to allow the player to escape at high speeds.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Beam Cooldown/Active</m_name>
+                  <m_funcName>CondBeamActive</m_funcName>
+                  <m_description>Make sure the beam cooldown is zero, or proceed if the beam is already active.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Beam Attack Action</m_name>
+                  <m_funcName>ActUseBeam</m_funcName>
+                  <m_description>Use the beam attack on the player.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+              <m_name>Portal Punch</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Punches the ground which spawn portals that punch through around the map</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Punch Cooldown</m_name>
+                  <m_funcName>CondSlamCD</m_funcName>
+                  <m_description>Makes sure the portal punch cooldown is zero.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>PortalNotInUse</m_name>
+                  <m_funcName>CondPortalNotActive</m_funcName>
+                  <m_description>Checks if the portal is not still active in the scene before attempting to summon a new one.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Beam Not Active</m_name>
+                  <m_funcName>CondBeamNotActive</m_funcName>
+                  <m_description>Ensures the beam attack is not currently active.</m_description>
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Portal Punch Action</m_name>
+                  <m_funcName>ActPlayPortalPunchAnim</m_funcName>
+                  <m_description>Plays the portal punch animation.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+          </m_children>
+        </NodeData>
+      </m_children>
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_COMPOSITE_SELECTOR</m_eType>
+      <m_name>Tracking</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description>Attempt to track the player's movement/face them.</m_description>
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Track Player</m_name>
+          <m_funcName>ActTrackPlayer</m_funcName>
+          <m_description>Look at and face the player.</m_description>
+          <m_children />
+        </NodeData>
+      </m_children>
+    </NodeData>
+  </m_children>
+</NodeData>

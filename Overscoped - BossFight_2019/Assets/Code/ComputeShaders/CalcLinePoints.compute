@@ -9,6 +9,7 @@ uint inWobblePointCount;
 
 float inFlyProgress;
 float inRippleMagnitude;
+float inDeltaTime;
 
 RWStructuredBuffer<float3> bezierPoints;
 RWStructuredBuffer<float3> bezierIntPoints;
@@ -21,15 +22,27 @@ float3 Lerp(float3 a, float3 b, float t)
 	return a + ((b - a) * t);
 }
 
+float SqrDistance(float3 f3Start, float3 f3End) 
+{
+	float3 f3Diff = f3End - f3Start;
+
+	return (f3Diff.x * f3Diff.x) + (f3Diff.y * f3Diff.y) + (f3Diff.z * f3Diff.z);
+}
+
+// float3 move towards helper function
+float3 MoveTowards(float3 f3Start, float3 f3End, float fDistance) 
+{
+	if (SqrDistance(f3End, f3Start) < fDistance * fDistance)
+	{
+		return f3End;
+	}
+
+	return f3Start + (normalize(f3End - f3Start) * fDistance);
+}
+
 // Evaluate provided bezier curve.
 float3 EvaluateCurve(RWStructuredBuffer<float3> points, uint threadIdx, uint startIndex, uint pointCount, float progress) 
 {
-	// Clamp progress between 0 and 1.
-	if (progress > 1.0f)
-		progress = 1.0f;
-	else if (progress < 0.0f)
-		progress = 0.0f;
-
 	uint intPointIndex = threadIdx * pointCount;
 
 	// Interpolate all line segments...
@@ -49,39 +62,40 @@ float3 EvaluateCurve(RWStructuredBuffer<float3> points, uint threadIdx, uint sta
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 	// Get dimensions of output array.
-	uint outPointCount = 0;
-	uint outPointStride = 0;
-	outPoints.GetDimensions(outPointCount, outPointStride);
+	uint nOutPointCount = 0;
+	uint nOutPointStride = 0;
+	outPoints.GetDimensions(nOutPointCount, nOutPointStride);
 
-	outPointCount /= 2;
+	nOutPointCount /= 2;
 
 	// Get point's point along the line.
-	float progress = ((float)id.x / outPointCount) * inFlyProgress;
+	float fProgress = ((float)id.x / nOutPointCount) * inFlyProgress;
 
 	// Rope wave
-	float waveInput = pow((1.0f - progress), 2) * WAVE_COUNT * PI;
-	float fCurveMag = sin(waveInput);
-	float fCurveMagY = -cos(waveInput);
+	float fWaveInput = pow((1.0f - fProgress), 2) * WAVE_COUNT * PI;
+	float fCurveMag = sin(fWaveInput);
+	float fCurveMagY = -cos(fWaveInput);
 
 	// Directions
-	float3 ropeDir = normalize(bezierPoints[0] - bezierPoints[inPointCount - 1]);
-	float3 rippleDir = cross(ropeDir, float3(0.0f, 1.0f, 0.0f));
+	float3 f3RopeDir = normalize(bezierPoints[0] - bezierPoints[inPointCount - 1]);
+	float3 f3RippleDir = cross(f3RopeDir, float3(0.0f, 1.0f, 0.0f));
 
-	float3 rippleVec = float3(0.0f, 0.0f, 0.0f);
+	float3 f3RippleVec = float3(0.0f, 0.0f, 0.0f);
 
-	if (id.x > 0 && id.x < outPointCount - 1) 
+	if (id.x > 0 && id.x < nOutPointCount) 
 	{
-		outPoints[outPointCount + id.x] = Lerp(outPoints[outPointCount + id.x], EvaluateCurve(bezierPoints, id.x, inPointCount, inWobblePointCount, progress), 0.1f);
+		outPoints[nOutPointCount + id.x] = MoveTowards(outPoints[nOutPointCount + id.x], EvaluateCurve(bezierPoints, id.x, inPointCount, inWobblePointCount, fProgress), inDeltaTime * 0.3f);
 
-		float power = pow((1.0f - progress), 5);
+		float fPower = pow((1.0f - fProgress), 5);
 
-		rippleVec = (rippleDir * power  * fCurveMag) + (float3(0.0f, 1.0f, 0.0f) * power * fCurveMagY); // Ripple vector
+		f3RippleVec = (f3RippleDir * fPower  * fCurveMag) + (float3(0.0f, 1.0f, 0.0f) * fPower * fCurveMagY); // Ripple vector
 
 		// Multipliers
-		rippleVec *= max((inRippleMagnitude - (pow(inFlyProgress, 5) * inRippleMagnitude)), 0.8f);
-		rippleVec *= inRippleMagnitude;
+		f3RippleVec *= max((inRippleMagnitude - (pow(inFlyProgress, 5) * inRippleMagnitude)), 0.8f);
+		f3RippleVec *= inRippleMagnitude;
+		f3RippleVec *= fProgress / 0.1f;
 	}
 
 	// Evaluate curve for output point.
-	outPoints[id.x] = EvaluateCurve(bezierPoints, id.x, 0, inPointCount, progress) + outPoints[outPointCount + id.x] + rippleVec;
+	outPoints[id.x] = EvaluateCurve(bezierPoints, id.x, 0, inPointCount, fProgress) + outPoints[nOutPointCount + id.x] + f3RippleVec;
 }

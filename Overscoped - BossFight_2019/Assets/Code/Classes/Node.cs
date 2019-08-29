@@ -526,10 +526,6 @@ namespace BTreeEditor
                 nWindowIndex = 0;
 
             // Draw this node's window...
-            //Vector2 v2ScaleOffset = new Vector2((fNodeWidth - m_v2VisualDimensions.x) * -0.5f, 0.0f);
-            //Vector2 v2FinalPos = m_rect.position - v2ScaleOffset + BTreeEditor.m_v2GlobalViewOffset;
-
-            //Rect nodeRect = new Rect(v2FinalPos, m_v2VisualDimensions);
 
             Vector2 v2FinalPos = v2ParentPos + m_v2LocalPosition;
 

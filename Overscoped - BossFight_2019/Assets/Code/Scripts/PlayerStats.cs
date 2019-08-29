@@ -210,7 +210,7 @@ public class PlayerStats : MonoBehaviour
             m_controller.AddImpulse(-other.transform.up * m_fPortalPunchForce);
 
             // Shake camera.
-            m_camEffects.ApplyShakeOverTime(0.5f, 2.0f, true);
+            m_camEffects.ApplyShake(0.5f, 2.0f, true);
 
             // Deal damage.
             DealDamage(m_fPortalPunchDamage);

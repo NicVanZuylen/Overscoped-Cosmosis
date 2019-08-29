@@ -8,6 +8,10 @@ public class Meteor : MonoBehaviour
     [SerializeField]
     private GameObject m_player = null;
 
+    [Tooltip("Reference to the Meteror's AOE")]
+    [SerializeField]
+    private MeteorAOE m_meteorAOE;
+
     [Tooltip("Speed in which the meteor will travel.")]
     [SerializeField]
     private float m_fSpeed = 50.0f;
@@ -36,8 +40,6 @@ public class Meteor : MonoBehaviour
 
         for (int i = 0; i < m_targetObjects.Length; ++i)
             Physics.IgnoreCollision(m_targetObjects[i].GetComponent<BoxCollider>(), thisCollider, true);
-
-        gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -65,10 +67,12 @@ public class Meteor : MonoBehaviour
         m_v3TravelDirection = (m_v3Target - transform.position).normalized;
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider collider)
     {
+        m_meteorAOE.AOE();
+
         // Deal damage to the player.
-        if(other.gameObject == m_player)
+        if(collider.gameObject == m_player)
         {
             m_playerStats.DealDamage(m_fDirectHitDamage);
         }

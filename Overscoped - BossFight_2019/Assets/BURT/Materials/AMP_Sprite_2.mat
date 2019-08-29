@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AMP_Sprite_2
   m_Shader: {fileID: 4800000, guid: c68d966b41c69ee4d91fc41a1b9a395b, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: UNITY_UI_ALPHACLIP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -30,6 +30,6 @@ Material:
     - _StencilOp: 0
     - _StencilReadMask: 255
     - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
+    - _UseUIAlphaClip: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

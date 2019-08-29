@@ -1480,12 +1480,12 @@ PrefabInstance:
     - target: {fileID: 3812603301322367556, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 9
+      value: 104.3
       objectReference: {fileID: 0}
     - target: {fileID: 3812603301322367556, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 76.8
+      value: 306
       objectReference: {fileID: 0}
     - target: {fileID: 3812603301322367556, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -1541,6 +1541,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fPortalPunchDamage
       value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fPortalPunchForce
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -1640,15 +1645,24 @@ PrefabInstance:
       propertyPath: m_Positions.Array.data[14].z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1101892924, guid: ed16ca3417fe22f478cf87da9d692428, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fMaxGroundMoveSpeed
-      value: 10
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fMaxSprintMoveSpeed
-      value: 17
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fGroundDrag
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -1657,8 +1671,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
-      propertyPath: m_fAirAcceleration
-      value: 2.5
+      propertyPath: m_fMaxAirborneMoveSpeed
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449864, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
@@ -1688,37 +1702,42 @@ PrefabInstance:
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fPullAcceleration
-      value: 15
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fAirAcceleration
-      value: 15
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_fMaxFlySpeed
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fDriftTolerance
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fLandMoveAcceleration
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fGrapplebreakDistance
-      value: 50
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fMinReleaseBoostTime
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_fReleaseForce
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3812603302388449870, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}

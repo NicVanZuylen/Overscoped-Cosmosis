@@ -144,6 +144,7 @@ public class GrappleHook : MonoBehaviour
     private float m_fPullLineLength;
     private float m_fPullLineProgress;
     private bool m_bPullLocked;
+    private bool m_bPullJustImpacted;
 
     // Misc.
     private float m_fReleaseGravity;
@@ -270,7 +271,10 @@ public class GrappleHook : MonoBehaviour
             m_fGrappleLineProgress += m_fGrappleLineSpeed * Time.deltaTime;
             m_fGrappleLineProgress = Mathf.Clamp(m_fGrappleLineProgress, 0.0f, m_fGrapLineLength);
 
+            bool bPrevLocked = m_bGrappleLocked;
             m_bGrappleLocked = m_fGrappleLineProgress >= m_fGrapLineLength;
+
+            m_bGrappleJustImpacted = !bPrevLocked && m_bGrappleLocked;
 
             if (m_bGrappleLocked)
             {
@@ -326,10 +330,24 @@ public class GrappleHook : MonoBehaviour
             m_fPullLineProgress += m_fPullLineSpeed * Time.deltaTime;
             m_fPullLineProgress = Mathf.Clamp(m_fPullLineProgress, 0.0f, m_fPullLineLength);
 
+            bool bPrevLocked = m_bPullLocked;
             m_bPullLocked = m_fPullLineProgress >= m_fPullLineLength;
 
-            if(m_bPullLocked)
+            m_bPullJustImpacted = !bPrevLocked && m_bPullLocked;
+
+            if (m_bPullLocked)
             {
+                if (m_bPullJustImpacted)
+                {
+                    m_cameraEffects.ApplyShake(0.05f, 1.0f, true);
+
+                    m_bPullJustImpacted = false;
+                }
+                else
+                {
+                    m_cameraEffects.ApplyShake(0.1f, 0.1f);
+                }
+
                 // Impact particle effect.
                 //m_impactEffect.transform.position = m_v3PullPoint;
                 //m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
@@ -745,7 +763,8 @@ public class GrappleHook : MonoBehaviour
         if(m_pullObj == null)
         {
             // Free the pull hook.
-            //m_bPullHookActive = false;
+            m_bPullHookActive = false;
+            m_fPullLineProgress = 0.0f;
 
             return;
         }

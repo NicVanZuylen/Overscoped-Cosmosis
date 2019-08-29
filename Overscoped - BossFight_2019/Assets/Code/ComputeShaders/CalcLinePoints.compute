@@ -43,12 +43,6 @@ float3 MoveTowards(float3 f3Start, float3 f3End, float fDistance)
 // Evaluate provided bezier curve.
 float3 EvaluateCurve(RWStructuredBuffer<float3> points, uint threadIdx, uint startIndex, uint pointCount, float progress) 
 {
-	// Clamp progress between 0 and 1.
-	if (progress > 1.0f)
-		progress = 1.0f;
-	else if (progress < 0.0f)
-		progress = 0.0f;
-
 	uint intPointIndex = threadIdx * pointCount;
 
 	// Interpolate all line segments...
@@ -99,7 +93,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 		// Multipliers
 		f3RippleVec *= max((inRippleMagnitude - (pow(inFlyProgress, 5) * inRippleMagnitude)), 0.8f);
 		f3RippleVec *= inRippleMagnitude;
-		f3RippleVec *= fProgress / 0.1f; // Prevents disconnection from the casting point by.
+		f3RippleVec *= fProgress / 0.1f;
 	}
 
 	// Evaluate curve for output point.

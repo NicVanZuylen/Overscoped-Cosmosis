@@ -86,6 +86,7 @@ public class PlayerController : MonoBehaviour
     private float m_fSprintDot;
     private bool m_bShouldSprint;
     private bool m_bShouldJump;
+    private bool m_bSlopeLimit;
 
     // Jumping
     private float m_fJumpGravity; // Gravity used when jumping.
@@ -337,8 +338,19 @@ public class PlayerController : MonoBehaviour
         float fSurfaceAngle = Vector3.Dot(v3SlopeForward, Vector3.up);
 
         // If the slope is too steep the surface vectors will be flattened.
-        if((Mathf.Abs(fSurfaceAngle) * 90.0f) >= m_controller.slopeLimit)
+        if ((Mathf.Abs(fSurfaceAngle) * 90.0f) >= m_controller.slopeLimit)
+        {
+            // Push away from surface.
+            float fVelCompNormal = Vector3.Dot(m_v3Velocity, -v3Normal);
+            Vector3 v3VelAgainstNormal = fVelCompNormal * v3Normal;
+
+            m_v3Velocity += v3VelAgainstNormal * 1.1f;
+
             v3Normal = Vector3.up;
+            m_bSlopeLimit = true;
+        }
+        else
+            m_bSlopeLimit = false;
 
         m_v3SurfaceUp = v3Normal;
         m_v3SurfaceForward = Vector3.Cross(m_cameraTransform.right, m_v3SurfaceUp);
@@ -491,7 +503,8 @@ public class PlayerController : MonoBehaviour
             // Reset movement vectors for airborn movement.
 
             // We're giving it the upward vector to represent a flat surface.
-            CalculateSurfaceAxes(Vector3.up);
+            //CalculateSurfaceAxes(m_groundHit.normal);
+            CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
 
             // ------------------------------------------------------------------------------------------------------
             // Airborne movement
@@ -518,9 +531,7 @@ public class PlayerController : MonoBehaviour
             // Remove external Y velocity factors affecting jumping.
             m_v3Velocity.y = 0.0f;
 
-            // Add jumping force.
-            //v3NetForce += JumpForce();
-
+            // Add jumping impulse.
             v3NetForce.y = m_fJumpInitialVelocity;
 
             m_bShouldJump = false;
@@ -533,13 +544,7 @@ public class PlayerController : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------
         // Gravity.
 
-        //if (!m_bOnGround)
-        //{
-
         m_v3Velocity.y += m_fCurrentGravity * Time.fixedDeltaTime;
-        //}
-        //else
-            //m_v3Velocity.y += Physics.gravity.y * Time.fixedDeltaTime;
             
         // ------------------------------------------------------------------------------------------------------
         // Final forces.
@@ -579,10 +584,10 @@ public class PlayerController : MonoBehaviour
 
         bool bPrevGrounded = m_bOnGround;
 
-        Ray sphereRay = new Ray(transform.position, -transform.up);
+        Ray sphereRay = new Ray(transform.position, -Vector3.up);
 
         // Sphere case down to the nearest surface below. Sphere cast is ignored if not falling.
-        bool bSphereCastHit = Physics.SphereCast(sphereRay, m_controller.radius, out m_groundHit);
+        bool bSphereCastHit = Physics.SphereCast(sphereRay, m_controller.radius, out m_groundHit, Mathf.Infinity, int.MaxValue, QueryTriggerInteraction.Ignore);
         m_bOnGround = bSphereCastHit && m_groundHit.distance < (m_controller.height * 0.5f) - (m_controller.radius * 0.7f);
 
         // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
@@ -602,6 +607,8 @@ public class PlayerController : MonoBehaviour
 
         // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
         m_bOnGround |= m_controller.isGrounded;
+
+        m_bOnGround &= !m_bSlopeLimit;
 
         // ---------------------------------------------------------------------------------------------------
         // FOV velocity effect.

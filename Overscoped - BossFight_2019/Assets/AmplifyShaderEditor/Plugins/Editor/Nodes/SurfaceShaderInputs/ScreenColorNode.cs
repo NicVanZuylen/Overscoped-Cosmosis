@@ -12,6 +12,16 @@ namespace AmplifyShaderEditor
 	[NodeAttributes( "Grab Screen Color", "Camera And Screen", "Grabed pixel color value from screen" )]
 	public sealed class ScreenColorNode : PropertyNode
 	{
+#if UNITY_5_6_OR_NEWER
+		private readonly string[] ASEDeclareMacro =
+		{
+			"#if defined(UNITY_STEREO_INSTANCING_ENABLED) || defined(UNITY_STEREO_MULTIVIEW_ENABLED)",
+			"#define ASE_DECLARE_SCREENSPACE_TEXTURE(tex) UNITY_DECLARE_SCREENSPACE_TEXTURE(tex);",
+			"#else",
+			"#define ASE_DECLARE_SCREENSPACE_TEXTURE(tex) UNITY_DECLARE_SCREENSPACE_TEXTURE(tex)",
+			"#endif"
+		};
+#endif
 		private readonly Color ReferenceHeaderColor = new Color( 0.6f, 3.0f, 1.25f, 1.0f );
 
 		private const string SamplerType = "tex2D";
@@ -45,7 +55,8 @@ namespace AmplifyShaderEditor
 		private const string OpaqueTextureDefine = "REQUIRE_OPAQUE_TEXTURE 1";
 		private const string FetchVarName = "fetchOpaqueVal";
 
-		private string LWFetchOpaqueTexture = "SAMPLE_TEXTURE2D( _CameraOpaqueTexture, sampler_CameraOpaqueTexture, {0})";
+		//private string LWFetchOpaqueTexture = "SAMPLE_TEXTURE2D( _CameraOpaqueTexture, sampler_CameraOpaqueTexture, {0})";
+		private string LWFetchOpaqueTexture = "float4( SHADERGRAPH_SAMPLE_SCENE_COLOR( {0} ), 1.0 )";
 #if UNITY_2018_3_OR_NEWER
 		private const string HDSampleSceneColorHeader5 = "ASEHDSampleSceneColor({0}, {1}, {2})";
 		private readonly string[] HDSampleSceneColorFunc5 =
@@ -311,6 +322,16 @@ namespace AmplifyShaderEditor
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalVar )
 		{
+#if UNITY_5_6_OR_NEWER
+			if( !dataCollector.IsTemplate || dataCollector.CurrentSRPType == TemplateSRPType.BuiltIn )
+			{
+				for( int i = 0; i < ASEDeclareMacro.Length; i++ )
+				{
+					dataCollector.AddToMisc( ASEDeclareMacro[ i ]);
+				}
+			}
+#endif
+
 #if !UNITY_2018_3_OR_NEWER
 			if( dataCollector.IsTemplate && dataCollector.CurrentSRPType == TemplateSRPType.HD )
 			{
@@ -318,7 +339,7 @@ namespace AmplifyShaderEditor
 				return GetOutputColorItem( 0, outputId, "(0).xxxx" );
 			}
 #endif
-			if( m_outputPorts[ 0 ].IsLocalValue( dataCollector.PortCategory ) )
+				if( m_outputPorts[ 0 ].IsLocalValue( dataCollector.PortCategory ) )
 				return GetOutputColorItem( 0, outputId, m_outputPorts[ 0 ].LocalValue( dataCollector.PortCategory ) );
 
 			string valueName = string.Empty;
@@ -387,7 +408,7 @@ namespace AmplifyShaderEditor
 #if UNITY_5_6_OR_NEWER
 			if( isProjecting )
 			{
-				uvValue = string.Format( "{0}/{0}.w", uvValue );
+				uvValue = string.Format( "{0}.xy/{0}.w", uvValue );
 			}
 			string samplerOp = string.Format( "UNITY_SAMPLE_SCREENSPACE_TEXTURE({0},{1})", propertyName, uvValue );
 #else
@@ -587,7 +608,7 @@ namespace AmplifyShaderEditor
 				return m_referenceNode.GetUniformValue();
 			}
 #if UNITY_5_6_OR_NEWER
-			return "UNITY_DECLARE_SCREENSPACE_TEXTURE( " + PropertyName + " )";
+			return "ASE_DECLARE_SCREENSPACE_TEXTURE( " + PropertyName + " )";
 #else
 			return "uniform sampler2D " + PropertyName + ";";
 #endif
@@ -606,7 +627,7 @@ namespace AmplifyShaderEditor
 				return m_referenceNode.GetUniformData( out dataType, out dataName, ref fullValue );
 			}
 #if UNITY_5_6_OR_NEWER
-			dataName = "UNITY_DECLARE_SCREENSPACE_TEXTURE( " + PropertyName + " )";
+			dataName = "ASE_DECLARE_SCREENSPACE_TEXTURE( " + PropertyName + " )";
 			dataType = string.Empty;
 			fullValue = true;
 #else

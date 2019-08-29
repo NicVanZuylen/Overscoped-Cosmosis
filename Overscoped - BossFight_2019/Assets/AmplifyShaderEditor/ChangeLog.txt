@@ -1,4 +1,56 @@
 Release Notes:
+v1.6.9 rev 00:
+* Fixes:
+    * Fixed 'Component Mask' node preview 
+
+v1.6.8 rev 07:
+* New Nodes:
+    * Gradient
+    * Gradient Sample
+
+* Fixes:
+    * Fixed nodes incorrectly moving when interacting with popup fields in recent Unity versions
+    * Fixed issue on incorrect size for vertex normal data on LWRP Unlit template
+
+* Improvements:
+    * Added Built-in Fog option to LWRP Unlit template
+
+v1.6.8 rev 06:
+* Fixes:
+    * Fixed issue on incorrectly selecting Shader Name textfield when opening an ASE shader
+    * Fixed issues on incorrect uv coordinates size over 'Grab Screen Color' node
+    * Fixed GPU instancing and vertex offset issues on all HDRP templates
+    * Fixed parse issues when capturing structs inside templates (API)
+    * Temporarily disabled SRP Batcher as it was not properly working
+
+v1.6.8 rev 05:
+* Fixes:
+    * 'Grab Screen Color' now prevents Unity macro inconsistent behavior between Unity versions
+
+v1.6.8 rev 04:
+* Fixes:
+    * Fixed issues regarding Diffusion Profile usage on HDRP
+
+v1.6.8 rev 03:
+* Fixes:
+    * 'Grab Screen Color' now prevents Unity macro inconsistent declaration ending between VR and non-VR compilation
+    * Preventing compilation errors related to GPU Instancing on SRP
+
+v1.6.8 rev 02:
+* Fixes:
+    * Added missing stereo config on LW Unlit template
+    * Fixed Blend Mode config on HD Lit template when choosing Opaque mode
+
+v1.6.8 rev 01:
+* Fixes:
+    * Fixed compilation issue with 'Grab Screen Color' node on VR
+    * Fixed issue on Shadow Caster pass over HD Lit template v5.16.1
+    * 'Grab Screen Color' node now takes VR into account on LWRP
+
+* Improvements:
+    * Share links now have permanent lifetime
+    * Added new Depth Offset option into HD Lit template v5.16.1
+
 v1.6.8 rev 00:
 * New features:
     * Added Share button that uploads select data to the cloud for easy sharing

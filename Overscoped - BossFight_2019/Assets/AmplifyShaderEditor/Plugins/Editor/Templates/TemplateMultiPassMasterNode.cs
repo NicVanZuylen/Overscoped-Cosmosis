@@ -1014,6 +1014,17 @@ namespace AmplifyShaderEditor
 #endif
 		}
 
+		// this will be removed later when PBR options are created
+		void SetExtraDefine(string define)
+		{
+			List<TemplateMultiPassMasterNode> nodes = this.ContainerGraph.MultiPassMasterNodes.NodesList;
+			int count = nodes.Count;
+			for( int nodeIdx = 0; nodeIdx < count; nodeIdx++ )
+			{
+				nodes[ nodeIdx ].OptionsDefineContainer.AddDefine( "#define " + define );
+			}
+		}
+
 		void AddHDKeywords()
 		{
 			if( m_templateMultiPass.CustomTemplatePropertyUI == CustomTemplatePropertyUIEnum.None )
@@ -1027,10 +1038,12 @@ namespace AmplifyShaderEditor
 			{
 				case HDSRPMaterialType.SubsurfaceScattering:
 				{
-					m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialSubsurfaceScatteringKeyword );
+					SetExtraDefine( SRPMaterialSubsurfaceScatteringKeyword );
+					//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialSubsurfaceScatteringKeyword );
 					if( m_thicknessPort != null && m_thicknessPort.HasOwnOrLinkConnection )
 					{
-						m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialTransmissionKeyword );
+						SetExtraDefine( SRPMaterialTransmissionKeyword );
+						//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialTransmissionKeyword );
 					}
 				}
 				break;
@@ -1038,29 +1051,34 @@ namespace AmplifyShaderEditor
 				break;
 				case HDSRPMaterialType.Specular:
 				{
-					m_currentDataCollector.AddToDefines( UniqueId, SRPHDMaterialSpecularKeyword );
+					SetExtraDefine( SRPHDMaterialSpecularKeyword );
+					//m_currentDataCollector.AddToDefines( UniqueId, SRPHDMaterialSpecularKeyword );
 				}
 				break;
 				case HDSRPMaterialType.Anisotropy:
 				{
-					m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialAnisotropyKeyword );
+					SetExtraDefine( SRPMaterialAnisotropyKeyword );
+					//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialAnisotropyKeyword );
 				}
 				break;
 				case HDSRPMaterialType.Iridescence:
 				{
-					m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialIridiscenceKeyword );
+					SetExtraDefine( SRPMaterialIridiscenceKeyword );
+					//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialIridiscenceKeyword );
 				}
 				break;
 				case HDSRPMaterialType.Translucent:
 				{
-					m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialTransmissionKeyword );
+					SetExtraDefine( SRPMaterialTransmissionKeyword );
+					//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialTransmissionKeyword );
 				}
 				break;
 			}
 
 			if( m_coatMaskPort != null && m_coatMaskPort.HasOwnOrLinkConnection )
 			{
-				m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialClearCoatKeyword );
+				SetExtraDefine( SRPMaterialClearCoatKeyword );
+				//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialClearCoatKeyword );
 			}
 		}
 
@@ -1347,19 +1365,19 @@ namespace AmplifyShaderEditor
 							m_currentDataCollector.AddToDefines( UniqueId, SRPLWMaterialSpecularKeyword );
 						}
 					}
-					else if( m_templateMultiPass.SubShaders[ m_subShaderIdx ].Modules.SRPType == TemplateSRPType.HD )
-					{
-						if( ports[ i ].Name.Contains( "Normal" ) )
-						{
-							m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialNormalMapKeyword );
-						}
+					//else if( m_templateMultiPass.SubShaders[ m_subShaderIdx ].Modules.SRPType == TemplateSRPType.HD )
+					//{
+					//	if( ports[ i ].Name.Contains( "Normal" ) )
+					//	{
+					//		//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialNormalMapKeyword );
+					//	}
 
-						if( ports[ i ].Name.Contains( "Alpha Clip Threshold" ) )
-						{
-							m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialAlphaTestKeyword );
-						}
+					//	if( ports[ i ].Name.Contains( "Alpha Clip Threshold" ) )
+					//	{
+					//		//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialAlphaTestKeyword );
+					//	}
 
-					}
+					//}
 
 					m_currentDataCollector.ResetInstructions();
 					m_currentDataCollector.ResetVertexInstructions();
@@ -1600,10 +1618,14 @@ namespace AmplifyShaderEditor
 				m_currentDataCollector.OptimizeInstancedProperties();
 				m_currentDataCollector.TabifyInstancedVars();
 
+				//string cbufferBegin = m_currentDataCollector.IsSRP ?
+				//							string.Format( IOUtils.SRPInstancedPropertiesBegin, "UnityPerMaterial" ) :
+				//							string.Format( IOUtils.InstancedPropertiesBegin, m_currentDataCollector.InstanceBlockName );
+				//string cBufferEnd = m_currentDataCollector.IsSRP ? ( string.Format( IOUtils.SRPInstancedPropertiesEnd, m_currentDataCollector.InstanceBlockName ) ) : IOUtils.InstancedPropertiesEnd;
 				string cbufferBegin = m_currentDataCollector.IsSRP ?
-											string.Format( IOUtils.SRPInstancedPropertiesBegin, "UnityPerMaterial" ) :
-											string.Format( IOUtils.InstancedPropertiesBegin, m_currentDataCollector.InstanceBlockName );
-				string cBufferEnd = m_currentDataCollector.IsSRP ? ( string.Format( IOUtils.SRPInstancedPropertiesEnd, m_currentDataCollector.InstanceBlockName ) ) : IOUtils.InstancedPropertiesEnd;
+							string.Format( IOUtils.LWSRPInstancedPropertiesBegin, m_currentDataCollector.InstanceBlockName ) :
+							string.Format( IOUtils.InstancedPropertiesBegin, m_currentDataCollector.InstanceBlockName );
+				string cBufferEnd = m_currentDataCollector.IsSRP ? ( string.Format( IOUtils.LWSRPInstancedPropertiesEnd, m_currentDataCollector.InstanceBlockName ) ) : IOUtils.InstancedPropertiesEnd;
 
 				m_currentDataCollector.InstancedPropertiesList.Insert( 0, new PropertyDataCollector( -1, cbufferBegin ) );
 				m_currentDataCollector.InstancedPropertiesList.Add( new PropertyDataCollector( -1, cBufferEnd ) );
@@ -1684,10 +1706,11 @@ namespace AmplifyShaderEditor
 				List<PropertyDataCollector> includePragmaDefineList = new List<PropertyDataCollector>();
 				includePragmaDefineList.AddRange( m_currentDataCollector.IncludesList );
 				includePragmaDefineList.AddRange( m_currentDataCollector.DefinesList );
-				includePragmaDefineList.AddRange( m_optionsDefineContainer.DefinesList );
+				//includePragmaDefineList.AddRange( m_optionsDefineContainer.DefinesList );
 				includePragmaDefineList.AddRange( m_currentDataCollector.PragmasList );
 				includePragmaDefineList.AddRange( m_currentDataCollector.MiscList );
-
+				
+				m_templateMultiPass.SetPassData( TemplateModuleDataType.ModulePragmaBefore, m_subShaderIdx, m_passIdx, m_optionsDefineContainer.DefinesList );
 				m_templateMultiPass.SetPassData( TemplateModuleDataType.ModulePragma, m_subShaderIdx, m_passIdx, includePragmaDefineList );
 
 				m_currentDataCollector.TemplateDataCollectorInstance.CloseLateDirectives();
@@ -1747,15 +1770,18 @@ namespace AmplifyShaderEditor
 				{
 					if( renderType == RenderType.Transparent && renderQueue == RenderQueue.Transparent )
 					{
-						m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialTransparentKeyword );
+						SetExtraDefine( SRPMaterialTransparentKeyword );
+						//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialTransparentKeyword );
 						TemplatesBlendModule blendOpHelper = passHelper.BlendOpHelper.ValidBlendMode ? passHelper.BlendOpHelper : subShaderHelper.BlendOpHelper;
 						if( blendOpHelper.IsAdditiveRGB )
 						{
-							m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialBlendModeAddKeyword );
+							SetExtraDefine( SRPMaterialBlendModeAddKeyword );
+							//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialBlendModeAddKeyword );
 						}
 						else if( blendOpHelper.IsAlphaBlendRGB )
 						{
-							m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialBlendModeAlphaKeyword );
+							SetExtraDefine( SRPMaterialBlendModeAlphaKeyword );
+							//m_currentDataCollector.AddToDefines( UniqueId, SRPMaterialBlendModeAlphaKeyword );
 						}
 					}
 				}

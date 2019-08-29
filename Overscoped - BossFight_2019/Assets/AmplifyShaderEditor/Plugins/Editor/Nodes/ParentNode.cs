@@ -1781,7 +1781,7 @@ namespace AmplifyShaderEditor
 						}
 						else
 						{
-							if( m_containerGraph.ParentWindow.GlobalShowInternalData && !m_inputPorts[ i ].IsConnected && UIUtils.InternalDataOnPort.fontSize > 1f && ( m_inputPorts[ i ].AutoDrawInternalData || ( m_autoDrawInternalPortData && m_useInternalPortData ) ) && m_inputPorts[ i ].DisplayInternalData.Length > 4 )
+							if( m_containerGraph.ParentWindow.GlobalShowInternalData && !m_inputPorts[ i ].IsConnected && UIUtils.InternalDataOnPort.fontSize > 1f && ( m_inputPorts[ i ].AutoDrawInternalData || ( m_autoDrawInternalPortData && m_useInternalPortData ) ) && m_inputPorts[ i ].DisplayInternalData.Length > 4 && m_inputPorts[ i ].DataType != WirePortDataType.OBJECT )
 							{
 								GUI.color = Constants.NodeBodyColor/* * new Color( 1f, 1f, 1f, 0.75f )*/;
 								Rect internalBox = m_inputPorts[ i ].LabelPosition;

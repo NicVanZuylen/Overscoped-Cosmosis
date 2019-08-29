@@ -345,6 +345,7 @@ namespace AmplifyShaderEditor
 		public static readonly string TemplateMPPassTag = "\\bPass\\b\\s*{";
 		public static readonly string TemplateLocalVarTag = "/*ase_local_var*/";
 		public static readonly string TemplateDependenciesListTag = "/*ase_dependencies_list*/";
+		public static readonly string TemplatePragmaBeforeTag = "/*ase_pragma_before*/";
 		public static readonly string TemplatePragmaTag = "/*ase_pragma*/";
 		public static readonly string TemplatePassTag = "/*ase_pass*/";
 		public static readonly string TemplatePassesEndTag = "/*ase_pass_end*/";
@@ -395,6 +396,7 @@ namespace AmplifyShaderEditor
 																new TemplateTagData( TemplateGlobalsTag,true),
 																new TemplateTagData( TemplateFunctionsTag,true),
 																//new TemplateTagData( TemplateTagsTag,false," "),
+																new TemplateTagData( TemplatePragmaBeforeTag,true),
 																new TemplateTagData( TemplatePragmaTag,true),
 																new TemplateTagData( TemplatePassTag,true),
 																new TemplateTagData( TemplateInputsVertParamsTag,false),

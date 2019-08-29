@@ -815,6 +815,7 @@ namespace AmplifyShaderEditor
 		public static string PragmasPattern = @"^\s*#pragma\s+([\w .]*)";
 		public static string IncludesPattern = "^\\s*#include\\s+\"([\\w.\\/]*)\"";
 		public static string GlobalDirectivesPattern = "[#]+(define|pragma|include)\\s+([\\w .\\/\\\"]*)";
+		public static string BeforePragmaPattern = @"(?:CGPROGRAM|HLSLPROGRAM|GLSLPROGRAM).*?\n(\s*)(.)";
 
 		public static string VertexPragmaPattern = @"#pragma vertex\s+(\w+)";
 		public static string FragmentPragmaPattern = @"#pragma fragment\s+(\w+)";
@@ -863,6 +864,8 @@ namespace AmplifyShaderEditor
 		public static readonly string InterpolatorDecl = Constants.VertexShaderOutputStr + ".{0} = " + Constants.VertexShaderInputStr + ".{0};";
 		public static readonly string TemplateVariableDecl = "{0} = {1};";
 		public static readonly string TemplateVarFormat = "{0}.{1}";
+
+		public static readonly string StructsRemoval = @"struct\s+\w+\s+{[\s\w;\/\*]+};";
 
 		public static string ReplaceAt( this string body, string oldStr, string newStr, int startIndex )
 		{
@@ -998,6 +1001,9 @@ namespace AmplifyShaderEditor
 		{
 			int typeIdx = (int)TemplateShaderGlobalsIdx.Type;
 			int nameIdx = (int)TemplateShaderGlobalsIdx.Name;
+			
+			// removes structs
+			propertyData = Regex.Replace( propertyData, StructsRemoval, "" );
 			MatchCollection matchCollection = Regex.Matches( propertyData, ShaderGlobalsOverallPattern );
 			string value = ( matchCollection.Count > 0 ) ? matchCollection[ 0 ].Groups[ 0 ].Value : propertyData;
 			foreach( Match lineMatch in Regex.Matches( value, ShaderGlobalsMultilinePattern, RegexOptions.Multiline ) )
@@ -1927,7 +1933,6 @@ namespace AmplifyShaderEditor
 				}
 			}
 		}
-
 
 		public static void FetchCustomInspector( TemplateInfoContainer inspectorContainer, ref string body )
 		{

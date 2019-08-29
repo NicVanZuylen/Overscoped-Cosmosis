@@ -76,19 +76,26 @@
     <Compile Include="Assets\Code\AnimBehaviours\ResetToIdle.cs" />
     <Compile Include="Assets\Code\Classes\BehaviourNode.cs" />
     <Compile Include="Assets\Code\Classes\Bezier.cs" />
+    <Compile Include="Assets\Code\Classes\LineEffects.cs" />
+    <Compile Include="Assets\Code\Classes\Node.cs" />
     <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
     <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
     <Compile Include="Assets\Code\Scripts\CameraEffects.cs" />
+    <Compile Include="Assets\Code\Scripts\EnergyPillar.cs" />
     <Compile Include="Assets\Code\Scripts\GameManager.cs" />
     <Compile Include="Assets\Code\Scripts\GrappleHook.cs" />
-    <Compile Include="Assets\Code\Scripts\Hook.cs" />
     <Compile Include="Assets\Code\Scripts\Meteor.cs" />
+    <Compile Include="Assets\Code\Scripts\MeteorAOE.cs" />
+    <Compile Include="Assets\Code\Scripts\PlayerBeam.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerController_old.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerStats.cs" />
+    <Compile Include="Assets\Code\Scripts\Portal.cs" />
+    <Compile Include="Assets\Code\Scripts\PortalPunch.cs" />
     <Compile Include="Assets\Code\Scripts\PullObject.cs" />
     <Compile Include="Assets\Code\Scripts\RBPlayerController.cs" />
     <Compile Include="Assets\Code\Scripts\Respawn.cs" />
+    <Compile Include="Assets\Code\Scripts\Switch.cs" />
     <Compile Include="Assets\ThirdParty\PlayModeComponentSaver\UnityPlayModeSaverSceneUtils.cs" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\LowPolyWater\Credits.txt" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\Legacy\Sprites-Default.shader" />
@@ -135,7 +142,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_DecodeFloatRGBAHlpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\ObjectNormalRefraction\ObjectNormalRefraction.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\UVLightReveal\UV light.shader" />
-    <None Include="Assets\3rd Party\tripolygon\UModeler\Materials\Basic\UModeler_UnlitVertexColorShader.shader" />
+    <None Include="Assets\ThirdParty\3rd Party\tripolygon\UModeler\Materials\Basic\UModeler_UnlitVertexColorShader.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WorldToObjectTransfNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ObjSpaceViewDirHlpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\README SRP Samples.txt" />
@@ -172,6 +179,7 @@
     <None Include="Assets\Materials\Shaders\SHD_Boss_Portal_Arm.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\ShaderLibrary\ShaderLibrary.txt" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TFHCIf.shader" />
+    <None Include="Assets\Code\BossBehaviours\TestTree.xml" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\Skybox Cubemap Extended\Shaders\Skybox Cubemap Extended.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Projectors\ProjectorShadow.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_VertexTangentNode.shader" />
@@ -186,6 +194,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TexturePropertyNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SinOpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WorldNormalVector.shader" />
+    <None Include="Assets\Code\BossBehaviours\BossTreePhase1.xml" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SimpleContrastNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\Volumetric Pixelization\Combine Layers.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_RefractOpVec.shader" />
@@ -202,7 +211,6 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_Log10OpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_LengthOpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WorldSpaceViewDirHlpNode.shader" />
-    <None Include="Assets\Materials\Shaders\Galaxy_Render.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_PosVertexDataNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\StencilExample\RefractionsPanels\AnimatedRefraction.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_CoshOpNode.shader" />
@@ -228,6 +236,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ConditionalIfNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Extrusion\NormalExtrusion.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Burn\BurnEffect.shader" />
+    <None Include="Assets\Code\BossBehaviours\BossTreePhase2.xml" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SummedBlendNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TruncOpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\Volumetric Pixelization\Breakdown.txt" />
@@ -330,6 +339,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_FresnelNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_HSVToRGBNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SqrtOpNode.shader" />
+    <None Include="Assets\Code\BossBehaviours\NewBehaviourTree.xml" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Dithering\DitheringFadeBlueNoise.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TimeNode.shader" />
     <None Include="Assets\Materials\Shaders\SHD_UI_Beam_Charge.shader" />
@@ -337,6 +347,7 @@
     <None Include="Assets\Materials\Shaders\SHD_Boss_Projectile_Energy.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_VertexIdVariableNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ObjectScaleNode.shader" />
+    <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_GradientSample.shader" />
     <None Include="Assets\Materials\Shaders\SHD_Boss_Projectile.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_Texture2D.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_CrossProductOpNode.shader" />
@@ -430,9 +441,6 @@
     <Reference Include="Unity.RenderPipelines.Core.Runtime">
       <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualEffectGraph.Runtime">
-      <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Runtime.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
       <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
@@ -442,9 +450,6 @@
     <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
       <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualEffectGraph.Editor">
-      <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.ShaderGraph.Editor">
       <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>
     </Reference>
@@ -453,6 +458,12 @@
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
       <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualEffectGraph.Runtime">
+      <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualEffectGraph.Editor">
+      <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -638,7 +649,7 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.8f1/Editor/Data/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="UModelerCommon">
-      <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Assets/3rd Party/tripolygon/UModeler/Scripts/UModelerCommon.dll</HintPath>
+      <HintPath>C:/Users/s181238/Documents/Overscoped/Overscoped - BossFight_2019/Assets/ThirdParty/3rd Party/tripolygon/UModeler/Scripts/UModelerCommon.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.8f1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>

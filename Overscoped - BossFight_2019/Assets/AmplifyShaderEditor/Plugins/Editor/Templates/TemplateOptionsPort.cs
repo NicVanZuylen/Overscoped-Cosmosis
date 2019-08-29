@@ -2,6 +2,7 @@
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AmplifyShaderEditor
@@ -47,12 +48,24 @@ namespace AmplifyShaderEditor
 					{
 						case AseOptionsActionType.SetDefine:
 						{
-							dataCollector.AddToDefines( -1, m_options.ActionsPerOption[ optionId ][ i ].ActionData );
+							List<TemplateMultiPassMasterNode> nodes = owner.ContainerGraph.MultiPassMasterNodes.NodesList;
+							int count = nodes.Count;
+							for( int nodeIdx = 0; nodeIdx < count; nodeIdx++ )
+							{
+								nodes[ nodeIdx ].OptionsDefineContainer.AddDefine( "#define "+m_options.ActionsPerOption[ optionId ][ i ].ActionData );
+							}
+							//dataCollector.AddToDefines( -1, m_options.ActionsPerOption[ optionId ][ i ].ActionData );
 						}
 						break;
 						case AseOptionsActionType.SetUndefine:
 						{
-							dataCollector.AddToDefines( -1, m_options.ActionsPerOption[ optionId ][ i ].ActionData, false );
+							List<TemplateMultiPassMasterNode> nodes = owner.ContainerGraph.MultiPassMasterNodes.NodesList;
+							int count = nodes.Count;
+							for( int nodeIdx = 0; nodeIdx < count; nodeIdx++ )
+							{
+								nodes[ nodeIdx ].OptionsDefineContainer.AddDefine( "#undef " + m_options.ActionsPerOption[ optionId ][ i ].ActionData );
+							}
+							//dataCollector.AddToDefines( -1, m_options.ActionsPerOption[ optionId ][ i ].ActionData, false );
 						}
 						break;
 					}

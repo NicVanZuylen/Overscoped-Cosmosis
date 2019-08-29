@@ -567,6 +567,30 @@ namespace UnityEditor
 		}
 	}
 
+	public static class EditorGUILayoutEx
+	{
+		public static System.Type Type = typeof( EditorGUILayout );
+		public static Gradient GradientField( Gradient value, params GUILayoutOption[] options )
+		{
+#if UNITY_2018_3_OR_NEWER
+			return EditorGUILayout.GradientField( value, options );
+#else
+			MethodInfo method = EditorGUILayoutEx.Type.GetMethod( "GradientField", BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeof( Gradient ), typeof( GUILayoutOption[] ) }, null );
+			return (Gradient)method.Invoke( Type, new object[]{ value, options} );
+#endif
+		}
+
+		public static Gradient GradientField( string label, Gradient value, params GUILayoutOption[] options )
+		{
+#if UNITY_2018_3_OR_NEWER
+			return EditorGUILayout.GradientField( label, value, options );
+#else
+			MethodInfo method = EditorGUILayoutEx.Type.GetMethod( "GradientField", BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeof( string ), typeof( Gradient ), typeof( GUILayoutOption[] ) }, null );
+			return (Gradient)method.Invoke( Type, new object[] { label, value, options } );
+#endif
+		}
+	}
+
 	public static class GUILayoutUtilityEx
 	{
 		private static System.Type type = null;
@@ -734,8 +758,16 @@ namespace UnityEditor
 
 	public static class EditorGUIEx
 	{
-		private static System.Type type = null;
-		public static  System.Type Type { get { return ( type == null ) ? type = System.Type.GetType( "UnityEditor.EditorGUI, UnityEditor" ) : type; } }
+		public static System.Type Type = typeof( EditorGUI );
+
+		public static Gradient GradientField( Rect position, Gradient gradient )
+		{
+#if UNITY_2018_3_OR_NEWER
+			return EditorGUI.GradientField( position, gradient );
+#else
+			return (Gradient)EditorGUIEx.Type.InvokeMember( "GradientField", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.InvokeMethod, null, null, new object[] { position, gradient } );
+#endif
+		}
 
 		public static bool ButtonMouseDown( Rect position, GUIContent content, FocusType focusType, GUIStyle style )
 		{

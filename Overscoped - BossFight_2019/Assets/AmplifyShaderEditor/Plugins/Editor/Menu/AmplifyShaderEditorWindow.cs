@@ -234,7 +234,7 @@ namespace AmplifyShaderEditor
 		private double m_wiredDoubleTapTimestamp;
 
 		private bool m_globalPreview = false;
-		private bool m_globalShowInternalData = false;
+		private bool m_globalShowInternalData = true;
 
 		private const double AutoZoomTime = 0.25;
 		private const double ToggleTime = 0.25;
@@ -758,11 +758,11 @@ namespace AmplifyShaderEditor
 				ForceRepaint();
 			} );
 
-			GlobalShowInternalData = EditorPrefs.GetBool( "GlobalShowInternalData", false );
+			GlobalShowInternalData = EditorPrefs.GetBool( "ASEGlobalShowInternalData", true );
 			m_shortcutManager.RegisterEditorShortcut( true, KeyCode.I, "Global Show Internal Data", () =>
 			{
 				GlobalShowInternalData = !GlobalShowInternalData;
-				EditorPrefs.SetBool( "GlobalShowInternalData", GlobalShowInternalData );
+				EditorPrefs.SetBool( "ASEGlobalShowInternalData", GlobalShowInternalData );
 				ForceRepaint();
 			} );
 
@@ -2884,6 +2884,9 @@ namespace AmplifyShaderEditor
 
 			if( InsideMenus( m_currentMousePos2D ) )
 			{
+				if( m_currentEvent.type == EventType.Used )
+					m_mouseDownOnValidArea = false;
+
 				if( m_currentEvent.type == EventType.MouseDown )
 				{
 					m_mouseDownOnValidArea = false;
@@ -3281,7 +3284,7 @@ namespace AmplifyShaderEditor
 			form.AddField( "name", "ASE" );
 			form.AddField( "private", "1" );
 			form.AddField( "lang", "text" );
-			form.AddField( "expire", "10080" );
+			form.AddField( "expire", "0" );
 
 			UnityWebRequest www = UnityWebRequest.Post( url, form );
 #if UNITY_2017_2_OR_NEWER
@@ -3391,6 +3394,9 @@ namespace AmplifyShaderEditor
 		private void OnFocus()
 		{
 			EditorGUI.FocusTextInControl( null );
+#if UNITY_2019_1_OR_NEWER
+			m_fixOnFocus = true;
+#endif
 		}
 
 		void OnLostFocus()
@@ -4469,8 +4475,29 @@ namespace AmplifyShaderEditor
 
 		public bool MouseInteracted = false;
 
+#if UNITY_2019_1_OR_NEWER
+		private bool m_fixOnFocus = false;
+		private bool m_fixFocusRepaint = false;
+#endif
 		void OnGUI()
 		{
+#if UNITY_2019_1_OR_NEWER
+			// hack fix for mouse selecting text fields
+			if( m_fixFocusRepaint && Event.current.type == EventType.Repaint )
+			{
+				EditorGUI.FocusTextInControl( null );
+				GUIUtility.keyboardControl = 0;
+				m_fixOnFocus = false;
+				m_fixFocusRepaint = false;
+			}
+
+			if( m_fixOnFocus && ( Event.current.type == EventType.Used || Event.current.type == EventType.MouseDown ) )
+			{
+				m_fixFocusRepaint = true;
+			}
+#endif
+
+
 #if UNITY_2018_3_OR_NEWER
 			if( ASEPackageManagerHelper.CheckImporter )
 				return;

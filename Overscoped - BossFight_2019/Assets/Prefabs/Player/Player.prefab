@@ -9765,7 +9765,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3812603302388449871}
-  - {fileID: 3812603302679706672}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10210,14 +10209,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_fMaxHealth: 100
   m_fMaxMana: 100
+  m_fMinManaCost: 15
   m_fManaLossRate: 15
   m_fManaRegenRate: 35
   m_fManaRegenRateLerp: 0.1
   m_fManaRegenDelay: 1
+  m_fPortalPunchDamage: 50
+  m_fPortalPunchForce: 100
   m_manaRegenMode: 1
-  m_healthFillRect: {fileID: 0}
-  m_manaFillRect: {fileID: 0}
-  m_manaMat: {fileID: 0}
+  m_healthFill: {fileID: 0}
+  m_manaFillMat: {fileID: 0}
+  m_armHealthMat: {fileID: 0}
+  m_armManaMat: {fileID: 0}
 --- !u!114 &3812603302388449864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10232,15 +10235,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_fGroundAcceleration: 10
   m_fMaxGroundMoveSpeed: 5
-  m_fMaxGroundVelocity: 30
+  m_fMaxSprintMoveSpeed: 8
+  m_fSprintAngleOffset: 30
   m_fGroundDrag: 10
-  m_fMovementDrag: 1
   m_fMomentumDrag: 5
+  m_fSlideDrag: 5
   m_fAirAcceleration: 5
-  m_fMaxAirbornMoveSpeed: 2.5
+  m_fMaxAirborneMoveSpeed: 2.5
   m_fAirDrag: 5
-  m_fTerminalVelocity: 53
-  m_fJumpForce: 5
+  m_fJumpDistance: 5
+  m_fJumpHeight: 3
   m_fRespawnHeight: 10
   m_bOnGround: 0
 --- !u!114 &3812603302388449870
@@ -10255,17 +10259,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc48989567edb76478caec71a9da6a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_grappleHook: {fileID: 3812603302679706673}
+  m_grappleHook: {fileID: 0}
   m_grappleLine: {fileID: 1101892924}
+  m_pullLine: {fileID: 0}
   m_grappleNode: {fileID: 3812603301381602537}
-  m_fFlyAcceleration: 10
+  m_pullNode: {fileID: 0}
+  m_fPullAcceleration: 30
+  m_fAirAcceleration: 30
   m_fMaxFlySpeed: 15
   m_fDestinationRadius: 2
   m_fDriftTolerance: 8
   m_fPushUpForce: 4
   m_fLandMoveAcceleration: 5
   m_fGrapplebreakDistance: 35
+  m_fMinReleaseBoostTime: 0.3
+  m_fReleaseForce: 20
+  m_fForwardGroundGrappleForce: 10
+  m_fUpGroundGrappleForce: 5
+  m_bJumpGravOnRelease: 0
+  m_fGrappleLineSpeed: 30
   m_fPullBreakDistance: 20
+  m_fPullLineSpeed: 30
   m_bRestrictToRopeLength: 1
   m_fHookRadius: 0.5
   m_grappleModeColor: {r: 1, g: 1, b: 1, a: 1}
@@ -10273,132 +10287,16 @@ MonoBehaviour:
   m_fShakeSpeed: 0.1
   m_fShakeMagnitude: 0.05
   m_nWaveCount: 3
-  m_fWobbleWaveAmp: 1
-  m_handEffect: {fileID: 1419247291}
+  m_fRippleWaveAmp: 0.15
+  m_fPopThickness: 2
+  m_fPopRate: 3
+  m_fImpactShakeDuration: 0.6
+  m_fImpactShakeMult: 5
+  m_grappleHandEffect: {fileID: 0}
   m_impactEffect: {fileID: 540026478}
---- !u!1 &3812603302679706673
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3812603302679706672}
-  - component: {fileID: 3812603302679706677}
-  - component: {fileID: 3812603302679706674}
-  - component: {fileID: 3812603302679706676}
-  - component: {fileID: 3812603302679706675}
-  - component: {fileID: 3812603302679706679}
-  m_Layer: 0
-  m_Name: GrappleHook
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &3812603302679706672
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3812603302679706673}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.098292, y: -2.3999608, z: 3.300023}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
-  m_Children: []
-  m_Father: {fileID: 3812603301322367556}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &3812603302679706677
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3812603302679706673}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &3812603302679706674
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3812603302679706673}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 91f53068cc01bc044866ee804ccd19f5, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 0
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
---- !u!135 &3812603302679706676
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3812603302679706673}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3812603302679706675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3812603302679706673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7921556a142a4664a9f5057b9f8ac85e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_playerController: {fileID: 9089708072951148978}
-  m_fFlySpeed: 100
---- !u!54 &3812603302679706679
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3812603302679706673}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_grappleLineMat: {fileID: 0}
+  m_pullLineMat: {fileID: 0}
+  m_lineCompute: {fileID: 0}
 --- !u!1001 &7704144250991594314
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10468,15 +10366,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bf1c8eac1e50d3143950aa69b5e599db, type: 3}
---- !u!4 &2223731230190766180 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -849252175379021010, guid: bf1c8eac1e50d3143950aa69b5e599db,
-    type: 3}
-  m_PrefabInstance: {fileID: 7704144250991594314}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3427286244367884368 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: bf1c8eac1e50d3143950aa69b5e599db,
+    type: 3}
+  m_PrefabInstance: {fileID: 7704144250991594314}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2223731230190766180 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -849252175379021010, guid: bf1c8eac1e50d3143950aa69b5e599db,
     type: 3}
   m_PrefabInstance: {fileID: 7704144250991594314}
   m_PrefabAsset: {fileID: 0}

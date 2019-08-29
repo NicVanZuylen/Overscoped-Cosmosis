@@ -340,10 +340,11 @@ public class PlayerController : MonoBehaviour
         // If the slope is too steep the surface vectors will be flattened.
         if ((Mathf.Abs(fSurfaceAngle) * 90.0f) >= m_controller.slopeLimit)
         {
-            // Push away from surface.
+            // Find component of velocity pushing against the slope.
             float fVelCompNormal = Vector3.Dot(m_v3Velocity, -v3Normal);
             Vector3 v3VelAgainstNormal = fVelCompNormal * v3Normal;
 
+            // Push back on the player with a slightly larger force to allow them to slide down the surface.
             m_v3Velocity += v3VelAgainstNormal * 1.1f;
 
             v3Normal = Vector3.up;

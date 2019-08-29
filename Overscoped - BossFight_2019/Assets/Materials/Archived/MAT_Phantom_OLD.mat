@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MAT_Phantom_OLD
+  m_Shader: {fileID: 4800000, guid: 80da23d9f00c11c46a19c4ddc0099e72, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Albedo:
+        m_Texture: {fileID: 2800000, guid: 4e5f38b4b873cd14c9d7005ff9f54166, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Noise:
+        m_Texture: {fileID: 2800000, guid: cd460ee4ac5c1e746b7a734cc7cc64dd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _FresBias: 0
+    - _FresPower: 1.15
+    - _FresScale: 1
+    - _Opacity: 1
+    - _Step: 0.5
+    m_Colors:
+    - _EdgeColour: {r: 1.0039216, g: 0, b: 191.74902, a: 0}
+    - _NoisePanning: {r: 0.225, g: -1, b: 0, a: 0}
+    - _NoiseTiling: {r: 5, g: 2, b: 0, a: 0}
+    - _PanningSpeed: {r: 1, g: 1, b: 0, a: 0}

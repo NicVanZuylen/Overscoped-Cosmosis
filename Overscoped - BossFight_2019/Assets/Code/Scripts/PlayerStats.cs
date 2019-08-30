@@ -212,6 +212,9 @@ public class PlayerStats : MonoBehaviour
             // Shake camera.
             m_camEffects.ApplyShake(0.5f, 2.0f, true);
 
+            // Break hook.
+            m_hookScript.ReleaseGrapple();
+
             // Deal damage.
             DealDamage(m_fPortalPunchDamage);
         }

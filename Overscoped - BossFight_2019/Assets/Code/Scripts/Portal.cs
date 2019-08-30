@@ -27,6 +27,10 @@ public class Portal : MonoBehaviour
     [SerializeField]
     private float m_fOpenTime = 1.0f;
 
+    [Tooltip("Amount of time to wait between the portal opening and the arm exiting it.")]
+    [SerializeField]
+    private float m_fWaitTime = 1.0f;
+
     [Tooltip("Amount of time for the arm to enter and leave.")]
     [SerializeField]
     private float m_fArmEnterTime = 0.2f;
@@ -131,6 +135,21 @@ public class Portal : MonoBehaviour
             m_armMaterials[0].SetVector("_PlaneNormal", -m_v3PunchDirection);
             m_armMaterials[1].SetVector("_PlaneNormal", -m_v3PunchDirection);
 
+            // Next stage.
+            m_stage = WaitTimeStage;
+            m_fCurrentTime = m_fWaitTime;
+        }
+    }
+
+    /*
+    Description: Wait stage between OpenStage and ArmEnterStage 
+    */
+    private void WaitTimeStage()
+    {
+        m_fCurrentTime -= Time.deltaTime;
+
+        if(m_fCurrentTime <= 0.0f)
+        {
             // Next stage.
             m_stage = ArmEnterStage;
             m_fCurrentTime = m_fArmEnterTime;

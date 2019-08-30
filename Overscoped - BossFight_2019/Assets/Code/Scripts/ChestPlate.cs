@@ -8,15 +8,33 @@ public class ChestPlate : PullObject
     [SerializeField]
     private float m_fHealth = 5.0f;
 
+    [Tooltip("Amount of time until the object will dissolve.")]
+    [SerializeField]
+    private float m_fDissolveTime = 10.0f;
+
     private PlayerBeam m_playerBeamScript;
     private BossBehaviour m_bossScript;
+    private Material m_material;
 
-    new void Awake()
+    new private void Awake()
     {
         base.Awake();
 
         m_playerBeamScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBeam>();
         m_bossScript = GetComponentInParent<BossBehaviour>();
+
+        m_material = GetComponent<MeshRenderer>().material;
+    }
+
+    new private void Update()
+    {
+        m_fDissolveTime = Mathf.Max(m_fDissolveTime - Time.deltaTime, 0.0f);
+
+        m_material.SetFloat("_Dissolve", Mathf.Min(m_fDissolveTime, 1.0f));
+
+        // Disable when fully dissolved.
+        if (m_fDissolveTime <= 0.0f)
+            gameObject.SetActive(false);
     }
 
     public override void Trigger(Vector3 playerDirection)
@@ -37,9 +55,13 @@ public class ChestPlate : PullObject
         {
             // Remove chestplate.
             Trigger(Vector3.zero);
+            enabled = true;
 
             // Progress stage.
             m_bossScript.ProgressStage();
+
+            // Turn of fresnel.
+            m_material.SetFloat("_FresnelOnOff", 0.0f);
 
             // Disable player beam.
             m_playerBeamScript.UnlockBeam(false);

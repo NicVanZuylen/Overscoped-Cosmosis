@@ -10,7 +10,11 @@ public class Meteor : MonoBehaviour
 
     [Tooltip("Reference to the Meteror's AOE")]
     [SerializeField]
-    private MeteorAOE m_meteorAOE = null;
+    private GameObject m_meteorAOEObj = null;
+
+    [Tooltip("Amount of active meteor AOEs allowed at any given time.")]
+    [SerializeField]
+    private int m_nAOECount = 5;
 
     [Tooltip("Speed in which the meteor will travel.")]
     [SerializeField]
@@ -26,7 +30,13 @@ public class Meteor : MonoBehaviour
     private Vector3 m_v3Target;
     private Vector3 m_v3TravelDirection;
 
-    void Awake()
+    // Meteor spawn target
+    private GameObject m_targetVolume;
+
+    // Meteor AOE pool
+    private Stack<MeteorAOE> m_meteorAOEStack;
+
+    public void Init(List<GameObject> spawnVolumePool)
     {
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_rigidBody = GetComponent<Rigidbody>();
@@ -36,10 +46,29 @@ public class Meteor : MonoBehaviour
 
         GameObject[] m_targetObjects = GameObject.FindGameObjectsWithTag("MeteorSpawn");
 
+        // Ignore collisions with spawn volumes.
         SphereCollider thisCollider = GetComponent<SphereCollider>();
-
         for (int i = 0; i < m_targetObjects.Length; ++i)
+        {
+            Physics.IgnoreCollision(m_targetObjects[i].GetComponentInChildren<BoxCollider>(), thisCollider, true);
             Physics.IgnoreCollision(m_targetObjects[i].GetComponent<BoxCollider>(), thisCollider, true);
+        }
+
+        m_meteorAOEStack = new Stack<MeteorAOE>();
+
+        // Create AOE hazards and add to the object pool.
+        for (int i = 0; i < m_nAOECount; ++i)
+        {
+            GameObject newAOE = Instantiate(m_meteorAOEObj);
+            newAOE.SetActive(false);
+
+            MeteorAOE aoeScript = newAOE.GetComponent<MeteorAOE>();
+            aoeScript.SetPools(m_meteorAOEStack, spawnVolumePool);
+
+            m_meteorAOEStack.Push(aoeScript);
+        }
+
+        gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -54,11 +83,12 @@ public class Meteor : MonoBehaviour
         m_rigidBody.velocity = Vector3.zero;
     }
 
-    public void Summon(Vector3 v3Origin, Vector3 v3Target)
+    public void Summon(Vector3 v3Origin, GameObject target)
     {
         gameObject.SetActive(true);
 
-        m_v3Target = v3Target;
+        m_v3Target = target.transform.position;
+        m_targetVolume = target;
 
         // Initial position.
         transform.position = v3Origin;
@@ -67,9 +97,22 @@ public class Meteor : MonoBehaviour
         m_v3TravelDirection = (m_v3Target - transform.position).normalized;
     }
 
+    /*
+    Description: Get whether or not the meteor is available, based upon if there are any available AOE hazards to spawn.
+    Return Type: bool
+    */
+    public bool Available()
+    {
+        return m_meteorAOEStack.Count > 0;
+    }
+
+    
     void OnTriggerEnter(Collider collider)
     {
-        m_meteorAOE.AOE(transform.position);
+        // Remove AOE object from object pool and activate.
+        m_meteorAOEStack.Pop().AOE(m_targetVolume);
+
+        Debug.Log(collider.gameObject.name);
 
         // Deal damage to the player.
         if(collider.gameObject == m_player)

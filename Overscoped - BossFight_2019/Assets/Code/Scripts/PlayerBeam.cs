@@ -42,7 +42,7 @@ public class PlayerBeam : MonoBehaviour
 
     [Tooltip("Reference to the boss chestplate script.")]
     [SerializeField]
-    private ChestPlate m_bossChestScript;
+    private ChestPlate m_bossChestScript = null;
 
     private PlayerController m_controller;
     private CameraEffects m_camEffects;
@@ -66,11 +66,14 @@ public class PlayerBeam : MonoBehaviour
     
     void LateUpdate()
     {
+        if (!m_bBeamUnlocked)
+            return;
+
         m_bCanCast = m_beamLine.enabled || (Input.GetMouseButtonDown(1) && m_fBeamCharge >= m_fMinBeamCharge);
 
         m_beamLine.enabled = Input.GetMouseButton(1) && m_bCanCast && m_fBeamCharge >= 0.0f;
 
-        if (m_bBeamUnlocked && m_beamLine.enabled)
+        if (m_beamLine.enabled)
         {
             // Use the player controller's look rotation, to avoid offsets from camera shake.
             m_beamOrigin.rotation = m_controller.LookRotation();
@@ -135,6 +138,8 @@ public class PlayerBeam : MonoBehaviour
     public void UnlockBeam(bool bUnlock)
     {
         m_bBeamUnlocked = bUnlock;
+        m_beamLine.enabled = false;
+        enabled = bUnlock;
     }
 
     /*

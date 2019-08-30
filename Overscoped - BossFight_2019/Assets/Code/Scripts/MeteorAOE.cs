@@ -16,7 +16,7 @@ public class MeteorAOE : MonoBehaviour
 
     [Tooltip("Reference to the particle effect")]
     [SerializeField]
-    private ParticleSystem m_AoeParticle;
+    private ParticleSystem m_AoeParticle = null;
 
     private float m_fWaitForParticleTimer;
 
@@ -29,8 +29,10 @@ public class MeteorAOE : MonoBehaviour
         m_fWaitForParticleTimer = m_fWaitForParticleCooldown;
     }
 
-    public void AOE()
+    public void AOE(Vector3 v3Position)
     {
+        transform.position = v3Position;
+
         m_fWaitForParticleTimer = m_fWaitForParticleCooldown;
         gameObject.SetActive(true);
         m_AoeParticle.Play();

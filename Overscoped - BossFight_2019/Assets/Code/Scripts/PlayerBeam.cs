@@ -40,6 +40,10 @@ public class PlayerBeam : MonoBehaviour
     [SerializeField]
     private float m_fBeamRange = 500.0f;
 
+    [Tooltip("Reference to the boss chestplate script.")]
+    [SerializeField]
+    private ChestPlate m_bossChestScript;
+
     private PlayerController m_controller;
     private CameraEffects m_camEffects;
     private RaycastHit m_sphereCastHit;
@@ -55,7 +59,9 @@ public class PlayerBeam : MonoBehaviour
         m_camEffects = GetComponentInChildren<CameraEffects>();
         m_beamLine.enabled = false;
 
-        //m_bBeamUnlocked = true;        
+        m_fBeamCharge = m_fMaxBeamCharge;
+
+        m_bBeamUnlocked = true;
     }
     
     void LateUpdate()
@@ -74,15 +80,19 @@ public class PlayerBeam : MonoBehaviour
 
             const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
             Ray sphereRay = new Ray(m_beamOrigin.position, m_beamOrigin.forward);
-            bool bSphereCastHit = Physics.Raycast(sphereRay, out m_sphereCastHit, m_fBeamRange, nRaymask, QueryTriggerInteraction.Ignore);
+            bool bRayHit = Physics.Raycast(sphereRay, out m_sphereCastHit, m_fBeamRange, nRaymask, QueryTriggerInteraction.Ignore);
 
             // Find end point of the line.
-            if (bSphereCastHit)
+            if (bRayHit)
             {
                 float fHitProj = Vector3.Dot(m_sphereCastHit.point, m_beamOrigin.forward);
                 float fOriginProj = Vector3.Dot(m_beamOrigin.position, m_beamOrigin.forward);
 
                 float fProjDiff = fHitProj - fOriginProj;
+
+                // Check if boss chestplate was hit, and if so deal damage.
+                if (m_sphereCastHit.collider.gameObject == m_bossChestScript.gameObject)
+                    m_bossChestScript.DealBeamDamage();
 
                 m_v3BeamDestination = m_beamOrigin.position + (m_beamOrigin.forward * fProjDiff);
             }
@@ -120,11 +130,11 @@ public class PlayerBeam : MonoBehaviour
     }
 
     /*
-    Description: Enable the player's ability to use the beam.
+    Description: Set whether or not to enable the player's ability to use the beam.
     */
-    public void UnlockBeam()
+    public void UnlockBeam(bool bUnlock)
     {
-        m_bBeamUnlocked = true;
+        m_bBeamUnlocked = bUnlock;
     }
 
     /*

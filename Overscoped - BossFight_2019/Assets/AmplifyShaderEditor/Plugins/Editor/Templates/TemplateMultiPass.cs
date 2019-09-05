@@ -1,6 +1,7 @@
 // Amplify Shader Editor - Visual Shader Editing Tool
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -57,6 +58,9 @@ namespace AmplifyShaderEditor
 		TemplateInfoContainer m_fallbackContainer = new TemplateInfoContainer();
 
 		[SerializeField]
+		TemplateInfoContainer m_beforePragmaContainer = new TemplateInfoContainer();
+
+		[SerializeField]
 		private CustomTemplatePropertyUIEnum m_customTemplatePropertyUI = CustomTemplatePropertyUIEnum.None;
 
 		private Dictionary<string, TemplateUniquePassData> m_passUniqueIdData = new Dictionary<string, TemplateUniquePassData>();
@@ -89,6 +93,17 @@ namespace AmplifyShaderEditor
 			string shaderBody = string.Empty;
 			shaderBody = IOUtils.LoadTextFileFromDisk( datapath );
 			shaderBody = shaderBody.Replace( "\r\n", "\n" );
+
+			// Insert Before Tag
+			MatchCollection col = Regex.Matches( shaderBody, TemplateHelperFunctions.BeforePragmaPattern, RegexOptions.Singleline );
+			for( int i = col.Count - 1; i >= 0; i-- )
+			{
+				if( col[ i ].Groups.Count == 3 )
+				{
+					shaderBody = shaderBody.Insert( col[ i ].Groups[ 2 ].Index, TemplatesManager.TemplatePragmaBeforeTag + "\n" + col[ i ].Groups[ 1 ].Value );
+				}
+			}
+
 			m_shaderData = TemplateShaderInfoUtil.CreateShaderData( shaderBody );
 			if( m_shaderData == null )
 			{
@@ -358,6 +373,11 @@ namespace AmplifyShaderEditor
 					m_templateIdManager.SetReplacementText( prefix + m_subShaders[ subShaderId ].Modules.PragmaTag.Id, text );
 				}
 				break;
+				case TemplateModuleDataType.ModulePragmaBefore:
+				{
+					m_templateIdManager.SetReplacementText( prefix + m_subShaders[ subShaderId ].Modules.PragmaBeforeTag.Id, text );
+				}
+				break;
 				case TemplateModuleDataType.ModulePass:
 				{
 					m_templateIdManager.SetReplacementText( prefix + m_subShaders[ subShaderId ].Modules.PassTag.Id, text );
@@ -467,6 +487,11 @@ namespace AmplifyShaderEditor
 					prefix = addPrefix ? m_subShaders[ subShaderId ].Modules.UniquePrefix : string.Empty;
 					return prefix + m_subShaders[ subShaderId ].Modules.PragmaTag.Id;
 				}
+				case TemplateModuleDataType.ModulePragmaBefore:
+				{
+					prefix = addPrefix ? m_subShaders[ subShaderId ].Modules.UniquePrefix : string.Empty;
+					return prefix + m_subShaders[ subShaderId ].Modules.PragmaBeforeTag.Id;
+				}
 				case TemplateModuleDataType.ModulePass:
 				{
 					prefix = addPrefix ? m_subShaders[ subShaderId ].Modules.UniquePrefix : string.Empty;
@@ -563,6 +588,11 @@ namespace AmplifyShaderEditor
 				{
 					prefix = addPrefix ? m_subShaders[ subShaderId ].Passes[ passId ].Modules.UniquePrefix : string.Empty;
 					return prefix + m_subShaders[ subShaderId ].Passes[ passId ].Modules.PragmaTag.Id;
+				}
+				case TemplateModuleDataType.ModulePragmaBefore:
+				{
+					prefix = addPrefix ? m_subShaders[ subShaderId ].Passes[ passId ].Modules.UniquePrefix : string.Empty;
+					return prefix + m_subShaders[ subShaderId ].Passes[ passId ].Modules.PragmaBeforeTag.Id;
 				}
 				case TemplateModuleDataType.ModulePass:
 				{
@@ -727,6 +757,12 @@ namespace AmplifyShaderEditor
 				{
 					prefix = m_subShaders[ subShaderId ].Passes[ passId ].Modules.UniquePrefix;
 					m_templateIdManager.SetReplacementText( prefix + m_subShaders[ subShaderId ].Passes[ passId ].Modules.PragmaTag.Id, text );
+				}
+				break;
+				case TemplateModuleDataType.ModulePragmaBefore:
+				{
+					prefix = m_subShaders[ subShaderId ].Passes[ passId ].Modules.UniquePrefix;
+					m_templateIdManager.SetReplacementText( prefix + m_subShaders[ subShaderId ].Passes[ passId ].Modules.PragmaBeforeTag.Id, text );
 				}
 				break;
 				case TemplateModuleDataType.ModulePass:
@@ -976,6 +1012,7 @@ namespace AmplifyShaderEditor
 				m_templateIdManager.SetReplacementText( m_fallbackContainer.Id, m_templateProperties.PropertyDict[ m_fallbackContainer.Id ].Indentation + fallback );
 			}
 		}
+
 		public void SetDependencies( string dependencies )
 		{
 			if( m_dependenciesContainer.Index > -1 )
@@ -996,6 +1033,7 @@ namespace AmplifyShaderEditor
 			m_shaderBody = string.Empty;
 			m_isSinglePass = false;
 			m_masterNodesRequired = 0;
+			m_beforePragmaContainer.Reset();
 			m_customInspectorContainer.Reset();
 			m_fallbackContainer.Reset();
 			m_dependenciesContainer.Reset();
@@ -1061,6 +1099,7 @@ namespace AmplifyShaderEditor
 		public TemplatePropertyContainer TemplateProperties { get { return m_templateProperties; } }
 		public TemplateInfoContainer CustomInspectorContainer { get { return m_customInspectorContainer; } }
 		public TemplateInfoContainer FallbackContainer { get { return m_fallbackContainer; } }
+		public TemplateInfoContainer BeforePragmaContainer { get { return m_beforePragmaContainer; } }
 		public bool IsSinglePass { get { return m_isSinglePass; } }
 		public int MasterNodesRequired { get { return m_masterNodesRequired; } }
 		public CustomTemplatePropertyUIEnum CustomTemplatePropertyUI { get { return m_customTemplatePropertyUI; } }

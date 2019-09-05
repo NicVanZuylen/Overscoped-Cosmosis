@@ -1201,6 +1201,7 @@ namespace AmplifyShaderEditor
 			if( m_currentParameterType == PropertyType.InstancedProperty && !m_outputPorts[ 0 ].IsLocalValue( dataCollector.PortCategory ) )
 			{
 				string instancedVar = dataCollector.IsSRP ?
+					//m_propertyName :
 					string.Format( IOUtils.LWSRPInstancedPropertiesData, dataCollector.InstanceBlockName, m_propertyName ) :
 					string.Format( IOUtils.InstancedPropertiesData, m_propertyName );
 				RegisterLocalVariable( 0, instancedVar, ref dataCollector, m_propertyName + "_Instance" );
@@ -1295,7 +1296,8 @@ namespace AmplifyShaderEditor
 			{
 				if( isSRP )
 				{
-					return GetUniformValue();
+					return string.Format( IOUtils.LWSRPInstancedPropertiesElement, UIUtils.FinalPrecisionWirePortToCgType( m_currentPrecisionType, m_outputPorts[ 0 ].DataType ), m_propertyName );
+					//return GetUniformValue();
 				}
 				else
 				{
@@ -1312,7 +1314,8 @@ namespace AmplifyShaderEditor
 			{
 				if( isSRP )
 				{
-					return GetUniformValue( dataType, value );
+					//return GetUniformValue( dataType, value );
+					return string.Format( IOUtils.LWSRPInstancedPropertiesElement, UIUtils.FinalPrecisionWirePortToCgType( m_currentPrecisionType, dataType ), value );
 				}
 				else
 				{

@@ -113,6 +113,8 @@ public class BossBehaviour : MonoBehaviour
     private EnergyPillar[] m_energyPillars;
     private float m_fBeamAttackCDTimer;
     private float m_fBeamTime;
+    public float factor = 0.5f;
+    public GameObject mesh;
 
     // Meteor attack
     private List<GameObject> m_availableMeteorSpawns;
@@ -326,10 +328,10 @@ public class BossBehaviour : MonoBehaviour
     {
         if (m_fMeteorCDTimer <= 0.0f && m_meteor.Available() && m_availableMeteorSpawns.Count > 0)
         {
-            m_bRandomMeteor = Random.Range(0.0f, 100.0f) >= m_fRandMeteorChance;
+            m_bRandomMeteor = Random.Range(0.0f, 100.0f) <= m_fRandMeteorChance;
 
             // Ensure the player is grounded or this is a random stike.
-            if(m_playerController.IsGrounded() && m_meteorSpawnVol != null && m_availableMeteorSpawns.Contains(m_meteorSpawnVol.gameObject))
+            if(m_playerController.IsGrounded() && m_meteorSpawnVol != null)
             {
                 // Make stikes when the player is in a volume not random.
                 m_bRandomMeteor = false;
@@ -352,7 +354,7 @@ public class BossBehaviour : MonoBehaviour
             m_fMeteorCDTimer = m_fMeteorCD;
 
             // Determine whether or not this is a random strike.
-            m_bRandomMeteor = true;
+            //m_bRandomMeteor = true;
 
 
             return ENodeResult.NODE_SUCCESS;
@@ -405,12 +407,13 @@ public class BossBehaviour : MonoBehaviour
     
         if (CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
         {
+            SetPos(m_beamOrigin.position, m_beamOrigin.position + (m_v3BeamDirection * m_fBeamMaxRange));
             return ENodeResult.NODE_SUCCESS;
         }
         else if (m_fBeamTime <= 0.0f)
         {
             // Beam attack is complete.
-            m_beamLine.enabled = false;
+            mesh.SetActive(false);
         }
     
         return ENodeResult.NODE_FAILURE;
@@ -530,7 +533,7 @@ public class BossBehaviour : MonoBehaviour
 
         Vector3 v3EndOnRadius = PointOnSphere(m_v3BeamEnd, m_beamOrigin.position, fSphereMag);
 
-        if (m_beamLine.enabled)
+        if (mesh.activeInHierarchy)
         {
             float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
 
@@ -549,7 +552,7 @@ public class BossBehaviour : MonoBehaviour
 
         }
         else
-            m_v3BeamEnd = PointOnSphere(m_player.transform.position, m_beamOrigin.position, fSphereMag);
+            m_v3BeamEnd = PointOnSphere(m_player.transform.position + new Vector3(10,0,0), m_beamOrigin.position, fSphereMag);
 
         return ENodeResult.NODE_SUCCESS;
     }
@@ -557,9 +560,9 @@ public class BossBehaviour : MonoBehaviour
     public ENodeResult ActUseBeam()
     {
         // Enable beam if it is disabled.
-        if (!m_beamLine.enabled)
+        if (!mesh.activeInHierarchy)
         {
-            m_beamLine.enabled = true;
+            mesh.SetActive(false);
         }
 
         // Look at player.
@@ -586,7 +589,7 @@ public class BossBehaviour : MonoBehaviour
                 beamLinePoints[1] = beamHit.point;
         }
 
-        m_beamLine.SetPositions(beamLinePoints);
+        //m_beamLine.SetPositions(beamLinePoints);
 
         return ENodeResult.NODE_SUCCESS;
     }
@@ -647,6 +650,17 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.SetPunchDirection(-v3PortalOffset);
 
         return;
+    }
+
+    void SetPos(Vector3 start, Vector3 end)
+    {
+        Vector3 dir = end - start;
+        Vector3 mid = (dir) / 2.0f + start;
+        mesh.transform.position = mid;
+        mesh.transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+        Vector3 scale = mesh.transform.localScale;
+        scale.y = dir.magnitude * factor;
+        mesh.transform.localScale = scale;
     }
 
     private void OnDrawGizmosSelected()

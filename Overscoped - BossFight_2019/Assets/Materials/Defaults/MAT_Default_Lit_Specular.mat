@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MAT_Player_Mana
-  m_Shader: {fileID: 4800000, guid: 84a0f6e2b704285488895f12ef04df39, type: 3}
+  m_Name: MAT_Default_Lit_Specular
+  m_Shader: {fileID: 4800000, guid: 3c045fcd5785f514fa2133ecfbd9b199, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -19,20 +19,20 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _Albedo:
-        m_Texture: {fileID: 2800000, guid: 9644eb6aca67672449e2bcbb0eab8e84, type: 3}
+    - _AlbedoTexture:
+        m_Texture: {fileID: 2800000, guid: e85e08db31081d74eaff004e0437011c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _Mask:
-        m_Texture: {fileID: 2800000, guid: 15a5f9ac93ec54241a05f416e77e5870, type: 3}
-        m_Scale: {x: 2.2, y: 2.4}
-        m_Offset: {x: 0, y: 0}
-    - _texcoord:
-        m_Texture: {fileID: 0}
+    - _SpecularTexture:
+        m_Texture: {fileID: 2800000, guid: 4e5f38b4b873cd14c9d7005ff9f54166, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Mana: 0
+    - _DotProdDeg: 0.275
+    - _DotProdGrad: 0.05
+    - _SpecularAngle: 0.33
+    - _SpecularSize: 0.1
     m_Colors:
-    - _EmissionColour: {r: 11.984314, g: 4.5176473, b: 0, a: 0}
-    - _Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _AlbedoTiling: {r: 5, g: 2, b: 0, a: 0}
+    - _SpecularColour: {r: 2.9960785, g: 1.772549, b: 0, a: 0}
+    - _SpecularTiling: {r: 1, g: 1, b: 0, a: 0}

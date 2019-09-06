@@ -19,7 +19,7 @@ public class Switch : PullObject
 
     private EventFunc m_eventFunc;
 
-    void Awake()
+    new void Awake()
     {
         m_fStartAngle = transform.parent.rotation.eulerAngles.x;
         m_fEndAngle = -m_fStartAngle;

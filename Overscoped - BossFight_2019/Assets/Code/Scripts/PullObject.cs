@@ -33,19 +33,19 @@ public class PullObject : MonoBehaviour
     private Vector3 m_v3TargetEuler;
     private float m_fTension;
     private float m_fCurrentShakeTime;
-    private bool m_bCoupled;
+    private bool m_bTriggered;
 
-    private void Awake()
+    protected void Awake()
     {
         m_rigidbody = GetComponent<Rigidbody>();
         m_rigidbody.isKinematic = true;
         m_v3StartEuler = transform.localRotation.eulerAngles;
-        m_bCoupled = true;
+        m_bTriggered = true;
     }
 
-    private void Update()
+    protected void Update()
     {
-        if (!m_bCoupled)
+        if (!m_bTriggered)
         {
             return;
         }
@@ -76,9 +76,9 @@ public class PullObject : MonoBehaviour
         }
     }
 
-    public bool IsCoupled()
+    public bool IsTriggered()
     {
-        return m_bCoupled;
+        return m_bTriggered;
     }
 
     public void SetTension(float fTension)
@@ -93,7 +93,7 @@ public class PullObject : MonoBehaviour
     public virtual void Trigger(Vector3 playerDirection)
     {
         m_rigidbody.isKinematic = false;
-        m_bCoupled = false;
+        m_bTriggered = false;
         transform.parent = null;
         m_fTension = 0.0f;
 

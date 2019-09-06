@@ -1,13 +1,15 @@
-﻿using System.Collections;
+﻿using BehaviourTree;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using BehaviourTree;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(LineRenderer))]
 
 public class BossBehaviour : MonoBehaviour
 {
+    [Header("References")]
+
     [Tooltip("Player object reference.")]
     [SerializeField]
     private GameObject m_player = null;
@@ -18,7 +20,11 @@ public class BossBehaviour : MonoBehaviour
 
     [Tooltip("Armour object reference.")]
     [SerializeField]
-    private GameObject m_armour = null;
+    private GameObject[] m_armorPeices = null;
+
+    [Tooltip("Armor pulse material reference.")]
+    [SerializeField]
+    private Material m_armorMaterial = null;
 
     [SerializeField]
     private GameObject m_portal = null;
@@ -27,17 +33,20 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private Transform m_beamOrigin = null;
 
+    [Header("Stages")]
+    [SerializeField]
+    private string[] m_stageNames = null;
+
+    [Header("Attacks")]
+
     [Tooltip("Distance in which the boss will attempt a slam attack.")]
     [SerializeField]
     private float m_fSlamDistance = 10.0f;
-
-    public bool m_bIsStuck;
 
     [Header("Meteor")]
     [Tooltip("Amount of time before meteor attack can be used again.")]
     [SerializeField]
     private float m_fMeteorCD = 10.0f;
-    private float m_fMeteorCDTimer;
 
     [Tooltip("Random chance of a meteor attack striking a random location.")]
     [SerializeField]
@@ -47,13 +56,11 @@ public class BossBehaviour : MonoBehaviour
     [Tooltip("Amount of time before portal punch attack can be used again.")]
     [SerializeField]
     private float m_fPortalPunchCD = 4.0f;
-    private float m_fPortalPunchCDTimer;
 
     [Header("Beam")]
     [Tooltip("Amount of time before the beam attac k can be used again.")]
     [SerializeField]
     private float m_fBeamAttackCD = 7.0f;
-    public float m_fBeamAttackCDTimer;
 
     [Tooltip("Maximum range of the beam attack.")]
     [SerializeField]
@@ -88,18 +95,33 @@ public class BossBehaviour : MonoBehaviour
     private PlayerController m_playerController;
     private PlayerStats m_playerStats;
     private Animator m_animator;
-    private LineRenderer m_beamLine;
-    private BehaviourNode m_bossTree;
     private float m_fTimeSinceGlobalAttack = 0.0f;
+    private bool m_bIsStuck;
 
+    // Stages
+    private BehaviourNode[] m_bossTreeStages;
+    private int m_nStageIndex;
+
+    // Portal punch
     private Portal m_portalScript;
+    private float m_fPortalPunchCDTimer;
+
+    // Beam attack
+    private LineRenderer m_beamLine;
     private Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
+    private EnergyPillar[] m_energyPillars;
+    private float m_fBeamAttackCDTimer;
     private float m_fBeamTime;
 
-    private GameObject[] m_allMeteorSpawns;
-    private EnergyPillar[] m_energyPillars;
+    // Meteor attack
+    private List<GameObject> m_availableMeteorSpawns;
+    private float m_fMeteorCDTimer;
     private bool m_bRandomMeteor;
+
+    // Armor
+    private PullObject[] m_armorPullScripts;
+    private Material[] m_armorMaterials;
 
     private static BoxCollider m_meteorSpawnVol;
 
@@ -123,17 +145,47 @@ public class BossBehaviour : MonoBehaviour
         m_v3BeamEnd = m_player.transform.position;
 
         // Meteor
-        m_allMeteorSpawns = GameObject.FindGameObjectsWithTag("MeteorSpawn");
+        GameObject[] allMeteorSpawns = GameObject.FindGameObjectsWithTag("MeteorSpawn");
+
+        m_availableMeteorSpawns = new List<GameObject>();
+
+        // Add meteor spawns to spawn object pool.
+        for (int i = 0; i < allMeteorSpawns.Length; ++i)
+            m_availableMeteorSpawns.Add(allMeteorSpawns[i]);
+
+        // Initialize meteor.
+        m_meteor.Init(m_availableMeteorSpawns);
 
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.SetActive(false);
 
+        // Armor components
+        m_armorPullScripts = new PullObject[m_armorPeices.Length];
+        m_armorMaterials = new Material[m_armorPeices.Length];
+
+        for(int i = 0; i < m_armorPeices.Length; ++i)
+        {
+            m_armorMaterials[i] = m_armorPeices[i].GetComponent<MeshRenderer>().material;
+
+            m_armorPullScripts[i] = m_armorPeices[i].GetComponent<PullObject>();
+
+            if (m_armorPullScripts[i] == null)
+                Debug.LogError("Invalid armor object!");
+        }
+
 #if (UNITY_EDITOR)
-        treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase1.xml";
+        treePath = Application.dataPath + "/Code/BossBehaviours/";
 #else
-        treePath = Application.dataPath + "/BossTreePhase1.xml";
+        treePath = Application.dataPath + "/";
 #endif
-        m_bossTree = BTreeEditor.NodeData.LoadTree(treePath, this);
+
+        m_bossTreeStages = new BehaviourNode[m_stageNames.Length];
+
+        // Load stage behaviour trees.
+        for (int i = 0; i < m_stageNames.Length; ++i)
+        {
+            m_bossTreeStages[i] = BTreeEditor.NodeData.LoadTree(treePath + m_stageNames[i], this);
+        }
     }
 
     void Update()
@@ -141,16 +193,80 @@ public class BossBehaviour : MonoBehaviour
         if (CondIsIdleAnimation() == ENodeResult.NODE_FAILURE)
             m_animator.SetInteger("AttackID", 0);
 
+        // Stuck state debug.
         if (Input.GetKeyDown(KeyCode.G))
-            m_bIsStuck = true;
+            EnterStuckState();
 
-        m_bossTree.Run();
+        if (Input.GetKeyDown(KeyCode.P))
+            ProgressStage();
+
+        m_bossTreeStages[m_nStageIndex].Run();
 
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
 
-        m_fPortalPunchCDTimer -= Time.deltaTime;
-        m_fMeteorCDTimer -= Time.deltaTime;
-        m_fBeamAttackCDTimer -= Time.deltaTime;
+        // Only reduce portal punch cooldown whilse the portal is not active.
+        if(!m_portalScript.IsActive())
+            m_fPortalPunchCDTimer -= Time.deltaTime;
+
+        // Only reduce meteor attack cooldown when the meteor is not active.
+        if(!m_meteor.gameObject.activeInHierarchy)
+            m_fMeteorCDTimer -= Time.deltaTime;
+
+        // Only reduce beam cooldown when not in use.
+        if(!m_beamLine.enabled)
+            m_fBeamAttackCDTimer -= Time.deltaTime;
+    }
+
+    public void ProgressStage()
+    {
+        // Exit stuck state.
+        ExitStuckState();
+
+        // Progress stage.
+        ++m_nStageIndex;
+    }
+
+    public void EnterStuckState()
+    {
+        m_bIsStuck = true;
+
+        // Reset to idle state.
+        m_animator.SetBool("isStunned", true);
+
+        // Disable beam & reset attack.
+        m_beamLine.enabled = false;
+        m_fBeamTime = 0.0f;
+        m_animator.SetInteger("AttackID", 0);
+        m_fTimeSinceGlobalAttack = 0.0f;
+
+        for (int i = 0; i < m_armorPeices.Length; ++i)
+        {
+            // Enable armor material glow.
+            m_armorMaterials[i].SetFloat("_FresnelOnOff", 1.0f);
+
+            // Tag armor peices as pullable objects.
+            m_armorPeices[i].tag = "PullObj";
+        }
+
+        // Start stuck timer.
+        StartCoroutine(ResetStuck());
+    }
+
+    public void ExitStuckState()
+    {
+        m_bIsStuck = false;
+
+        // Exit stuck state in animation controller.
+        m_animator.SetBool("isStunned", false);
+
+        for (int i = 0; i < m_armorPeices.Length; ++i)
+        {
+            // Disable armor material glow.
+            m_armorMaterials[i].SetFloat("_FresnelOnOff", 0.0f);
+
+            // Untag armor peices.
+            m_armorPeices[i].tag = "Untagged";
+        }
     }
 
     // ----------------------------------------------------------------------------------------------
@@ -208,15 +324,12 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondMeteorAvailable()
     {
-        if (m_fMeteorCDTimer <= 0.0f)
+        if (m_fMeteorCDTimer <= 0.0f && m_meteor.Available() && m_availableMeteorSpawns.Count > 0)
         {
-            m_fMeteorCDTimer = m_fMeteorCD;
-
-            // 50% chance for random strike.
             m_bRandomMeteor = Random.Range(0.0f, 100.0f) >= m_fRandMeteorChance;
 
             // Ensure the player is grounded or this is a random stike.
-            if(m_playerController.IsGrounded() && m_meteorSpawnVol != null)
+            if(m_playerController.IsGrounded() && m_meteorSpawnVol != null && m_availableMeteorSpawns.Contains(m_meteorSpawnVol.gameObject))
             {
                 // Make stikes when the player is in a volume not random.
                 m_bRandomMeteor = false;
@@ -264,42 +377,9 @@ public class BossBehaviour : MonoBehaviour
     {
         if (m_bIsStuck)
         {
-            // Reset to idle state.
-            m_animator.SetBool("isStunned", true);
-
-            m_armour.GetComponent<Renderer>().material.SetFloat("_FresnelOnOff", 1.0f);
-
-            // Disable beam & reset attack.
-            m_beamLine.enabled = false;
-            m_fBeamTime = 0.0f;
-
-            m_animator.SetInteger("AttackID", 0);
-            m_fTimeSinceGlobalAttack = 0.0f;
-
-            m_armour.tag = "PullObj";
-
-            if(!m_armour.GetComponent<PullObject>().enabled)
-            {
-                m_bIsStuck = false;
-
-                //Load next boss behaviour
-
-
-#if (UNITY_EDITOR)
-                treePath = Application.dataPath + "/Code/BossBehaviours/BossTreePhase2.xml";
-#else
-        treePath = Application.dataPath + "/BossTreePhase2.xml";
-#endif
-                m_bossTree = BTreeEditor.NodeData.LoadTree(treePath, this);
-
-                m_bossTree.Run();
-
-                return ENodeResult.NODE_SUCCESS;
-            }
-
-            StartCoroutine(ResetStuck());
             return ENodeResult.NODE_SUCCESS;
         }
+
         return ENodeResult.NODE_FAILURE;
     }
 
@@ -375,6 +455,8 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult ActPlayMeteorAnim()
     {
+        m_fMeteorCDTimer = m_fMeteorCD;
+
         m_animator.SetInteger("AttackID", 2);
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
@@ -382,27 +464,29 @@ public class BossBehaviour : MonoBehaviour
         {
             Debug.Log("Meteor Attack!");
 
-            // Get spawn volume.
-            BoxCollider spawnBox = m_meteorSpawnVol.GetComponent<BoxCollider>();
+            m_availableMeteorSpawns.Remove(m_meteorSpawnVol.transform.parent.gameObject);
 
             // Calculate random spawn point and summon meteor.
             Vector3 v3RandomSpawn = m_meteorSpawnVol.transform.position;
 
-            v3RandomSpawn.x += spawnBox.center.x + Random.Range(spawnBox.size.x * 0.5f, spawnBox.size.x * -0.5f);
-            v3RandomSpawn.y += spawnBox.center.y + Random.Range(spawnBox.size.y * 0.5f, spawnBox.size.y * -0.5f);
-            v3RandomSpawn.z += spawnBox.center.z + Random.Range(spawnBox.size.z * 0.5f, spawnBox.size.z * -0.5f);
+            v3RandomSpawn.x += m_meteorSpawnVol.center.x + Random.Range(m_meteorSpawnVol.size.x * 0.5f, m_meteorSpawnVol.size.x * -0.5f);
+            v3RandomSpawn.y += m_meteorSpawnVol.center.y + Random.Range(m_meteorSpawnVol.size.y * 0.5f, m_meteorSpawnVol.size.y * -0.5f);
+            v3RandomSpawn.z += m_meteorSpawnVol.center.z + Random.Range(m_meteorSpawnVol.size.z * 0.5f, m_meteorSpawnVol.size.z * -0.5f);
 
-            m_meteor.Summon(v3RandomSpawn, m_player.transform.position);
+            m_meteor.Summon(v3RandomSpawn, m_meteorSpawnVol.transform.parent.gameObject);
         }
         else if(m_bRandomMeteor)
         {
             Debug.Log("Random Meteor Attack!");
 
-            if (m_allMeteorSpawns.Length <= 0)
+            if (m_availableMeteorSpawns.Count <= 0)
                 return ENodeResult.NODE_SUCCESS;
 
+            int nRandomIndex = Random.Range(0, m_availableMeteorSpawns.Count);
+
             // Pick random spawn point object.
-            GameObject spawnObj = m_allMeteorSpawns[Random.Range(0, m_allMeteorSpawns.Length)].transform.GetChild(0).gameObject;
+            GameObject spawnObj = m_availableMeteorSpawns[nRandomIndex].transform.GetChild(0).gameObject;
+            m_availableMeteorSpawns.RemoveAt(nRandomIndex);
 
             // Get the spawn volume.
             BoxCollider spawnBox = spawnObj.GetComponent<BoxCollider>();
@@ -414,7 +498,7 @@ public class BossBehaviour : MonoBehaviour
             v3RandomSpawn.y += spawnBox.center.y + Random.Range(spawnBox.size.y * 0.5f, spawnBox.size.y * -0.5f);
             v3RandomSpawn.z += spawnBox.center.z + Random.Range(spawnBox.size.z * 0.5f, spawnBox.size.z * -0.5f);
 
-            m_meteor.Summon(v3RandomSpawn, spawnObj.transform.parent.position);
+            m_meteor.Summon(v3RandomSpawn, spawnObj.transform.parent.gameObject);
 
             m_bRandomMeteor = false;
         }
@@ -528,10 +612,7 @@ public class BossBehaviour : MonoBehaviour
     IEnumerator ResetStuck()
     {
         yield return new WaitForSeconds(m_fStuckTime);
-        m_bIsStuck = false;
-        m_armour.GetComponent<Renderer>().material.SetFloat("_FresnelOnOff", 1.0f);
-        m_animator.SetBool("isStunned", false);
-        m_armour.tag = "Untagged";
+        ExitStuckState();
     }
 
     public void SummonPortal()
@@ -553,6 +634,7 @@ public class BossBehaviour : MonoBehaviour
         v3PortalOffset.z += v3PlayerRight.z * fHorizontalOff;
 
         v3PortalOffset += Vector3.up * Random.Range(0.5f, 1.0f);
+        v3PortalOffset += v3PlayerRight * Random.Range(-1.0f, 1.0f);
 
         v3PortalOffset.Normalize();
 
@@ -565,15 +647,6 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.SetPunchDirection(-v3PortalOffset);
 
         return;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.tag == "Stuck")
-        {
-            Destroy(other.gameObject);
-            m_bIsStuck = true;
-        }
     }
 
     private void OnDrawGizmosSelected()

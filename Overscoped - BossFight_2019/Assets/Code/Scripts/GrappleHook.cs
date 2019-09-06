@@ -48,7 +48,7 @@ public class GrappleHook : MonoBehaviour
 
     [Tooltip("The distance the grapple hook will travel before cancelling.")]
     [SerializeField]
-    private float m_fGrapplebreakDistance = 20.0f;
+    private float m_fGrappleRange = 20.0f;
 
     [Tooltip("The minimum time grappling before the release boost can be applied.")]
     [SerializeField]
@@ -163,18 +163,21 @@ public class GrappleHook : MonoBehaviour
     private bool m_bGrappleLocked;
     private bool m_bGrappleJustImpacted;
 
-    // Effects
-    private LineEffects m_grapLineEffects;
-    private LineEffects m_pullLineEffects;
-
     // Pull function
     private PullObject m_pullObj;
+    private GameObject m_pullEndPoint;
     private Vector3 m_v3PullTension;
-    private Vector3 m_v3PullPoint;
     private float m_fPullLineLength;
     private float m_fPullLineProgress;
     private bool m_bPullLocked;
     private bool m_bPullJustImpacted;
+
+    // Both functions.
+    private bool m_bWithinRange;
+
+    // Effects
+    private LineEffects m_grapLineEffects;
+    private LineEffects m_pullLineEffects;
 
     // Misc.
     private float m_fReleaseGravity;
@@ -200,6 +203,9 @@ public class GrappleHook : MonoBehaviour
         lineEffectParams.m_fLineThickness = m_pullLine.startWidth;
 
         m_pullLineEffects = new LineEffects(Instantiate(m_lineCompute), lineEffectParams, m_pullLine.positionCount);
+
+        // Grapple end point object.
+        m_pullEndPoint = new GameObject("Pull_End_Point");
 
         // Component retreival.
         m_controller = GetComponent<PlayerController>();
@@ -237,11 +243,12 @@ public class GrappleHook : MonoBehaviour
 
         bool bPlayerHasEnoughMana = m_stats.EnoughMana();
 
+        // Spherecast to find impact point.
         const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
+        m_bWithinRange = Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrappleRange, nRaymask, QueryTriggerInteraction.Ignore);
 
         // Grapple casting.
-        if(bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButton(0) 
-            && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
+        if (bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButton(0) && m_bWithinRange && m_fireHit.collider.tag != "NoGrapple")
         {
             m_v3GrapplePoint = m_fireHit.point;
             m_v3GrappleNormal = m_fireHit.normal;
@@ -256,8 +263,7 @@ public class GrappleHook : MonoBehaviour
         }
 
         // Pull casting.
-        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) 
-            && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
+        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) && m_bWithinRange)
         {
             if (m_fireHit.collider.tag == "PullObj")
             {
@@ -267,7 +273,11 @@ public class GrappleHook : MonoBehaviour
             else
                 m_pullObj = null;
 
-            m_v3PullPoint = m_fireHit.point;
+            // Set end point to hit point and parent it to the hit object.
+            m_pullEndPoint.transform.position = m_fireHit.point;
+            m_pullEndPoint.transform.parent = m_fireHit.collider.transform;
+
+            //m_v3PullPoint = m_fireHit.point;
             m_fPullLineLength = m_fireHit.distance;
 
             m_bPullHookActive = true;
@@ -275,6 +285,13 @@ public class GrappleHook : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------------------------------------
         // Effects & Animations
+
+        // Show particle effect at the hit point while aiming.
+        if(!m_bGrappleHookActive && !m_bPullHookActive && m_bWithinRange)
+        {
+            m_impactEffect.transform.position = m_fireHit.point;
+            m_impactEffect.transform.rotation = Quaternion.LookRotation(m_fireHit.normal, Vector3.up);
+        }
 
         // Line will disable when the pop effect finishes.
         m_grappleHandEffect.SetActive(m_bGrappleHookActive);
@@ -284,7 +301,8 @@ public class GrappleHook : MonoBehaviour
         // Animations
         m_animController.SetBool("isCasting", m_bGrappleHookActive);
 
-        m_impactEffect.SetActive(bImpacted);
+        m_impactEffect.SetActive(m_bWithinRange);
+
         m_animController.SetBool("isGrappled", bImpacted);
 
         // ------------------------------------------------------------------------------------------------------------------------------
@@ -327,10 +345,7 @@ public class GrappleHook : MonoBehaviour
                 // Add small FOV offset.
                 m_cameraEffects.SetFOVOffset(5.0f);
 
-                // Impact particle effect.
-                m_impactEffect.transform.position = m_v3GrapplePoint;
-                m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
-
+                // Begin grapple override.
                 m_controller.OverrideMovement(GrappleFly);
 
                 // Exit when releasing the left mouse button.
@@ -372,10 +387,6 @@ public class GrappleHook : MonoBehaviour
                     m_cameraEffects.ApplyShake(0.1f, 0.1f);
                 }
 
-                // Impact particle effect.
-                //m_impactEffect.transform.position = m_v3PullPoint;
-                //m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
-
                 // Pulling...
                 PullObject();
 
@@ -396,7 +407,7 @@ public class GrappleHook : MonoBehaviour
     private void LateUpdate()
     {
         m_grapLineEffects.ProcessLine(m_grappleLine, m_controller, m_grappleNode, m_v3GrapplePoint, m_fGrappleLineProgress / m_fGrapLineLength, m_bGrappleHookActive);
-        m_pullLineEffects.ProcessLine(m_pullLine, m_controller, m_pullNode, m_v3PullPoint, m_fPullLineProgress / m_fPullLineLength, m_bPullHookActive);
+        m_pullLineEffects.ProcessLine(m_pullLine, m_controller, m_pullNode, m_pullEndPoint.transform.position, m_fPullLineProgress / m_fPullLineLength, m_bPullHookActive);
     }
 
 
@@ -541,7 +552,7 @@ public class GrappleHook : MonoBehaviour
             return;
         }
 
-        Vector3 v3ObjDiff = transform.position - m_v3PullPoint;
+        Vector3 v3ObjDiff = transform.position - m_pullEndPoint.transform.position;
         Vector3 v3ObjDir = v3ObjDiff.normalized;
         float fRopeDistSqr = v3ObjDiff.magnitude; // Current rope length squared.
 
@@ -585,5 +596,14 @@ public class GrappleHook : MonoBehaviour
         m_fGrappleLineProgress = 0.0f;
 
         m_controller.FreeOverride();
+    }
+
+    /*
+    Description: Get whether or not the player is within grapple range of the target.
+    Return Type: bool
+    */
+    public bool InGrappleRange()
+    {
+        return m_bWithinRange || m_bGrappleHookActive || m_bPullHookActive;
     }
 }

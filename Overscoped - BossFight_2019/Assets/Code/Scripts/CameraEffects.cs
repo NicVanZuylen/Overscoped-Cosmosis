@@ -46,7 +46,7 @@ public class CameraEffects : MonoBehaviour
     {
         m_camera = GetComponent<Camera>();
 
-        m_camSpline = new List<CameraSplineState>();
+        m_camSpline = new List<CameraSplineState>(m_nMaxSplinePoints);
 
         m_v3StartPosition = transform.localPosition;
         m_startCamRot = transform.localRotation;
@@ -58,6 +58,11 @@ public class CameraEffects : MonoBehaviour
 
     void Update()
     {
+        //for (int i = 0; i < m_camSpline.Count - 1; ++i)
+        //{
+        //    Debug.DrawLine(m_camSpline[i].m_v4Position, m_camSpline[i + 1].m_v4Position, Color.magenta);
+        //}
+
         m_startCamRot = transform.localRotation;
 
         // Apply shake.
@@ -153,8 +158,6 @@ public class CameraEffects : MonoBehaviour
 
             // Remove old point.
             m_camSpline.RemoveAt(0);
-
-            Debug.Log("Done");
         }
 
         CameraSplineState state;
@@ -174,7 +177,7 @@ public class CameraEffects : MonoBehaviour
     }
 
     /*
-    Description: Prepare camera spline for reading.
+    Description: Prepare camera backtracking spline for reading.
     */
     public void StartCamSpline()
     {
@@ -183,6 +186,14 @@ public class CameraEffects : MonoBehaviour
 
         m_currentSplineState = m_camSpline[Mathf.Max(m_camSpline.Count - 1, 0)];
         m_nextSplineState = m_camSpline[Mathf.Max(m_camSpline.Count - 2, 0)];
+    }
+
+    /*
+    Description: Clear the camera backtracking spline.
+    */
+    public void ClearCamSpline()
+    {
+        m_camSpline.Clear();
     }
 
     /*
@@ -201,11 +212,6 @@ public class CameraEffects : MonoBehaviour
 
         CameraSplineState currentSplineState = m_camSpline[nSplineIndex];
         CameraSplineState nextSplineState = m_camSpline[Mathf.Max(nSplineIndex - 1, 0)];
-
-        for(int i = 0; i < m_camSpline.Count - 1; ++i)
-        {
-            Debug.DrawLine(m_camSpline[i].m_v4Position, m_camSpline[i + 1].m_v4Position, Color.magenta);
-        }
 
         CameraSplineState state;
         state.m_v4Position = Vector4.Lerp(currentSplineState.m_v4Position, nextSplineState.m_v4Position, fInterp);

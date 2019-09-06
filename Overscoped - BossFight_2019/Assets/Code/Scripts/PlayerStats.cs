@@ -200,6 +200,12 @@ public class PlayerStats : MonoBehaviour
 
         m_camPivot.transform.position = splineState.m_v4Position;
         m_camPivot.transform.rotation = splineState.m_rotation;
+
+        // Resurrect player.
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Resurrect();
+        }
     }
 
     /*
@@ -228,6 +234,20 @@ public class PlayerStats : MonoBehaviour
         m_fHealth = m_fMaxHealth;
 
         // Reverse death effects...
+
+        // Reset spline.
+        m_camEffects.ClearCamSpline();
+        m_fSplineProgress = 0.0f;
+
+        m_camPivot.parent = transform;
+        m_camPivot.localPosition = new Vector3(0.0f, 0.7f, 0.0f);
+
+        // Enable scripts.
+        m_controller.enabled = true;
+        m_hookScript.enabled = true;
+        m_beamScript.enabled = true;
+
+        m_bIsAlive = true;
     }
 
     /*

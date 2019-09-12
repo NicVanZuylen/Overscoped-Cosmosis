@@ -16,6 +16,7 @@ public class Beam : MonoBehaviour
     //particle system renderer
     private ParticleSystemRenderer psr;
     //Position at the end of the beam
+    [SerializeField]
     private Vector3 m_v3EndPoint;
     //Positions of where the particles need to spawn
     [SerializeField]
@@ -23,6 +24,7 @@ public class Beam : MonoBehaviour
     [SerializeField]
     private ParticleSystem.Particle[] particles;
     private int m_PositionArrayLength;
+    public GameObject player;
 
     void BeamControl()
     {
@@ -36,7 +38,7 @@ public class Beam : MonoBehaviour
     void BeamCastRay()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, m_fMaxLength))
+        if (Physics.Raycast(transform.position, player.transform.position, out hit, m_fMaxLength))
         {
             m_fHitLength = hit.distance;
             m_PositionArrayLength = Mathf.RoundToInt(hit.distance / (m_ParticleMeshLength * m_fFinalSize));
@@ -53,7 +55,7 @@ public class Beam : MonoBehaviour
             if(m_PositionArrayLength < m_fMaxLength)
                 m_PositionArrayLength += 1;
             m_v3ParticleSpawnPositions = new Vector3[m_PositionArrayLength];
-            m_v3EndPoint = Vector3.MoveTowards(transform.position, transform.forward * 1000f, m_fMaxLength);
+            m_v3EndPoint = Vector3.MoveTowards(transform.position, player.transform.position * 1000f, m_fMaxLength);
         }
     }
 

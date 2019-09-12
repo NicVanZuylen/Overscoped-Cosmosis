@@ -205,49 +205,22 @@ public class CameraEffects : MonoBehaviour
     
     public CameraSplineState EvaluateCamSpline(float fProgress)
     {
+        // Find spline index using progress value.
         float fIndexProgress = (1.0f - fProgress) * m_camSpline.Count;
         int nSplineIndex = Mathf.Min(Mathf.FloorToInt(fIndexProgress), m_camSpline.Count - 1);
 
+        // Find interpolation value between current and next spline points.
         float fInterp = 1.0f - (fIndexProgress - nSplineIndex);
 
+        // Find current and next spline points.
         CameraSplineState currentSplineState = m_camSpline[nSplineIndex];
         CameraSplineState nextSplineState = m_camSpline[Mathf.Max(nSplineIndex - 1, 0)];
 
+        // Interpolate and read spline states.
         CameraSplineState state;
         state.m_v4Position = Vector4.Lerp(currentSplineState.m_v4Position, nextSplineState.m_v4Position, fInterp);
         state.m_rotation = Quaternion.Slerp(currentSplineState.m_rotation, nextSplineState.m_rotation, fInterp);
 
         return state;
     }
-    
-    /*
-    public CameraSplineState EvaluateCamSpline(float fRate)
-    {
-        for (int i = 0; i < m_camSpline.Count - 1; ++i)
-        {
-            Debug.DrawLine(m_camSpline[i].m_v4Position, m_camSpline[i + 1].m_v4Position, Color.magenta);
-        }
-
-        CameraSplineState state;
-        state.m_v4Position = Vector4.Lerp(m_currentSplineState.m_v4Position, m_nextSplineState.m_v4Position, m_fSplineInterp);
-        state.m_rotation = Quaternion.Slerp(m_currentSplineState.m_rotation, m_nextSplineState.m_rotation, m_fSplineInterp);
-
-        m_fSplineInterp += fRate;
-
-        // Advance points if the interp reaches 1.
-        if (m_fSplineInterp >= 1.0f)
-        {
-            m_fSplineInterp = 0.0f;
-
-            // Decrement spline index and don't alow it to decrement below zero.
-            if (--m_nSplineIndex < 0)
-                m_nSplineIndex = 0;
-
-            m_currentSplineState = m_nextSplineState;
-            m_nextSplineState = m_camSpline[m_nSplineIndex];
-        }
-
-        return state;
-    }
-    */
 }

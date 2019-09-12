@@ -97,6 +97,7 @@ public class BossBehaviour : MonoBehaviour
     private Animator m_animator;
     private float m_fTimeSinceGlobalAttack = 0.0f;
     private bool m_bIsStuck;
+    private GameObject end_Portal;
 
     // Stages
     private BehaviourNode[] m_bossTreeStages;
@@ -108,7 +109,7 @@ public class BossBehaviour : MonoBehaviour
 
     // Beam attack
     private LineRenderer m_beamLine;
-    private Vector3 m_v3BeamEnd;
+    public Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
     private EnergyPillar[] m_energyPillars;
     private float m_fBeamAttackCDTimer;
@@ -120,14 +121,11 @@ public class BossBehaviour : MonoBehaviour
     private List<GameObject> m_availableMeteorSpawns;
     private float m_fMeteorCDTimer;
     private bool m_bRandomMeteor;
+    private static BoxCollider m_meteorSpawnVol;
 
     // Armor
     private PullObject[] m_armorPullScripts;
     private Material[] m_armorMaterials;
-
-    private static BoxCollider m_meteorSpawnVol;
-
-     
 
     public string treePath;
 
@@ -138,6 +136,9 @@ public class BossBehaviour : MonoBehaviour
         m_animator = GetComponent<Animator>();
         m_beamLine = GetComponent<LineRenderer>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+
+        end_Portal = GameObject.FindGameObjectWithTag("EndPortal");
+        end_Portal.SetActive(false);
 
         // Initial attack cooldowns.
         m_fPortalPunchCDTimer = m_fPortalPunchCD;
@@ -205,13 +206,7 @@ public class BossBehaviour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
             ProgressStage();
 
-        if (m_bossTreeStages[m_nStageIndex] != null)
-            m_bossTreeStages[m_nStageIndex].Run();
-        else
-        {
-            //End gmae shit
-        }
-
+        m_bossTreeStages[m_nStageIndex].Run();  
 
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
 
@@ -235,6 +230,13 @@ public class BossBehaviour : MonoBehaviour
 
         // Progress stage.
         ++m_nStageIndex;
+    }
+
+    public void BossDead()
+    {
+        //enable end portal
+        Debug.Log("Boss Dead");
+        end_Portal.SetActive(true);
     }
 
     public void EnterStuckState()
@@ -573,7 +575,7 @@ public class BossBehaviour : MonoBehaviour
         // Enable beam if it is disabled.
         if (!mesh.activeInHierarchy)
         {
-            mesh.SetActive(false);
+            mesh.SetActive(true);
         }
 
         // Look at player.

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EndPortal : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class EndPortal : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            Debug.Log("End Game");
+            SceneManager.LoadScene(0);
         }
     }
 }

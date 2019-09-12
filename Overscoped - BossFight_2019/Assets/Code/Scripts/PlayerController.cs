@@ -116,9 +116,7 @@ public class PlayerController : MonoBehaviour
         m_v3RespawnPosition = transform.position;
 
         // Set intitial camrera look rotation.
-        Vector3 v3LookEuler = m_cameraTransform.rotation.eulerAngles;
-        m_fLookEulerX = v3LookEuler.x;
-        m_fLookEulerY = v3LookEuler.y;
+        SetLookRotation(m_cameraTransform.rotation);
 
         m_v3SurfaceUp = transform.up;
         m_v3SurfaceForward = transform.forward;
@@ -152,6 +150,19 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         m_controller.enabled = true;
+    }
+
+    /*
+    Description: Set the look rotation of the player, z axis will be ignored.
+    Param:
+        Quaternion rotation: The rotation to use for looking.
+    */
+    public void SetLookRotation(Quaternion rotation)
+    {
+        Vector3 v3Euler = rotation.eulerAngles;
+
+        m_fLookEulerX = v3Euler.x;
+        m_fLookEulerY = v3Euler.y;
     }
 
     /*

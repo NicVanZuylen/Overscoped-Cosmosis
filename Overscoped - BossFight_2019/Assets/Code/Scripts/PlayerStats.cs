@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -52,7 +53,15 @@ public class PlayerStats : MonoBehaviour
     [Header("Death")]
     [Tooltip("Amount of time's worth of movement captured by the camera spline.")]
     [SerializeField]
-    private float m_fDeathCamTime = 5.0f;
+    private float m_fDeathRecordTime = 20.0f;
+
+    [Tooltip("Speed curve for death rewind.")]
+    [SerializeField]
+    private AnimationCurve m_rewindCurve = null;
+
+    [Tooltip("Checkpoint to restart at after dying.")]
+    [SerializeField]
+    private Transform m_checkpoint = null;
 
     [Tooltip("Regen mode for mana regen.")]
     [SerializeField]
@@ -89,6 +98,7 @@ public class PlayerStats : MonoBehaviour
     private float m_fHealth;
     private float m_fMana;
     private float m_fCurrentRegenDelay;
+    private static bool m_bCheckpointReached = false;
     private bool m_bIsAlive;
 
     // Camera backtracking
@@ -109,8 +119,15 @@ public class PlayerStats : MonoBehaviour
         m_fCurrentRegenDelay = 1.0f;
         m_bIsAlive = true;
 
-        m_fSplineInterval = m_fDeathCamTime / m_camEffects.MaxSplineCount();
+        m_fSplineInterval = m_fDeathRecordTime / m_camEffects.MaxSplineCount();
         m_fCurrentSplineTime = 0.0f;
+
+        // Spawn at checkpoint if it has been reached.
+        if(m_bCheckpointReached && m_checkpoint)
+        {
+            transform.position = m_checkpoint.position;
+            m_controller.SetLookRotation(m_checkpoint.rotation);
+        }
     }
 
     // Update is called once per frame
@@ -191,10 +208,9 @@ public class PlayerStats : MonoBehaviour
 
     private void DeathUpdate()
     {
-        //CameraSplineState splineState = m_camEffects.EvaluateCamSpline(1.0f * Time.deltaTime);
         CameraSplineState splineState = m_camEffects.EvaluateCamSpline(Mathf.Clamp(m_fSplineProgress, 0.0f, 1.0f));
 
-        m_fSplineProgress += 0.1f * Time.deltaTime;
+        m_fSplineProgress += m_rewindCurve.Evaluate(m_fSplineProgress) * Time.deltaTime;
 
         m_camEffects.transform.localRotation = Quaternion.identity;
 
@@ -205,6 +221,12 @@ public class PlayerStats : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K))
         {
             Resurrect();
+        }
+
+        // Reset scene when spline is complete.
+        if(m_fSplineProgress >= 1.0f)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
@@ -294,6 +316,9 @@ public class PlayerStats : MonoBehaviour
         m_controller.enabled = false;
         m_hookScript.enabled = false;
         m_beamScript.enabled = false;
+
+        // Assume checkpoint is reached.
+        m_bCheckpointReached = true;
 
         // Flag as dead.
         m_bIsAlive = false;

@@ -263,15 +263,10 @@ public class GrappleHook : MonoBehaviour
         }
 
         // Pull casting.
-        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) && m_bWithinRange)
+        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) && m_bWithinRange && m_fireHit.collider.tag == "PullObj")
         {
-            if (m_fireHit.collider.tag == "PullObj")
-            {
-                // Find & enable pull object script.
-                m_pullObj = m_fireHit.collider.gameObject.GetComponent<PullObject>();
-            }
-            else
-                m_pullObj = null;
+            // Find & enable pull object script.
+            m_pullObj = m_fireHit.collider.gameObject.GetComponent<PullObject>();
 
             // Set end point to hit point and parent it to the hit object.
             m_pullEndPoint.transform.position = m_fireHit.point;

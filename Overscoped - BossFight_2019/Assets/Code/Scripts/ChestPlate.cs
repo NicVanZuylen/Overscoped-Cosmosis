@@ -53,12 +53,9 @@ public class ChestPlate : PullObject
 
         if(m_fHealth <= 0.0f)
         {
-            // Remove chestplate.
+            // Remove chestplate & progress stage.
             Trigger(Vector3.zero);
             enabled = true;
-
-            // Progress stage.
-            m_bossScript.ProgressStage();
 
             // Turn of fresnel.
             m_material.SetFloat("_FresnelOnOff", 0.0f);

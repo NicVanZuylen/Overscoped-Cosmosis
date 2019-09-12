@@ -6,121 +6,117 @@ using UnityEngine;
 
 public class GrappleHook : MonoBehaviour
 {
-    // Public:
+    // Private: 
 
     [SerializeField]
-    public LineRenderer m_grappleLine;
+    private LineRenderer m_grappleLine = null;
 
     [SerializeField]
-    public LineRenderer m_pullLine;
+    private LineRenderer m_pullLine = null;
 
     [SerializeField]
-    public Transform m_grappleNode;
+    private Transform m_grappleNode = null;
 
     [SerializeField]
-    public Transform m_pullNode;
+    private Transform m_pullNode = null;
 
     [Header("Physics")]
 
     [Tooltip("Acceleration due to grapple pull.")]
     [SerializeField]
-    public float m_fPullAcceleration = 30.0f;
+    private float m_fPullAcceleration = 30.0f;
 
     [Tooltip("Acceleration due to grapple pull.")]
     [SerializeField]
-    public float m_fAirAcceleration = 30.0f;
+    private float m_fAirAcceleration = 30.0f;
 
     [Tooltip("Maximum speed in the direction of the grapple line the player can travel.")]
     [SerializeField]
-    public float m_fMaxFlySpeed = 40.0f;
+    private float m_fMaxFlySpeed = 40.0f;
 
     [Tooltip("Radius from the hook in which the player will detach.")]
     [SerializeField]
-    public float m_fDestinationRadius = 2.0f;
+    private float m_fDestinationRadius = 2.0f;
 
     [Tooltip("Allowance of lateral movement when grappling.")]
     [SerializeField]
-    public float m_fDriftTolerance = 8.0f;
-
-    [Tooltip("Force exerted upwards upon the player when they reach the grapple destination.")]
-    [SerializeField]
-    public float m_fPushUpForce = 4.0f;
+    private float m_fDriftTolerance = 8.0f;
 
     [Tooltip("Player move acceleration when landing after successfully reaching the grapple hook.")]
     [SerializeField]
-    public float m_fLandMoveAcceleration = 5.0f;
+    private float m_fLandMoveAcceleration = 5.0f;
 
     [Tooltip("The distance the grapple hook will travel before cancelling.")]
     [SerializeField]
-    public float m_fGrapplebreakDistance = 20.0f;
+    private float m_fGrappleRange = 20.0f;
 
     [Tooltip("The minimum time grappling before the release boost can be applied.")]
     [SerializeField]
-    public float m_fMinReleaseBoostTime = 0.3f;
+    private float m_fMinReleaseBoostTime = 0.3f;
 
     [Tooltip("The magnitude of the forward force applied to the player upon rope release.")]
     [SerializeField]
-    public float m_fReleaseForce = 20.0f;
+    private float m_fReleaseForce = 20.0f;
 
     [Tooltip("The magnitude of the foward force applied to the player when grappling from the ground.")]
     [SerializeField]
-    public float m_fForwardGroundGrappleForce = 10.0f;
+    private float m_fForwardGroundGrappleForce = 10.0f;
 
     [Tooltip("The magnitude of the upward force applied to the player when grappling from the ground.")]
     [SerializeField]
-    public float m_fUpGroundGrappleForce = 5.0f;
+    private float m_fUpGroundGrappleForce = 5.0f;
 
     [Tooltip("Whether or not to use the default jumping gravity whilst flying after grapple.")]
     [SerializeField]
-    public bool m_bJumpGravOnRelease = false;
+    private bool m_bJumpGravOnRelease = false;
 
     [Header("Grapple Mode")]
 
     [Tooltip("Rate in which the pull line will travel towards its destination.")]
     [SerializeField]
-    public float m_fGrappleLineSpeed = 30.0f;
+    private float m_fGrappleLineSpeed = 30.0f;
 
     [Header("Pull Mode")]
 
     [Tooltip("The distance the pull hook must be extended beyond the initial rope length on impact to decouple the target object.")]
     [SerializeField]
-    public float m_fPullBreakDistance = 8.0f;
+    private float m_fPullBreakDistance = 8.0f;
 
     [Tooltip("Rate in which the pull line will travel towards its destination.")]
     [SerializeField]
-    public float m_fPullLineSpeed = 30.0f;
+    private float m_fPullLineSpeed = 30.0f;
 
     [Header("Misc.")]
 
     [Tooltip("Whether or not the player will be restricted a spherical volume with the rope length as the radius when grappling.")]
     [SerializeField]
-    public bool m_bRestrictToRopeLength = true;
+    private bool m_bRestrictToRopeLength = true;
 
     [Tooltip("Spherecast radius for firing the grapple hook.")]
     [SerializeField]
-    public float m_fHookRadius = 0.5f;
+    private float m_fHookRadius = 0.5f;
 
     [Header("Effects")]
 
     [Tooltip("Delay between getting a new set of random points for the rope shake effect.")]
     [SerializeField]
-    public float m_fRopeShakeDelay = 0.1f;
+    private float m_fRopeShakeDelay = 0.1f;
 
     [Tooltip("Speed of rope point movement between random points.")]
     [SerializeField]
-    public float m_fShakeSpeed = 0.1f;
+    private float m_fShakeSpeed = 0.1f;
 
     [Tooltip("Maximum offset of rope points from thier position on the curve.")]
     [SerializeField]
-    public float m_fShakeMagnitude = 0.05f;
+    private float m_fShakeMagnitude = 0.05f;
 
     [Tooltip("Amount of waves in the rope whilst it flies.")]
     [SerializeField]
-    public int m_nWaveCount = 3;
+    private int m_nWaveCount = 3;
 
     [Tooltip("Wave amplitude multiplier of the wobble effect.")]
     [SerializeField]
-    public float m_fRippleWaveAmp = 0.15f;
+    private float m_fRippleWaveAmp = 0.15f;
 
     [Tooltip("Thickness the line will expand to when popping.")]
     [SerializeField]
@@ -128,26 +124,24 @@ public class GrappleHook : MonoBehaviour
 
     [Tooltip("Rate in which the line will expand and pop after use.")]
     [SerializeField]
-    public float m_fPopRate = 3.0f;
+    private float m_fPopRate = 3.0f;
 
     [Tooltip("Amount of time shake is amplified following rope impact.")]
     [SerializeField]
-    public float m_fImpactShakeDuration = 0.6f;
+    private float m_fImpactShakeDuration = 0.6f;
 
     [Tooltip("Multiplier for the impact shake effect.")]
     [SerializeField]
-    public float m_fImpactShakeMult = 5.0f;
+    private float m_fImpactShakeMult = 5.0f;
 
     [SerializeField]
-    public GameObject m_grappleHandEffect;
+    private GameObject m_grappleHandEffect = null;
 
     [SerializeField]
-    public GameObject m_impactEffect;
+    private GameObject m_impactEffect = null;
 
     [SerializeField]
-    public ComputeShader m_lineCompute;
-
-    // Private: 
+    private ComputeShader m_lineCompute = null;
 
     private PlayerController m_controller;
     private PlayerStats m_stats;
@@ -169,18 +163,21 @@ public class GrappleHook : MonoBehaviour
     private bool m_bGrappleLocked;
     private bool m_bGrappleJustImpacted;
 
-    // Effects
-    private LineEffects m_grapLineEffects;
-    private LineEffects m_pullLineEffects;
-
     // Pull function
     private PullObject m_pullObj;
+    private GameObject m_pullEndPoint;
     private Vector3 m_v3PullTension;
-    private Vector3 m_v3PullPoint;
     private float m_fPullLineLength;
     private float m_fPullLineProgress;
     private bool m_bPullLocked;
     private bool m_bPullJustImpacted;
+
+    // Both functions.
+    private bool m_bWithinRange;
+
+    // Effects
+    private LineEffects m_grapLineEffects;
+    private LineEffects m_pullLineEffects;
 
     // Misc.
     private float m_fReleaseGravity;
@@ -206,6 +203,9 @@ public class GrappleHook : MonoBehaviour
         lineEffectParams.m_fLineThickness = m_pullLine.startWidth;
 
         m_pullLineEffects = new LineEffects(Instantiate(m_lineCompute), lineEffectParams, m_pullLine.positionCount);
+
+        // Grapple end point object.
+        m_pullEndPoint = new GameObject("Pull_End_Point");
 
         // Component retreival.
         m_controller = GetComponent<PlayerController>();
@@ -243,11 +243,12 @@ public class GrappleHook : MonoBehaviour
 
         bool bPlayerHasEnoughMana = m_stats.EnoughMana();
 
+        // Spherecast to find impact point.
         const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
+        m_bWithinRange = Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrappleRange, nRaymask, QueryTriggerInteraction.Ignore);
 
         // Grapple casting.
-        if(bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButtonDown(0) 
-            && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
+        if (bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButton(0) && m_bWithinRange && m_fireHit.collider.tag != "NoGrapple")
         {
             m_v3GrapplePoint = m_fireHit.point;
             m_v3GrappleNormal = m_fireHit.normal;
@@ -262,19 +263,21 @@ public class GrappleHook : MonoBehaviour
         }
 
         // Pull casting.
-        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButtonDown(1) 
-            && Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrapplebreakDistance, nRaymask, QueryTriggerInteraction.Ignore))
+        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) && m_bWithinRange)
         {
             if (m_fireHit.collider.tag == "PullObj")
             {
                 // Find & enable pull object script.
                 m_pullObj = m_fireHit.collider.gameObject.GetComponent<PullObject>();
-                m_pullObj.enabled = true;
             }
             else
                 m_pullObj = null;
 
-            m_v3PullPoint = m_fireHit.point;
+            // Set end point to hit point and parent it to the hit object.
+            m_pullEndPoint.transform.position = m_fireHit.point;
+            m_pullEndPoint.transform.parent = m_fireHit.collider.transform;
+
+            //m_v3PullPoint = m_fireHit.point;
             m_fPullLineLength = m_fireHit.distance;
 
             m_bPullHookActive = true;
@@ -282,6 +285,13 @@ public class GrappleHook : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------------------------------------
         // Effects & Animations
+
+        // Show particle effect at the hit point while aiming.
+        if(!m_bGrappleHookActive && !m_bPullHookActive && m_bWithinRange)
+        {
+            m_impactEffect.transform.position = m_fireHit.point;
+            m_impactEffect.transform.rotation = Quaternion.LookRotation(m_fireHit.normal, Vector3.up);
+        }
 
         // Line will disable when the pop effect finishes.
         m_grappleHandEffect.SetActive(m_bGrappleHookActive);
@@ -291,7 +301,8 @@ public class GrappleHook : MonoBehaviour
         // Animations
         m_animController.SetBool("isCasting", m_bGrappleHookActive);
 
-        m_impactEffect.SetActive(bImpacted);
+        m_impactEffect.SetActive(m_bWithinRange);
+
         m_animController.SetBool("isGrappled", bImpacted);
 
         // ------------------------------------------------------------------------------------------------------------------------------
@@ -334,10 +345,7 @@ public class GrappleHook : MonoBehaviour
                 // Add small FOV offset.
                 m_cameraEffects.SetFOVOffset(5.0f);
 
-                // Impact particle effect.
-                m_impactEffect.transform.position = m_v3GrapplePoint;
-                m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
-
+                // Begin grapple override.
                 m_controller.OverrideMovement(GrappleFly);
 
                 // Exit when releasing the left mouse button.
@@ -379,10 +387,6 @@ public class GrappleHook : MonoBehaviour
                     m_cameraEffects.ApplyShake(0.1f, 0.1f);
                 }
 
-                // Impact particle effect.
-                //m_impactEffect.transform.position = m_v3PullPoint;
-                //m_impactEffect.transform.rotation = Quaternion.LookRotation(m_v3GrappleNormal, Vector3.up);
-
                 // Pulling...
                 PullObject();
 
@@ -403,7 +407,7 @@ public class GrappleHook : MonoBehaviour
     private void LateUpdate()
     {
         m_grapLineEffects.ProcessLine(m_grappleLine, m_controller, m_grappleNode, m_v3GrapplePoint, m_fGrappleLineProgress / m_fGrapLineLength, m_bGrappleHookActive);
-        m_pullLineEffects.ProcessLine(m_pullLine, m_controller, m_pullNode, m_v3PullPoint, m_fPullLineProgress / m_fPullLineLength, m_bPullHookActive);
+        m_pullLineEffects.ProcessLine(m_pullLine, m_controller, m_pullNode, m_pullEndPoint.transform.position, m_fPullLineProgress / m_fPullLineLength, m_bPullHookActive);
     }
 
 
@@ -548,7 +552,7 @@ public class GrappleHook : MonoBehaviour
             return;
         }
 
-        Vector3 v3ObjDiff = transform.position - m_v3PullPoint;
+        Vector3 v3ObjDiff = transform.position - m_pullEndPoint.transform.position;
         Vector3 v3ObjDir = v3ObjDiff.normalized;
         float fRopeDistSqr = v3ObjDiff.magnitude; // Current rope length squared.
 
@@ -592,5 +596,14 @@ public class GrappleHook : MonoBehaviour
         m_fGrappleLineProgress = 0.0f;
 
         m_controller.FreeOverride();
+    }
+
+    /*
+    Description: Get whether or not the player is within grapple range of the target.
+    Return Type: bool
+    */
+    public bool InGrappleRange()
+    {
+        return m_bWithinRange || m_bGrappleHookActive || m_bPullHookActive;
     }
 }

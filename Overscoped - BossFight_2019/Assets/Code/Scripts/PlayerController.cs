@@ -115,6 +115,11 @@ public class PlayerController : MonoBehaviour
         m_cameraTransform = GetComponentInChildren<Camera>().transform;
         m_v3RespawnPosition = transform.position;
 
+        // Set intitial camrera look rotation.
+        Vector3 v3LookEuler = m_cameraTransform.rotation.eulerAngles;
+        m_fLookEulerX = v3LookEuler.x;
+        m_fLookEulerY = v3LookEuler.y;
+
         m_v3SurfaceUp = transform.up;
         m_v3SurfaceForward = transform.forward;
         m_v3SurfaceRight = transform.right;
@@ -137,6 +142,16 @@ public class PlayerController : MonoBehaviour
     
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    private void OnDisable()
+    {
+        m_controller.enabled = false;
+    }
+
+    private void OnEnable()
+    {
+        m_controller.enabled = true;
     }
 
     /*
@@ -567,9 +582,7 @@ public class PlayerController : MonoBehaviour
 
         m_fLookEulerX = Mathf.Clamp(m_fLookEulerX, -89.9f, 89.9f);
 
-        //Quaternion targetCamRotation = Quaternion.Euler(m_fLookEulerX, m_fLookEulerY, 0.0f);
         m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler());
-        //m_cameraTransform.rotation = Quaternion.Slerp(m_cameraTransform.rotation, targetCamRotation, 1.0f);
 
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceUp * 3.0f), Color.green);

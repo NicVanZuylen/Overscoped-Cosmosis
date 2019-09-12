@@ -127,6 +127,8 @@ public class BossBehaviour : MonoBehaviour
 
     private static BoxCollider m_meteorSpawnVol;
 
+     
+
     public string treePath;
 
     void Awake()
@@ -159,6 +161,7 @@ public class BossBehaviour : MonoBehaviour
         m_meteor.Init(m_availableMeteorSpawns);
 
         m_portalScript = m_portal.GetComponent<Portal>();
+        m_portal.tag = "NoGrapple";
         m_portal.SetActive(false);
 
         // Armor components
@@ -202,7 +205,13 @@ public class BossBehaviour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
             ProgressStage();
 
-        m_bossTreeStages[m_nStageIndex].Run();
+        if (m_bossTreeStages[m_nStageIndex] != null)
+            m_bossTreeStages[m_nStageIndex].Run();
+        else
+        {
+            //End gmae shit
+        }
+
 
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
 
@@ -544,7 +553,9 @@ public class BossBehaviour : MonoBehaviour
 
             // Keep beam within a tight cone of the player's position.
             if (Vector3.Dot(m_v3BeamDirection, v3PlayerDir) >= 0.95f)
+            {
                 m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, fTrackSpeed * Time.deltaTime);
+            }
             else
             {
                 m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, 500.0f * Time.deltaTime);

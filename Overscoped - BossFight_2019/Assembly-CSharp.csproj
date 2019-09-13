@@ -93,6 +93,7 @@
      <Compile Include="Assets\Code\Scripts\Portal.cs" />
      <Compile Include="Assets\Code\Scripts\PortalPunch.cs" />
      <Compile Include="Assets\Code\Scripts\PullObject.cs" />
+     <Compile Include="Assets\Code\Scripts\RaiseBridge.cs" />
      <Compile Include="Assets\Code\Scripts\RBPlayerController.cs" />
      <Compile Include="Assets\Code\Scripts\Respawn.cs" />
      <Compile Include="Assets\Code\Scripts\Switch.cs" />
@@ -134,6 +135,7 @@
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ATanOpNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_FunctionOutputNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WorldSpaceCameraPos.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_Projectile.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ATan2OpNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Community\Volumetric Pixelization\Screen And Mask.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\Legacy\DefaultUnlit.shader" />
@@ -161,6 +163,7 @@
      <None Include="Assets\AmplifyShaderEditor\Examples\Community\Skybox Cubemap Extended\Credits.txt" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_PiNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_FloorOpNode.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_Vertex_Offset.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TFHCCompareLessNode.shader" />
      <None Include="Assets\Materials\Shaders\SHD_Boss_Dissolve.shader" />
      <None Include="Assets\Code\ComputeShaders\CalcLinePoints.compute" />
@@ -173,6 +176,7 @@
      <None Include="Assets\Materials\Shaders\SHD_Defaults_Lit.shader" />
      <None Include="Assets\Materials\Shaders\SHD_Player_Grapple_Pull.shader" />
      <None Include="Assets\Materials\Shaders\SHD_UI_Health.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_Outline_Fresnel.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_DeltaTime.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\TemplateExamples\Particles\HeatHaze\ParticlesTest.shader" />
      <None Include="Assets\AmplifyShaderEditor\ChangeLog.txt" />
@@ -218,6 +222,7 @@
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TauNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_IntNode.shader" />
      <None Include="Assets\Materials\Shaders\SHD_Player_Pullable_Outline.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_PlantLife.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\RadialUVDistortion\RadialUVDistortion.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Community\EnvironmentGradient\Credits.txt" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\SimpleRefraction\SimpleRefraction.shader" />
@@ -233,6 +238,7 @@
      <None Include="Assets\Materials\Shaders\PH_SHD_Radial_Floor.shader" />
      <None Include="Assets\Materials\Shaders\PH_SHD_Vertex_Offset.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TemplateShaderProperty.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_Vertex_Mask.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\ParallaxOffsetFakeInterior\ParallaxWindow.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ConditionalIfNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\Extrusion\NormalExtrusion.shader" />
@@ -306,6 +312,7 @@
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TanhOpNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_BreakToComponentsNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\UnlitWithLightmap\UnlitWithLightmap.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_Line_Kapow.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\HDSPRUnlit.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_GammaToLinearNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WorldReflectionVector.shader" />
@@ -323,6 +330,7 @@
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_OneMinusNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\Legacy\PostProcess.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_EncodeFloatRGHlpNode.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_PBR.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ACosOpNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_DecodeFloatRGHlpNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\Substance2018\Readme.txt" />
@@ -362,6 +370,7 @@
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\Legacy\UnlitLightmap.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\MultiPassDistortion\MultiPassDistortion.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\MultiPassDistortion\DoublePassUnlitTemplate.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_Phantom.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\WorldPosSLices\WorldPosSlices.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ColorNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_LinearDepthNode.shader" />
@@ -390,6 +399,7 @@
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_Vector2Node.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SimpleMultiplyOpNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\ReflectRefractSoapBubble\ReflectRefractSoapBubble.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_UL.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_RegisterLocalVarNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TFHCCompareWithRange.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_UnpackScaleNormalNode.shader" />
@@ -423,10 +433,12 @@
      <None Include="Assets\Materials\Shaders\SHD_PS_Default.shader" />
      <None Include="Assets\Materials\Shaders\PH_SHD_Plant_Life.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Community\EnvironmentGradient\MourEnvironmentGradient.shader" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_Lit.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SimplifiedFModOpNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_DdyOpNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_Vector3Node.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\SRP (Legacy)\README.txt" />
+     <None Include="Assets\Materials\Boss\Shaders\AMP_Dissolve.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\Transmission\Transmission.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\StencilExample\Portals\Portal01\StencilDiffuse01.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_FaceVariableNode.shader" />

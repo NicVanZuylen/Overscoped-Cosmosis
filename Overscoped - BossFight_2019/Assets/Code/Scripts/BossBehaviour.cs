@@ -97,6 +97,7 @@ public class BossBehaviour : MonoBehaviour
     private Animator m_animator;
     private float m_fTimeSinceGlobalAttack = 0.0f;
     private bool m_bIsStuck;
+    private GameObject end_Portal;
 
     // Stages
     private BehaviourNode[] m_bossTreeStages;
@@ -107,23 +108,23 @@ public class BossBehaviour : MonoBehaviour
     private float m_fPortalPunchCDTimer;
 
     // Beam attack
-    private LineRenderer m_beamLine;
-    private Vector3 m_v3BeamEnd;
+    public Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
     private EnergyPillar[] m_energyPillars;
     private float m_fBeamAttackCDTimer;
     private float m_fBeamTime;
+    public float factor = 0.5f;
+    public GameObject mesh;
 
     // Meteor attack
     private List<GameObject> m_availableMeteorSpawns;
     private float m_fMeteorCDTimer;
     private bool m_bRandomMeteor;
+    private static BoxCollider m_meteorSpawnVol;
 
     // Armor
     private PullObject[] m_armorPullScripts;
     private Material[] m_armorMaterials;
-
-    private static BoxCollider m_meteorSpawnVol;
 
     public string treePath;
 
@@ -132,8 +133,10 @@ public class BossBehaviour : MonoBehaviour
         m_playerController = m_player.GetComponent<PlayerController>();
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_animator = GetComponent<Animator>();
-        m_beamLine = GetComponent<LineRenderer>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+
+        end_Portal = GameObject.FindGameObjectWithTag("EndPortal");
+        end_Portal.SetActive(false);
 
         // Initial attack cooldowns.
         m_fPortalPunchCDTimer = m_fPortalPunchCD;
@@ -157,6 +160,7 @@ public class BossBehaviour : MonoBehaviour
         m_meteor.Init(m_availableMeteorSpawns);
 
         m_portalScript = m_portal.GetComponent<Portal>();
+        m_portal.tag = "NoGrapple";
         m_portal.SetActive(false);
 
         // Armor components
@@ -200,7 +204,7 @@ public class BossBehaviour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
             ProgressStage();
 
-        m_bossTreeStages[m_nStageIndex].Run();
+        m_bossTreeStages[m_nStageIndex].Run();  
 
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
 
@@ -213,7 +217,7 @@ public class BossBehaviour : MonoBehaviour
             m_fMeteorCDTimer -= Time.deltaTime;
 
         // Only reduce beam cooldown when not in use.
-        if(!m_beamLine.enabled)
+        if(!mesh.activeInHierarchy)
             m_fBeamAttackCDTimer -= Time.deltaTime;
     }
 
@@ -226,6 +230,13 @@ public class BossBehaviour : MonoBehaviour
         ++m_nStageIndex;
     }
 
+    public void BossDead()
+    {
+        //enable end portal
+        Debug.Log("Boss Dead");
+        end_Portal.SetActive(true);
+    }
+
     public void EnterStuckState()
     {
         m_bIsStuck = true;
@@ -234,7 +245,7 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetBool("isStunned", true);
 
         // Disable beam & reset attack.
-        m_beamLine.enabled = false;
+        mesh.SetActive(false);
         m_fBeamTime = 0.0f;
         m_animator.SetInteger("AttackID", 0);
         m_fTimeSinceGlobalAttack = 0.0f;
@@ -326,10 +337,10 @@ public class BossBehaviour : MonoBehaviour
     {
         if (m_fMeteorCDTimer <= 0.0f && m_meteor.Available() && m_availableMeteorSpawns.Count > 0)
         {
-            m_bRandomMeteor = Random.Range(0.0f, 100.0f) >= m_fRandMeteorChance;
+            m_bRandomMeteor = Random.Range(0.0f, 100.0f) <= m_fRandMeteorChance;
 
             // Ensure the player is grounded or this is a random stike.
-            if(m_playerController.IsGrounded() && m_meteorSpawnVol != null && m_availableMeteorSpawns.Contains(m_meteorSpawnVol.gameObject))
+            if(m_playerController.IsGrounded() && m_meteorSpawnVol != null)
             {
                 // Make stikes when the player is in a volume not random.
                 m_bRandomMeteor = false;
@@ -352,7 +363,7 @@ public class BossBehaviour : MonoBehaviour
             m_fMeteorCDTimer = m_fMeteorCD;
 
             // Determine whether or not this is a random strike.
-            m_bRandomMeteor = true;
+            //m_bRandomMeteor = true;
 
 
             return ENodeResult.NODE_SUCCESS;
@@ -405,12 +416,13 @@ public class BossBehaviour : MonoBehaviour
     
         if (CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
         {
+            //SetPos(m_beamOrigin.position, m_beamOrigin.position + (m_v3BeamDirection * m_fBeamMaxRange));
             return ENodeResult.NODE_SUCCESS;
         }
         else if (m_fBeamTime <= 0.0f)
         {
             // Beam attack is complete.
-            m_beamLine.enabled = false;
+            mesh.SetActive(false);
         }
     
         return ENodeResult.NODE_FAILURE;
@@ -526,12 +538,21 @@ public class BossBehaviour : MonoBehaviour
     // Track the beam's aim. Even if the beam is not in use.
     public ENodeResult ActBeamTrack()
     {
+        //Vector3 direction = m_player.transform.position - mesh.transform.position;
+       // Quaternion toRotation = Quaternion.LookRotation(direction);
+        //mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
+
+
         float fSphereMag = (m_player.transform.position - m_beamOrigin.position).magnitude;
 
         Vector3 v3EndOnRadius = PointOnSphere(m_v3BeamEnd, m_beamOrigin.position, fSphereMag);
 
-        if (m_beamLine.enabled)
+        if (mesh.activeInHierarchy)
         {
+            Vector3 direction = m_player.transform.position - mesh.transform.position;
+            Quaternion toRotation = Quaternion.LookRotation(direction);
+            mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
+
             float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
 
             float fTrackSpeed = m_fMinBeamTrackSpeed + (fBeamProgress * (m_fMaxBeamTrackSpeed - m_fMinBeamTrackSpeed));
@@ -541,7 +562,9 @@ public class BossBehaviour : MonoBehaviour
 
             // Keep beam within a tight cone of the player's position.
             if (Vector3.Dot(m_v3BeamDirection, v3PlayerDir) >= 0.95f)
+            {
                 m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, fTrackSpeed * Time.deltaTime);
+            }
             else
             {
                 m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, 500.0f * Time.deltaTime);
@@ -549,7 +572,13 @@ public class BossBehaviour : MonoBehaviour
 
         }
         else
-            m_v3BeamEnd = PointOnSphere(m_player.transform.position, m_beamOrigin.position, fSphereMag);
+        {
+            m_v3BeamEnd = PointOnSphere(m_player.transform.position + new Vector3(10,0,0), m_beamOrigin.position, fSphereMag);
+
+            Vector3 direction = (m_player.transform.position + new Vector3(30,0,0)) - mesh.transform.position;
+            Quaternion toRotation = Quaternion.LookRotation(direction);
+            mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
+        }
 
         return ENodeResult.NODE_SUCCESS;
     }
@@ -557,18 +586,13 @@ public class BossBehaviour : MonoBehaviour
     public ENodeResult ActUseBeam()
     {
         // Enable beam if it is disabled.
-        if (!m_beamLine.enabled)
+        if (!mesh.activeInHierarchy)
         {
-            m_beamLine.enabled = true;
+            mesh.SetActive(true);
         }
 
         // Look at player.
         ActTrackPlayer();
-
-        // Linerenderer points.
-        Vector3[] beamLinePoints = new Vector3[2];
-        beamLinePoints[0] = m_beamOrigin.position;
-        beamLinePoints[1] = m_beamOrigin.position + (m_v3BeamDirection * m_fBeamMaxRange);
 
         Ray beamRay = new Ray(m_beamOrigin.position, m_v3BeamDirection);
         RaycastHit beamHit;
@@ -582,12 +606,8 @@ public class BossBehaviour : MonoBehaviour
             {
                 beamHit.collider.GetComponent<EnergyPillar>().Charge(this.transform.GetComponent<BossBehaviour>());
             }
-            else
-                beamLinePoints[1] = beamHit.point;
+
         }
-
-        m_beamLine.SetPositions(beamLinePoints);
-
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -647,6 +667,17 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.SetPunchDirection(-v3PortalOffset);
 
         return;
+    }
+
+    void SetPos(Vector3 start, Vector3 end)
+    {
+        Vector3 dir = end - start;
+        Vector3 mid = (dir) / 2.0f + start;
+        mesh.transform.position = mid;
+        mesh.transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+        Vector3 scale = mesh.transform.localScale;
+        scale.y = dir.magnitude * factor;
+        mesh.transform.localScale = scale;
     }
 
     private void OnDrawGizmosSelected()

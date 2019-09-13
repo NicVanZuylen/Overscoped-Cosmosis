@@ -74,12 +74,15 @@
      <Compile Include="Assets\Code\Classes\Node.cs" />
      <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
      <Compile Include="Assets\Code\Scripts\ArmorPull.cs" />
+     <Compile Include="Assets\Code\Scripts\Beam.cs" />
      <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
      <Compile Include="Assets\Code\Scripts\CameraEffects.cs" />
      <Compile Include="Assets\Code\Scripts\ChestPlate.cs" />
+     <Compile Include="Assets\Code\Scripts\EndPortal.cs" />
      <Compile Include="Assets\Code\Scripts\EnergyPillar.cs" />
      <Compile Include="Assets\Code\Scripts\GameManager.cs" />
      <Compile Include="Assets\Code\Scripts\GrappleHook.cs" />
+     <Compile Include="Assets\Code\Scripts\HeartPull.cs" />
      <Compile Include="Assets\Code\Scripts\Menus\MainMenu.cs" />
      <Compile Include="Assets\Code\Scripts\Meteor.cs" />
      <Compile Include="Assets\Code\Scripts\MeteorAOE.cs" />
@@ -252,6 +255,7 @@
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TexCoordVertexDataNode.shader" />
      <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ColorSpaceDouble.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\TemplateExamples\UI\SimpleUI\SimpleUI.shader" />
+     <None Include="Assets\Code\BossBehaviours\BossTreePhase3.xml" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\XRay\ProceduralWall.shader" />
      <None Include="Assets\AmplifyShaderEditor\Examples\Official\SimpleNoise\SimpleNoise.shader" />
      <None Include="Assets\Materials\Shaders\SHD_Boss_Beam.shader" />
@@ -436,6 +440,9 @@
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
+ <Reference Include="com.unity.multiplayer-hlapi.Editor">
+ <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Editor.dll</HintPath>
+ </Reference>
  <Reference Include="Unity.RenderPipelines.Core.Editor">
  <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll</HintPath>
  </Reference>
@@ -460,8 +467,20 @@
  <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
  <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
  </Reference>
+ <Reference Include="com.unity.multiplayer-weaver.Editor">
+ <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/com.unity.multiplayer-weaver.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.XR.LegacyInputHelpers">
+ <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
+ </Reference>
  <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
  <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.SpatialTracking">
+ <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/UnityEditor.SpatialTracking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.SpatialTracking">
+ <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VisualEffectGraph.Editor">
  <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Editor.dll</HintPath>
@@ -480,21 +499,6 @@
  </Reference>
  <Reference Include="Unity.Analytics.DataPrivacy">
  <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
- </Reference>
- <Reference Include="com.unity.multiplayer-hlapi.Editor">
- <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/com.unity.multiplayer-hlapi.Editor.dll</HintPath>
- </Reference>
- <Reference Include="com.unity.multiplayer-weaver.Editor">
- <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/com.unity.multiplayer-weaver.Editor.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.XR.LegacyInputHelpers">
- <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.SpatialTracking">
- <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/UnityEditor.SpatialTracking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.SpatialTracking">
- <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/UnityEngine.SpatialTracking.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.XR.LegacyInputHelpers">
  <HintPath>C:/Users/Nic/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/UnityEditor.XR.LegacyInputHelpers.dll</HintPath>

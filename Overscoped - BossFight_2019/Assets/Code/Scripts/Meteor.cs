@@ -36,6 +36,11 @@ public class Meteor : MonoBehaviour
     // Meteor AOE pool
     private Stack<MeteorAOE> m_meteorAOEStack;
 
+    private void Awake()
+    {
+        Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_player.GetComponent<Collider>());
+    }
+
     public void Init(List<GameObject> spawnVolumePool)
     {
         m_playerStats = m_player.GetComponent<PlayerStats>();
@@ -111,8 +116,6 @@ public class Meteor : MonoBehaviour
     {
         // Remove AOE object from object pool and activate.
         m_meteorAOEStack.Pop().AOE(m_targetVolume);
-
-        Debug.Log(collider.gameObject.name);
 
         // Deal damage to the player.
         if(collider.gameObject == m_player)

@@ -200,7 +200,7 @@ Material:
     - _PPDPrimitiveWidth: 1
     - _ReceivesSSR: 1
     - _RefractionModel: 0
-    - _RoughnessModifier: 0
+    - _RoughnessModifier: 1
     - _SSRefractionProjectionModel: 0
     - _ShiverDirectionality: 0.5
     - _ShiverDrag: 0.2
@@ -209,8 +209,8 @@ Material:
     - _SmoothnessRemapMin: 0
     - _SpecularAAScreenSpaceVariance: 0.1
     - _SpecularAAThreshold: 0.2
-    - _SpecularAngle: 0
-    - _SpecularSize: 0
+    - _SpecularAngle: 0.676
+    - _SpecularSize: 0.092
     - _SrcBlend: 1
     - _StencilRef: 2
     - _StencilRefDepth: 0
@@ -247,8 +247,8 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColourAdd: {r: 0, g: 0, b: 0, a: 0}
-    - _ColourMult: {r: 1, g: 1, b: 1, a: 0}
+    - _ColourAdd: {r: 0.2830189, g: 0.08254717, b: 0, a: 0}
+    - _ColourMult: {r: 1, g: 0.765893, b: 0.4481132, a: 0}
     - _ColourSubtract: {r: 0, g: 0, b: 0, a: 0}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
@@ -262,7 +262,7 @@ Material:
     - _SpecularColour: {r: 1, g: 0.5883557, b: 0, a: 0}
     - _SpecularTiling: {r: 1, g: 1, b: 0, a: 0}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
-    - _Tiling: {r: 3, g: 1, b: 0, a: 0}
+    - _Tiling: {r: 10, g: 2, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}
     - _UVDetailsMappingMask: {r: 1, g: 0, b: 0, a: 0}
     - _UVMappingMask: {r: 1, g: 0, b: 0, a: 0}

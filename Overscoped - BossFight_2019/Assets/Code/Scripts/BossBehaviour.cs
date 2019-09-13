@@ -108,7 +108,6 @@ public class BossBehaviour : MonoBehaviour
     private float m_fPortalPunchCDTimer;
 
     // Beam attack
-    private LineRenderer m_beamLine;
     public Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
     private EnergyPillar[] m_energyPillars;
@@ -134,7 +133,6 @@ public class BossBehaviour : MonoBehaviour
         m_playerController = m_player.GetComponent<PlayerController>();
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_animator = GetComponent<Animator>();
-        m_beamLine = GetComponent<LineRenderer>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
         end_Portal = GameObject.FindGameObjectWithTag("EndPortal");
@@ -219,7 +217,7 @@ public class BossBehaviour : MonoBehaviour
             m_fMeteorCDTimer -= Time.deltaTime;
 
         // Only reduce beam cooldown when not in use.
-        if(!m_beamLine.enabled)
+        if(!mesh.activeInHierarchy)
             m_fBeamAttackCDTimer -= Time.deltaTime;
     }
 
@@ -247,7 +245,7 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetBool("isStunned", true);
 
         // Disable beam & reset attack.
-        m_beamLine.enabled = false;
+        mesh.SetActive(false);
         m_fBeamTime = 0.0f;
         m_animator.SetInteger("AttackID", 0);
         m_fTimeSinceGlobalAttack = 0.0f;
@@ -418,7 +416,7 @@ public class BossBehaviour : MonoBehaviour
     
         if (CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
         {
-            SetPos(m_beamOrigin.position, m_beamOrigin.position + (m_v3BeamDirection * m_fBeamMaxRange));
+            //SetPos(m_beamOrigin.position, m_beamOrigin.position + (m_v3BeamDirection * m_fBeamMaxRange));
             return ENodeResult.NODE_SUCCESS;
         }
         else if (m_fBeamTime <= 0.0f)
@@ -540,12 +538,21 @@ public class BossBehaviour : MonoBehaviour
     // Track the beam's aim. Even if the beam is not in use.
     public ENodeResult ActBeamTrack()
     {
+        //Vector3 direction = m_player.transform.position - mesh.transform.position;
+       // Quaternion toRotation = Quaternion.LookRotation(direction);
+        //mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
+
+
         float fSphereMag = (m_player.transform.position - m_beamOrigin.position).magnitude;
 
         Vector3 v3EndOnRadius = PointOnSphere(m_v3BeamEnd, m_beamOrigin.position, fSphereMag);
 
         if (mesh.activeInHierarchy)
         {
+            Vector3 direction = m_player.transform.position - mesh.transform.position;
+            Quaternion toRotation = Quaternion.LookRotation(direction);
+            mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
+
             float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
 
             float fTrackSpeed = m_fMinBeamTrackSpeed + (fBeamProgress * (m_fMaxBeamTrackSpeed - m_fMinBeamTrackSpeed));
@@ -565,7 +572,13 @@ public class BossBehaviour : MonoBehaviour
 
         }
         else
+        {
             m_v3BeamEnd = PointOnSphere(m_player.transform.position + new Vector3(10,0,0), m_beamOrigin.position, fSphereMag);
+
+            Vector3 direction = (m_player.transform.position + new Vector3(30,0,0)) - mesh.transform.position;
+            Quaternion toRotation = Quaternion.LookRotation(direction);
+            mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
+        }
 
         return ENodeResult.NODE_SUCCESS;
     }
@@ -581,11 +594,6 @@ public class BossBehaviour : MonoBehaviour
         // Look at player.
         ActTrackPlayer();
 
-        // Linerenderer points.
-        Vector3[] beamLinePoints = new Vector3[2];
-        beamLinePoints[0] = m_beamOrigin.position;
-        beamLinePoints[1] = m_beamOrigin.position + (m_v3BeamDirection * m_fBeamMaxRange);
-
         Ray beamRay = new Ray(m_beamOrigin.position, m_v3BeamDirection);
         RaycastHit beamHit;
         if(Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
@@ -598,12 +606,8 @@ public class BossBehaviour : MonoBehaviour
             {
                 beamHit.collider.GetComponent<EnergyPillar>().Charge(this.transform.GetComponent<BossBehaviour>());
             }
-            else
-                beamLinePoints[1] = beamHit.point;
+
         }
-
-        //m_beamLine.SetPositions(beamLinePoints);
-
         return ENodeResult.NODE_SUCCESS;
     }
 

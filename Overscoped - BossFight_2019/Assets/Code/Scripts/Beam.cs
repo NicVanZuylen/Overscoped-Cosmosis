@@ -16,15 +16,17 @@ public class Beam : MonoBehaviour
     //particle system renderer
     private ParticleSystemRenderer psr;
     //Position at the end of the beam
-    [SerializeField]
     private Vector3 m_v3EndPoint;
     //Positions of where the particles need to spawn
-    [SerializeField]
     private Vector3[] m_v3ParticleSpawnPositions;
-    [SerializeField]
     private ParticleSystem.Particle[] particles;
     private int m_PositionArrayLength;
     public GameObject player;
+    private bool tempFix = false;
+    [SerializeField]
+    private BossBehaviour boss;
+    [SerializeField]
+    private float m_speed;
 
     void BeamControl()
     {
@@ -35,45 +37,60 @@ public class Beam : MonoBehaviour
         psr.material.SetFloat("_FinalSize", m_fFinalSize);
     }
 
+    public Vector3 PointOnSphere(Vector3 v3Point, Vector3 v3SpherePos, float fSphereRadius)
+    {
+        Vector3 v3Dir = (v3Point - v3SpherePos).normalized;
+
+        return v3SpherePos + (v3Dir * fSphereRadius);
+    }
+
     void BeamCastRay()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, player.transform.position, out hit, m_fMaxLength))
+        if (Physics.Raycast(transform.position, boss.m_v3BeamEnd - transform.position, out hit, m_fMaxLength))
         {
             m_fHitLength = hit.distance;
             m_PositionArrayLength = Mathf.RoundToInt(hit.distance / (m_ParticleMeshLength * m_fFinalSize));
-            if (m_PositionArrayLength < hit.distance)
-                m_PositionArrayLength += 1;
+            m_PositionArrayLength += 2;
             m_v3ParticleSpawnPositions = new Vector3[m_PositionArrayLength];
             m_v3EndPoint = hit.point;
         }
         else
         {
-
             m_fHitLength = m_fMaxLength;
             m_PositionArrayLength = Mathf.RoundToInt(m_fMaxLength / (m_ParticleMeshLength * m_fFinalSize));
-            if(m_PositionArrayLength < m_fMaxLength)
-                m_PositionArrayLength += 1;
+            m_PositionArrayLength += 2;
             m_v3ParticleSpawnPositions = new Vector3[m_PositionArrayLength];
-            m_v3EndPoint = Vector3.MoveTowards(transform.position, player.transform.position * 1000f, m_fMaxLength);
+        
+            m_v3EndPoint = Vector3.MoveTowards(transform.position, boss.m_v3BeamEnd, 1000f*Time.deltaTime);
         }
     }
 
     void Start()
     {
+        m_v3EndPoint = player.transform.position;
         ps = GetComponent<ParticleSystem>();
         psr = GetComponent<ParticleSystemRenderer>();
         m_fHitLength = 0;
         BeamCastRay();
         BeamControl();
         UpdateBeamParts();
+        tempFix = true;
+    }
+
+    void OnEnable()
+    {
+        if (tempFix == true)
+        {
+            UpdateBeamParts();
+        }
     }
 
     void UpdateBeamParts()
     {
         particles = new ParticleSystem.Particle[m_PositionArrayLength];
 
-        for(int i = 0; i< m_PositionArrayLength; i++)
+        for(int i = 0; i < m_PositionArrayLength; i++)
         {
             m_v3ParticleSpawnPositions[i] = new Vector3(0f, 0f, 0f) + new Vector3(0f, 0f, i * m_ParticleMeshLength * m_fFinalSize);
             particles[i].position = m_v3ParticleSpawnPositions[i];
@@ -87,6 +104,7 @@ public class Beam : MonoBehaviour
 
     void Update()
     {
+        Debug.DrawRay(transform.position, boss.m_v3BeamEnd - transform.position);
         if(scalingWithSize == true)
         {
             m_fFinalSize = gameObject.transform.lossyScale.x;

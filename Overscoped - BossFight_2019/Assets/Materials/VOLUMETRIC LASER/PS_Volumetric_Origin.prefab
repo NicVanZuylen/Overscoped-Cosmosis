@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1590132554}
   - component: {fileID: 1590132553}
   m_Layer: 0
-  m_Name: PS_Volumetric_Boss_Origin_05
+  m_Name: PS_Volumetric_Boss_Origin_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 1144457191832891434}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &1590132554
 ParticleSystem:
@@ -284,7 +284,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 20
+      scalar: 25
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -4822,7 +4822,7 @@ GameObject:
   - component: {fileID: 1144457191537003708}
   - component: {fileID: 1144457191537003709}
   m_Layer: 0
-  m_Name: PS_Volumetric_Boss_Origin_03
+  m_Name: PS_Volumetric_Boss_Origin_05
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4840,7 +4840,7 @@ Transform:
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 1144457191832891434}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &1144457191537003708
 ParticleSystem:
@@ -9594,9 +9594,9 @@ Transform:
   - {fileID: 1144457192578083304}
   - {fileID: 1144457193320653050}
   - {fileID: 1144457192152579212}
-  - {fileID: 1144457191537003710}
-  - {fileID: 1144457192135810073}
   - {fileID: 1590132552}
+  - {fileID: 1144457192135810073}
+  - {fileID: 1144457191537003710}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
@@ -24257,7 +24257,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 9
       minScalar: 1
       maxCurve:
         serializedVersion: 2

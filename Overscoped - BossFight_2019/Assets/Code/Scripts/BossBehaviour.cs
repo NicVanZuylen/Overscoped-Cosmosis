@@ -93,7 +93,7 @@ public class BossBehaviour : MonoBehaviour
     private float m_fTimeSinceGlobalAttack = 0.0f;
 
     private Portal m_portalScript;
-    private Vector3 m_v3BeamEnd;
+    public Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
     private float m_fBeamTime;
 

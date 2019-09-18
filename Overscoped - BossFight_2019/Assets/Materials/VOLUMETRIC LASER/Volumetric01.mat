@@ -7,26 +7,30 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MAT_PS_Default
-  m_Shader: {fileID: 4800000, guid: e75f854f40e649e468cc6fac906def94, type: 3}
+  m_Name: Volumetric01
+  m_Shader: {fileID: 4800000, guid: 48006c93c2950c640a24330a8bfa2520, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3050
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _Sprite:
-        m_Texture: {fileID: 2800000, guid: 518a3ea91dd960a4aa42abef965055b2, type: 3}
+    - _Debug:
+        m_Texture: {fileID: 2800000, guid: df9c56c350207114cbd7b98256778937, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _texcoord:
-        m_Texture: {fileID: 0}
+    - _Noise:
+        m_Texture: {fileID: 2800000, guid: e451e4a7415133e499b571c26159bd98, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _ColourMultiplier: 20
-    m_Colors: []
+    - _VertexOffsetStrength: 0.3
+    m_Colors:
+    - _ColourH: {r: 1, g: 1, b: 1, a: 0}
+    - _ColourL: {r: 0, g: 0, b: 0, a: 0}
+    - _Offset: {r: -2, g: 0.5, b: 0, a: 0}
+    - _Tiling: {r: 1, g: 1, b: 0, a: 0}

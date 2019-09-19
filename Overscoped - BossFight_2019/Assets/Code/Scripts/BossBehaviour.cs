@@ -117,10 +117,11 @@ public class BossBehaviour : MonoBehaviour
     public GameObject mesh;
 
     // Meteor attack
-    private List<GameObject> m_availableMeteorSpawns;
+    public List<GameObject> m_availableMeteorSpawns;
+    public List<GameObject> m_choosenMeteorSpawns;
     private float m_fMeteorCDTimer;
     private bool m_bRandomMeteor;
-    private static BoxCollider m_meteorSpawnVol;
+    private static BoxCollider m_meteorWithPlayer;
 
     // Armor
     private PullObject[] m_armorPullScripts;
@@ -234,6 +235,7 @@ public class BossBehaviour : MonoBehaviour
     {
         //enable end portal
         Debug.Log("Boss Dead");
+        gameObject.SetActive(false);
         end_Portal.SetActive(true);
     }
 
@@ -340,7 +342,7 @@ public class BossBehaviour : MonoBehaviour
             m_bRandomMeteor = Random.Range(0.0f, 100.0f) <= m_fRandMeteorChance;
 
             // Ensure the player is grounded or this is a random stike.
-            if(m_playerController.IsGrounded() && m_meteorSpawnVol != null)
+            if(m_playerController.IsGrounded() && m_meteorWithPlayer != null)
             {
                 // Make stikes when the player is in a volume not random.
                 m_bRandomMeteor = false;
@@ -472,48 +474,70 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetInteger("AttackID", 2);
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
-        if(m_meteorSpawnVol != null && !m_bRandomMeteor)
+        int m_AmountOfMeteors = Random.Range(1, 4);
+
+        List<GameObject> m_MeteorSpawns = new List<GameObject>(m_availableMeteorSpawns);
+
+        m_choosenMeteorSpawns = new List<GameObject>();
+        for (int i = 0; i < m_AmountOfMeteors; i++)
         {
-            Debug.Log("Meteor Attack!");
-
-            m_availableMeteorSpawns.Remove(m_meteorSpawnVol.transform.parent.gameObject);
-
-            // Calculate random spawn point and summon meteor.
-            Vector3 v3RandomSpawn = m_meteorSpawnVol.transform.position;
-
-            v3RandomSpawn.x += m_meteorSpawnVol.center.x + Random.Range(m_meteorSpawnVol.size.x * 0.5f, m_meteorSpawnVol.size.x * -0.5f);
-            v3RandomSpawn.y += m_meteorSpawnVol.center.y + Random.Range(m_meteorSpawnVol.size.y * 0.5f, m_meteorSpawnVol.size.y * -0.5f);
-            v3RandomSpawn.z += m_meteorSpawnVol.center.z + Random.Range(m_meteorSpawnVol.size.z * 0.5f, m_meteorSpawnVol.size.z * -0.5f);
-
-            m_meteor.Summon(v3RandomSpawn, m_meteorSpawnVol.transform.parent.gameObject);
+            GameObject meteor = m_MeteorSpawns[Random.Range(1, m_MeteorSpawns.Count)];
+            m_MeteorSpawns.Remove(meteor);
+            m_choosenMeteorSpawns.Add(meteor);
         }
-        else if(m_bRandomMeteor)
-        {
-            Debug.Log("Random Meteor Attack!");
 
-            if (m_availableMeteorSpawns.Count <= 0)
-                return ENodeResult.NODE_SUCCESS;
 
-            int nRandomIndex = Random.Range(0, m_availableMeteorSpawns.Count);
 
-            // Pick random spawn point object.
-            GameObject spawnObj = m_availableMeteorSpawns[nRandomIndex].transform.GetChild(0).gameObject;
-            m_availableMeteorSpawns.RemoveAt(nRandomIndex);
 
-            // Get the spawn volume.
-            BoxCollider spawnBox = spawnObj.GetComponent<BoxCollider>();
 
-            // Calculate random spawn point and summon meteor.
-            Vector3 v3RandomSpawn = spawnObj.transform.position;
 
-            v3RandomSpawn.x += spawnBox.center.x + Random.Range(spawnBox.size.x * 0.5f, spawnBox.size.x * -0.5f);
-            v3RandomSpawn.y += spawnBox.center.y + Random.Range(spawnBox.size.y * 0.5f, spawnBox.size.y * -0.5f);
-            v3RandomSpawn.z += spawnBox.center.z + Random.Range(spawnBox.size.z * 0.5f, spawnBox.size.z * -0.5f);
 
-            m_meteor.Summon(v3RandomSpawn, spawnObj.transform.parent.gameObject);
 
-            m_bRandomMeteor = false;
-        }
+
+
+
+        //if(m_meteorWithPlayer != null && !m_bRandomMeteor)
+        //{
+        //    Debug.Log("Meteor Attack!");
+        //
+        //    m_availableMeteorSpawns.Remove(m_meteorSpawnVol.transform.parent.gameObject);
+        //
+        //    // Calculate random spawn point and summon meteor.
+        //    Vector3 v3RandomSpawn = m_meteorSpawnVol.transform.position;
+        //
+        //    v3RandomSpawn.x += m_meteorSpawnVol.center.x + Random.Range(m_meteorSpawnVol.size.x * 0.5f, m_meteorSpawnVol.size.x * -0.5f);
+        //    v3RandomSpawn.y += m_meteorSpawnVol.center.y + Random.Range(m_meteorSpawnVol.size.y * 0.5f, m_meteorSpawnVol.size.y * -0.5f);
+        //    v3RandomSpawn.z += m_meteorSpawnVol.center.z + Random.Range(m_meteorSpawnVol.size.z * 0.5f, m_meteorSpawnVol.size.z * -0.5f);
+        //
+        //    m_meteor.Summon(v3RandomSpawn, m_meteorSpawnVol.transform.parent.gameObject);
+        //}
+        //else if(m_bRandomMeteor)
+        //{
+        //    Debug.Log("Random Meteor Attack!");
+        //
+        //    if (m_availableMeteorSpawns.Count <= 0)
+        //        return ENodeResult.NODE_SUCCESS;
+        //
+        //    int nRandomIndex = Random.Range(0, m_availableMeteorSpawns.Count);
+        //
+        //    // Pick random spawn point object.
+        //    GameObject spawnObj = m_availableMeteorSpawns[nRandomIndex].transform.GetChild(0).gameObject;
+        //    m_availableMeteorSpawns.RemoveAt(nRandomIndex);
+        //
+        //    // Get the spawn volume.
+        //    BoxCollider spawnBox = spawnObj.GetComponent<BoxCollider>();
+        //
+        //    // Calculate random spawn point and summon meteor.
+        //    Vector3 v3RandomSpawn = spawnObj.transform.position;
+        //
+        //    v3RandomSpawn.x += spawnBox.center.x + Random.Range(spawnBox.size.x * 0.5f, spawnBox.size.x * -0.5f);
+        //    v3RandomSpawn.y += spawnBox.center.y + Random.Range(spawnBox.size.y * 0.5f, spawnBox.size.y * -0.5f);
+        //    v3RandomSpawn.z += spawnBox.center.z + Random.Range(spawnBox.size.z * 0.5f, spawnBox.size.z * -0.5f);
+        //
+        //    m_meteor.Summon(v3RandomSpawn, spawnObj.transform.parent.gameObject);
+        //
+        //    m_bRandomMeteor = false;
+        //}
 
         return ENodeResult.NODE_SUCCESS;
     }
@@ -621,7 +645,7 @@ public class BossBehaviour : MonoBehaviour
     */
     public static void SetMeteorSpawn(BoxCollider spawner)
     {
-        m_meteorSpawnVol = spawner;
+        m_meteorWithPlayer = spawner;
     }
 
     public void ResetAnimToIdle()

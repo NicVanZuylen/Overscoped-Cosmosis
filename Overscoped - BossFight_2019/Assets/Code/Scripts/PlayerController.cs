@@ -82,7 +82,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_v3SurfaceRight;
     private Vector3 m_v3SurfaceUp;
     private Vector3 m_v3SurfaceForward;
-    private Vector3 m_v3Velocity;
+    public Vector3 m_v3Velocity;
     private float m_fSprintDot;
     private bool m_bShouldSprint;
     private bool m_bShouldJump;
@@ -100,12 +100,14 @@ public class PlayerController : MonoBehaviour
     private float m_fLookEulerX;
     private float m_fLookEulerY;
     private float m_fFOVIncrease;
+    private bool m_bFocused; // Whether or not the player's cursor is locked and focused on camera movement.
 
     // Overrides
     public delegate Vector3 OverrideFunction(PlayerController controller);
 
     OverrideFunction m_overrideFunction;
     bool m_bOverridden;
+    bool m_bJustResumed;
 
     private void Awake()
     {
@@ -137,9 +139,8 @@ public class PlayerController : MonoBehaviour
 
         // Determine initial impulse added to vertical velocity when jumping.
         m_fJumpInitialVelocity = (2 * m_fJumpHeight) / (m_fJumpDuration * 0.5f);
-    
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+
+        SetFocus(true);
     }
 
     private void OnDisable()
@@ -150,6 +151,34 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         m_controller.enabled = true;
+    }
+
+    /*
+    Description: Set whether or not the cursor is focused on camera movement.
+    Param:
+        bool bFocus: Whether or not to focus.
+    */
+    public void SetFocus(bool bFocus)
+    {
+        m_bFocused = bFocus;
+        Cursor.visible = !bFocus;
+
+        if (bFocus)
+            Cursor.lockState = CursorLockMode.Locked;
+        else
+            Cursor.lockState = CursorLockMode.None;
+    }
+
+    /*
+    Description: Set whether or not the player controller is paused.
+    Param:
+        bool bPause: Whether or not to pause.
+    */
+    public void SetPaused(bool bPause)
+    {
+        SetFocus(!bPause);
+
+        m_bJustResumed = !bPause;
     }
 
     /*
@@ -182,6 +211,9 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 v3Direction = Vector3.zero;
         int nMoveDirectionCount = 0;
+
+        if (PauseMenu.IsPaused())
+            return Vector3.zero;
 
         // On the ground, move relative to the camera and the surface.
         if (Input.GetKey(KeyCode.W))
@@ -423,6 +455,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         // ------------------------------------------------------------------------------------------------------
         // Movement override
 
@@ -530,7 +565,6 @@ public class PlayerController : MonoBehaviour
             // Reset movement vectors for airborn movement.
 
             // We're giving it the upward vector to represent a flat surface.
-            //CalculateSurfaceAxes(m_groundHit.normal);
             CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
 
             // ------------------------------------------------------------------------------------------------------
@@ -585,13 +619,19 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         // ------------------------------------------------------------------------------------------------------
         // Mouse look
 
-        m_fLookEulerX -= Input.GetAxis("Mouse Y");
-        m_fLookEulerY += Input.GetAxis("Mouse X");
+        if(m_bFocused)
+        {
+            m_fLookEulerX -= Input.GetAxis("Mouse Y");
+            m_fLookEulerY += Input.GetAxis("Mouse X");
 
-        m_fLookEulerX = Mathf.Clamp(m_fLookEulerX, -89.9f, 89.9f);
+            m_fLookEulerX = Mathf.Clamp(m_fLookEulerX, -89.9f, 89.9f);
+        }
 
         m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler());
 
@@ -660,7 +700,10 @@ public class PlayerController : MonoBehaviour
         m_controller.Move(m_v3Velocity * Time.deltaTime);
 
         // Get modified velocity back from the controller.
-        m_v3Velocity = m_controller.velocity;
+        if(!m_bJustResumed)
+            m_v3Velocity = m_controller.velocity;
+        else
+            m_bJustResumed = false;
     }
 
     private void OnCollisionEnter(Collision collision)

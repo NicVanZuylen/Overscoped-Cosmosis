@@ -1785,6 +1785,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
+      propertyPath: m_reticleMats.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
       propertyPath: m_fMaxHealth
       value: 200
       objectReference: {fileID: 0}
@@ -1900,9 +1905,14 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 240a198202cc0cd4d8613720f900b454, type: 2}
     - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
-      propertyPath: m_reticleMat
+      propertyPath: m_reticleMats.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 330970325837f5c498b3d0a9cdb4f047, type: 2}
+    - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
+        type: 3}
+      propertyPath: m_reticleMats.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: a9045109c9b457f4b866ab7967008ef3, type: 2}
     - target: {fileID: 6149349662412444835, guid: ed16ca3417fe22f478cf87da9d692428,
         type: 3}
       propertyPath: m_armHealthMat

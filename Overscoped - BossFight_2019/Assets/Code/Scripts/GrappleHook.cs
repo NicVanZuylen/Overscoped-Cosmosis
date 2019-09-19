@@ -236,6 +236,9 @@ public class GrappleHook : MonoBehaviour
 
     void Update()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         // ------------------------------------------------------------------------------------------------------------------------------
         // Shooting
 
@@ -401,6 +404,9 @@ public class GrappleHook : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         m_grapLineEffects.ProcessLine(m_grappleLine, m_controller, m_grappleNode, m_v3GrapplePoint, m_fGrappleLineProgress / m_fGrapLineLength, m_bGrappleHookActive);
         m_pullLineEffects.ProcessLine(m_pullLine, m_controller, m_pullNode, m_pullEndPoint.transform.position, m_fPullLineProgress / m_fPullLineLength, m_bPullHookActive);
     }

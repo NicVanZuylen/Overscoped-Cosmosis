@@ -11,10 +11,9 @@ GameObject:
   - component: {fileID: 8176933855311526725}
   - component: {fileID: 8176933855311526724}
   - component: {fileID: 8176933855311526727}
-  - component: {fileID: 8176933855311526726}
   - component: {fileID: 8176933855311526730}
   - component: {fileID: 8176933855311526731}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: End Portal
   m_TagString: EndPortal
   m_Icon: {fileID: 0}
@@ -80,20 +79,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &8176933855311526726
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8176933855311526721}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!65 &8176933855311526730
 BoxCollider:
   m_ObjectHideFlags: 0

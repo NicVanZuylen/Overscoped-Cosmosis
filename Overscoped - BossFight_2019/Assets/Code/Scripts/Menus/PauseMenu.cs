@@ -9,6 +9,10 @@ public class PauseMenu : MonoBehaviour
     [SerializeField]
     private GameObject m_pauseMenu = null;
 
+    [Tooltip("Parent object of all elements in credits screen.")]
+    [SerializeField]
+    private GameObject m_creditsScreen = null;
+
     private PlayerController m_playerController;
     private ScreenFade m_fadeScript;
     private static bool m_bPaused;
@@ -79,9 +83,25 @@ public class PauseMenu : MonoBehaviour
     {
         m_bPaused = false;
         Time.timeScale = 1.0f;
+        m_playerController.SetFocus(false);
 
         // Loads title screen scene.
         SceneManager.LoadScene(0);
+    }
+
+    /*
+    Description: Show the credits screen.
+    */
+    public void ShowCreditsScreen()
+    {
+        PauseGame();
+
+        // Show credits UI.
+        m_creditsScreen.SetActive(true);
+
+        // Reverse fade.
+        m_fadeScript.SetFadeRate(0.3f);
+        m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_OUT);
     }
 
     /*

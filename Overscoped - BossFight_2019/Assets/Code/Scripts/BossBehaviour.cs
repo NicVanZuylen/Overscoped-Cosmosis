@@ -18,6 +18,8 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private Meteor m_meteor = null;
 
+    public MeteorManager m_meteorManager;
+
     [Tooltip("Armour object reference.")]
     [SerializeField]
     private GameObject[] m_armorPeices = null;
@@ -117,8 +119,8 @@ public class BossBehaviour : MonoBehaviour
     public GameObject mesh;
 
     // Meteor attack
-    public List<GameObject> m_availableMeteorSpawns;
-    public List<GameObject> m_choosenMeteorSpawns;
+    public List<MeteorInitialize> m_availableMeteorSpawns;
+    public List<MeteorInitialize> m_chosenMeteorSpawns;
     private float m_fMeteorCDTimer;
     private bool m_bRandomMeteor;
     private static BoxCollider m_meteorWithPlayer;
@@ -150,15 +152,19 @@ public class BossBehaviour : MonoBehaviour
 
         // Meteor
         GameObject[] allMeteorSpawns = GameObject.FindGameObjectsWithTag("MeteorSpawn");
+        
 
-        m_availableMeteorSpawns = new List<GameObject>();
+        m_availableMeteorSpawns = new List<MeteorInitialize>();
 
         // Add meteor spawns to spawn object pool.
         for (int i = 0; i < allMeteorSpawns.Length; ++i)
-            m_availableMeteorSpawns.Add(allMeteorSpawns[i]);
+        {
+            MeteorInitialize meteor = allMeteorSpawns[i].GetComponent<MeteorInitialize>();
+            m_availableMeteorSpawns.Add(meteor);
+        }
 
         // Initialize meteor.
-        m_meteor.Init(m_availableMeteorSpawns);
+        //m_meteor.Init(m_availableMeteorSpawns);
 
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.tag = "NoGrapple";
@@ -214,7 +220,7 @@ public class BossBehaviour : MonoBehaviour
             m_fPortalPunchCDTimer -= Time.deltaTime;
 
         // Only reduce meteor attack cooldown when the meteor is not active.
-        if(!m_meteor.gameObject.activeInHierarchy)
+        if(CondMeteorAvailable() == ENodeResult.NODE_FAILURE)
             m_fMeteorCDTimer -= Time.deltaTime;
 
         // Only reduce beam cooldown when not in use.
@@ -337,7 +343,7 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondMeteorAvailable()
     {
-        if (m_fMeteorCDTimer <= 0.0f && m_meteor.Available() && m_availableMeteorSpawns.Count > 0)
+        if (m_fMeteorCDTimer <= 0.0f)
         {
             m_bRandomMeteor = Random.Range(0.0f, 100.0f) <= m_fRandMeteorChance;
 
@@ -469,23 +475,38 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult ActPlayMeteorAnim()
     {
+        //Sets the cooldown timers
         m_fMeteorCDTimer = m_fMeteorCD;
-
-        m_animator.SetInteger("AttackID", 2);
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
+        //Sets the animator to the meteor animation
+        m_animator.SetInteger("AttackID", 2);
+
+        //Gets a random amount of meteors to spawn
         int m_AmountOfMeteors = Random.Range(1, 4);
 
-        List<GameObject> m_MeteorSpawns = new List<GameObject>(m_availableMeteorSpawns);
+        //Copys the availableMeteorSpawns list
+        List<MeteorInitialize> m_MeteorSpawns = new List<MeteorInitialize>(m_availableMeteorSpawns);
 
-        m_choosenMeteorSpawns = new List<GameObject>();
+        //Resets the chosenMeteorSpawns list
+        m_chosenMeteorSpawns = new List<MeteorInitialize>();
+        //Goes though the amount of meteors to spawn
         for (int i = 0; i < m_AmountOfMeteors; i++)
         {
-            GameObject meteor = m_MeteorSpawns[Random.Range(1, m_MeteorSpawns.Count)];
+            //Chooses a random meteor spawn
+            MeteorInitialize meteor = m_MeteorSpawns[Random.Range(1, m_MeteorSpawns.Count)];
+            //Pops meteor out so it isn't chosen again
             m_MeteorSpawns.Remove(meteor);
-            m_choosenMeteorSpawns.Add(meteor);
+            //Adds the chosen meteor spawn into the list
+            m_chosenMeteorSpawns.Add(meteor);
+
+            m_meteorManager.Add(meteor);
         }
 
+        m_meteorManager.SummonList();
+
+        //Resets the list
+        m_meteorManager.Reset();
 
 
 

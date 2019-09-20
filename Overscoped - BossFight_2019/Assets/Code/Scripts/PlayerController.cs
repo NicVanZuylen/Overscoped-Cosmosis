@@ -633,7 +633,8 @@ public class PlayerController : MonoBehaviour
             m_fLookEulerX = Mathf.Clamp(m_fLookEulerX, -89.9f, 89.9f);
         }
 
-        m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler());
+        m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler() + m_cameraEffects.HeadBobbingEuler());
+        m_cameraTransform.localPosition = m_cameraEffects.HeadBobbingOffset();
 
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceUp * 3.0f), Color.green);

@@ -26,10 +26,16 @@ public class CameraEffects : MonoBehaviour
     private List<CameraSplineState> m_camSpline;
     private CameraSplineState m_currentSplineState;
     private CameraSplineState m_nextSplineState;
-    private Vector3 m_v3StartPosition;
     private Quaternion m_currentRotOffset;
     private Quaternion m_startCamRot;
     private Quaternion m_shakeRot;
+    private Vector3 m_v3StartPosition;
+    private Vector3 m_v3BobbingEuler;
+    private Vector3 m_v3BobbingOffset;
+    private float m_fBobbingLevel; // Range between 0 and 1.
+    private float m_fSideBobbingLevel; // Range between -1 and 1.
+    private int m_nBobbingDirection; // 1 or -1.
+    private int m_nBobbingSideDirection;
     private float m_fShakeDuration;
     private float m_fShakeReturnTime;
     private float m_fCurrentShakeDelay;
@@ -54,15 +60,13 @@ public class CameraEffects : MonoBehaviour
 
         m_fShakeDuration = 0.0f;
         m_fShakeMagnitude = 0.0f;
+
+        m_nBobbingDirection = -1;
+        m_nBobbingSideDirection = -1;
     }
 
     void Update()
     {
-        //for (int i = 0; i < m_camSpline.Count - 1; ++i)
-        //{
-        //    Debug.DrawLine(m_camSpline[i].m_v4Position, m_camSpline[i + 1].m_v4Position, Color.magenta);
-        //}
-
         m_startCamRot = transform.localRotation;
 
         // Apply shake.
@@ -71,7 +75,43 @@ public class CameraEffects : MonoBehaviour
         // Apply FOV lerp offset.
         m_camera.fieldOfView = Mathf.Lerp(m_camera.fieldOfView, m_fStartFOV + m_fFOVOffset, m_fFOVLerpRate);
 
+        UpdateBobbing();
+
+        if (Input.GetKeyDown(KeyCode.B))
+            Bob();
+
         m_fFOVOffset = 0.0f;
+    }
+
+    public void UpdateBobbing()
+    {
+        const float fBobbingSpeed = 7.0f;
+        const float fBobbingAngleMagnitude = 0.8f;
+        const float fBobbingPosMagnitude = 0.07f;
+
+        m_fBobbingLevel += Time.deltaTime * fBobbingSpeed * m_nBobbingDirection;
+        m_fBobbingLevel = Mathf.Clamp(m_fBobbingLevel, 0.0f, 1.0f);
+
+        m_fSideBobbingLevel = Mathf.MoveTowards(m_fSideBobbingLevel, m_nBobbingSideDirection, fBobbingSpeed * Time.deltaTime);
+
+        if (m_fBobbingLevel >= 1.0f)
+        {
+            m_nBobbingDirection = -1;
+            m_nBobbingSideDirection = -m_nBobbingSideDirection;
+        }
+
+        m_v3BobbingEuler.x = Mathf.Abs(Mathf.Sin(m_fBobbingLevel * Mathf.PI * 0.5f)) * fBobbingAngleMagnitude;
+        //m_v3BobbingEuler.y = Mathf.Abs(Mathf.Sin(m_fSideBobbingLevel * Mathf.PI * 0.5f)) * 2.0f;
+
+        m_v3BobbingOffset.y = -Mathf.Abs(Mathf.Sin(m_fBobbingLevel * Mathf.PI * 0.5f)) * fBobbingPosMagnitude;
+    }
+
+    public void Bob()
+    {
+        if (m_nBobbingDirection < 0)
+            m_nBobbingDirection = 1;
+
+        //m_nBobbingSideDirection = -m_nBobbingSideDirection;
     }
 
     /*
@@ -144,6 +184,24 @@ public class CameraEffects : MonoBehaviour
     public Vector3 ShakeEuler()
     {
         return m_currentRotOffset.eulerAngles;
+    }
+
+    /*
+    Description: Offset from head bobbing effect.
+    Return Type: Vector3
+    */
+    public Vector3 HeadBobbingOffset()
+    {
+        return m_v3BobbingOffset;
+    }
+
+    /*
+    Description: Angle offset from head bobbing effect.
+    Return Type: Vector3
+    */
+    public Vector3 HeadBobbingEuler()
+    {
+        return m_v3BobbingEuler;
     }
 
     /*

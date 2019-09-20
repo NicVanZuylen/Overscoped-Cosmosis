@@ -10,6 +10,10 @@ public class CreditsScreen : MonoBehaviour
     [SerializeField]
     private RectTransform m_scrollHandle = null;
 
+    [Tooltip("Text component for the press to escape text.")]
+    [SerializeField]
+    private Text m_escapeText = null;
+
     [Tooltip("Scolling speed.")]
     [SerializeField]
     private float m_fScrollSpeed = 200.0f;
@@ -34,9 +38,18 @@ public class CreditsScreen : MonoBehaviour
     {
         m_scrollHandle.anchoredPosition = m_scrollHandle.anchoredPosition + new Vector2(0.0f, m_fScrollSpeed * Time.unscaledDeltaTime);
 
+        // Show skip text if any other button than escape is pressed.
+        if(Input.anyKeyDown)
+        {
+            m_escapeText.enabled = true;
+        }
+
         // Load main menu scene once end point has been reached or the user pressed escape to skip.
         if ((m_scrollHandle.anchoredPosition.y >= m_fEndValue || Input.GetKeyDown(KeyCode.Escape)) && !m_bQuitting)
         {
+            m_escapeText.enabled = false;
+            m_bQuitting = true;
+
             m_fadeScript.SetCallback(m_pauseScript.FadeQuitTitleScreen);
             m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
         }

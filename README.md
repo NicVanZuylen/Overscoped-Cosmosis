@@ -1,2 +1,2 @@
-# Overscoped
-Game project repository of Team Overscoped.
+# Cosmosis
+Game repository for Cosmosis. Developed by Team Overscoped.

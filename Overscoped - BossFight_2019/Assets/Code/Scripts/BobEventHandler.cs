@@ -18,6 +18,6 @@ public class BobEventHandler : MonoBehaviour
         if (m_animator.GetAnimatorTransitionInfo(0).IsName("Run -> Idle"))
             return;
 
-        m_camEffects.Bob();
+        m_camEffects.Step();
     }
 }

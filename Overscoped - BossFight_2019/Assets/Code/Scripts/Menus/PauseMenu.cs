@@ -22,6 +22,9 @@ public class PauseMenu : MonoBehaviour
         m_playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         m_fadeScript = GetComponentInChildren<ScreenFade>();
 
+        Time.timeScale = 1.0f;
+        m_bPaused = false;
+
         m_pauseMenu.SetActive(false);
     }
 

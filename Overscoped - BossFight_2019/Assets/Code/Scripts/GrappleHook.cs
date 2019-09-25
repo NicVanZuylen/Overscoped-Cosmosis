@@ -341,7 +341,7 @@ public class GrappleHook : MonoBehaviour
                 m_fGrappleTime += Time.deltaTime;
 
                 // Add small FOV offset.
-                m_cameraEffects.SetFOVOffset(5.0f);
+                m_cameraEffects.AddFOVOffset(7.0f);
 
                 // Begin grapple override.
                 m_controller.OverrideMovement(GrappleFly);

@@ -84,6 +84,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_v3SurfaceForward;
     public Vector3 m_v3Velocity;
     private float m_fSprintDot;
+    private float m_fCurrentGroundMaxSpeed;
     private bool m_bShouldSprint;
     private bool m_bShouldJump;
     private bool m_bSlopeLimit;
@@ -463,6 +464,8 @@ public class PlayerController : MonoBehaviour
 
         if (m_bOverridden)
         {
+            m_cameraEffects.SetBobbingEnabled(false);
+
             // Run override behaviour and use it's velocity output.
             m_v3Velocity = m_overrideFunction(this);
 
@@ -478,8 +481,6 @@ public class PlayerController : MonoBehaviour
         // Movement and dragging forces are added to this vector, which is added to the final velocity.
         Vector3 v3NetForce = Vector3.zero;
 
-        m_fFOVIncrease = 0.0f;
-
         if (m_bOnGround)
         {
             // ------------------------------------------------------------------------------------------------------
@@ -489,18 +490,7 @@ public class PlayerController : MonoBehaviour
 
             if (m_v3MoveDirection.sqrMagnitude > 0.0f)
             {
-                // ------------------------------------------------------------------------------------------------------
-                // Sprinting.
-
-                float fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
-
-                float fMoveDirDot = Vector3.Dot(m_v3MoveDirection, LookForward());
-
-                if (m_bShouldSprint && fMoveDirDot >= m_fSprintDot)
-                {
-                    m_fFOVIncrease = 10.0f;
-                    fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
-                }
+                m_cameraEffects.SetBobbingEnabled(true);
                     
                 // ------------------------------------------------------------------------------------------------------
                 // Play animation...
@@ -522,12 +512,12 @@ public class PlayerController : MonoBehaviour
                 // ------------------------------------------------------------------------------------------------------
                 // Running
 
-                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, m_v3MoveDirection), 0.0f, fCurrentGroundMaxSpeed);
-                float fMoveAmount = fCurrentGroundMaxSpeed - fCompInVelocity;
+                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, m_v3MoveDirection), 0.0f, m_fCurrentGroundMaxSpeed);
+                float fMoveAmount = m_fCurrentGroundMaxSpeed - fCompInVelocity;
 
                 Vector3 v3SlideDrag = Vector3.zero;
 
-                if(m_v3Velocity.sqrMagnitude > fCurrentGroundMaxSpeed * fCurrentGroundMaxSpeed)
+                if(m_v3Velocity.sqrMagnitude > m_fCurrentGroundMaxSpeed * m_fCurrentGroundMaxSpeed)
                 {
                     v3SlideDrag -= m_v3Velocity * m_fSlideDrag * Time.fixedDeltaTime;
                 }
@@ -538,10 +528,12 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                m_cameraEffects.SetBobbingEnabled(false);
+
                 // ------------------------------------------------------------------------------------------------------
                 // When not attempting to move.
 
-                if(m_v3Velocity.sqrMagnitude <= m_fMaxGroundMoveSpeed * m_fMaxGroundMoveSpeed)
+                if (m_v3Velocity.sqrMagnitude <= m_fMaxGroundMoveSpeed * m_fMaxGroundMoveSpeed)
                 {
                     // Foot drag.
                     v3NetForce -= m_v3Velocity * m_fGroundDrag * Time.fixedDeltaTime;
@@ -557,6 +549,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            m_cameraEffects.SetBobbingEnabled(false);
+
             // ------------------------------------------------------------------------------------------------------
             // Play flying animation...
             m_animController.SetBool("isRunning", false);
@@ -676,22 +670,47 @@ public class PlayerController : MonoBehaviour
 
         m_bOnGround &= !m_bSlopeLimit;
 
-        // ---------------------------------------------------------------------------------------------------
-        // FOV velocity effect.
-
-        m_cameraEffects.SetFOVOffset(Mathf.Clamp((Vector3.Dot(m_v3Velocity, m_cameraTransform.forward) - m_fMaxGroundMoveSpeed) * 3 + m_fFOVIncrease, 0.0f, 15.0f));
-
         // ------------------------------------------------------------------------------------------------------
-        // Sprint & jumping input
+        // Jumping
 
         bool bPrevShouldJump = m_bShouldJump;
 
-        m_bShouldSprint = m_bOnGround && Input.GetKey(KeyCode.LeftShift);
         m_bShouldJump = m_bOnGround && Input.GetKey(KeyCode.Space);
 
         if (!bPrevShouldJump && m_bShouldJump)
         {
             m_nJumpFrame = 4; // Give multiple frames to clear the ground.
+        }
+
+        // ------------------------------------------------------------------------------------------------------
+        // Sprinting.
+
+        // Reset grounded max speed and FOV offset.
+        m_fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
+        m_fFOVIncrease = 0.0f;
+
+        float fMoveDirDot = Vector3.Dot(m_v3MoveDirection, LookForward());
+
+        if (m_bOnGround && Input.GetKey(KeyCode.LeftShift) && fMoveDirDot >= m_fSprintDot)
+        {
+            m_fFOVIncrease = 10.0f;
+            m_fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
+        }
+
+        // ---------------------------------------------------------------------------------------------------
+        // FOV velocity effect.
+
+        float fFOVOffset = Mathf.Clamp((m_v3Velocity.magnitude - m_fMaxGroundMoveSpeed) + m_fFOVIncrease, 0.0f, 15.0f);
+
+        if (m_bOnGround)
+        {
+            m_cameraEffects.AddFOVOffset(m_fFOVIncrease);
+            m_cameraEffects.SetFOVChangeRate(75.0f);
+        }
+        else
+        {
+            m_cameraEffects.AddFOVOffset(fFOVOffset);
+            m_cameraEffects.SetFOVChangeRate(20.0f);
         }
 
         // ------------------------------------------------------------------------------------------------------

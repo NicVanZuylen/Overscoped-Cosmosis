@@ -12,7 +12,7 @@ public class CameraEffects : MonoBehaviour
 {
     [Tooltip("Lerp rate of FOV changes.")]
     [SerializeField]
-    private float m_fFOVLerpRate = 0.1f;
+    private float m_fFOVChangeRate = 0.1f;
 
     [Tooltip("Rate in which new shake offsets will be applied.")]
     [SerializeField]
@@ -21,6 +21,22 @@ public class CameraEffects : MonoBehaviour
     [Tooltip("Amount of time for the shake offset to fade.")]
     [SerializeField]
     private float m_fShakeReturnDuration = 0.1f;
+
+    [Tooltip("Rate of head bobbing related movement")]
+    [SerializeField]
+    private float m_fBobbingSpeed = 7.0f;
+
+    [Tooltip("Magnitude of vertical angle head bobbing")]
+    [SerializeField]
+    private float m_fBobbingXAngleMagnitude = 0.8f;
+
+    [Tooltip("Magnitude of horizontal angle head bobbing")]
+    [SerializeField]
+    private float m_fBobbingYAngleMagnitude = 0.5f;
+
+    [Tooltip("Magnitude of vertical offset head bobbing")]
+    [SerializeField]
+    private float m_fBobbingPosMagnitude = 0.07f;
 
     private Camera m_camera;
     private List<CameraSplineState> m_camSpline;
@@ -32,21 +48,21 @@ public class CameraEffects : MonoBehaviour
     private Vector3 m_v3StartPosition;
     private Vector3 m_v3BobbingEuler;
     private Vector3 m_v3BobbingOffset;
-    private float m_fBobbingLevel; // Range between 0 and 1.
+    private float m_fVertBobbingLevel; // Range between 0 and 1.
     private float m_fSideBobbingLevel; // Range between -1 and 1.
     private int m_nBobbingDirection; // 1 or -1.
-    private int m_nBobbingSideDirection;
+    private int m_nBobbingSideDirection; // 1 or -1.
     private float m_fShakeDuration;
     private float m_fShakeReturnTime;
     private float m_fCurrentShakeDelay;
     private float m_fShakeMagnitude;
     private float m_fStartFOV;
     private float m_fFOVOffset;
-    private float m_fSplineInterp;
-    private int m_nSplineIndex;
     private const int m_nSplineSampleCount = 3;
     private const int m_nMaxSplinePoints = 256;
-    private bool m_bFullMag;
+    private int m_nSplineIndex;
+    private bool m_bFullMag; // Whether or not to use the full shake magnitude always when shaking.
+    private bool m_bBobbing; // Whether or not to enable head bobbing from walking or running.
 
     void Awake()
     {
@@ -72,46 +88,68 @@ public class CameraEffects : MonoBehaviour
         // Apply shake.
         Shake(m_fShakeMagnitude, m_bFullMag);
 
-        // Apply FOV lerp offset.
-        m_camera.fieldOfView = Mathf.Lerp(m_camera.fieldOfView, m_fStartFOV + m_fFOVOffset, m_fFOVLerpRate);
-
-        UpdateBobbing();
-
-        if (Input.GetKeyDown(KeyCode.B))
-            Bob();
-
+        // Apply FOV offset over time.
+        m_camera.fieldOfView = Mathf.MoveTowards(m_camera.fieldOfView, m_fStartFOV + m_fFOVOffset, m_fFOVChangeRate * Time.deltaTime);
         m_fFOVOffset = 0.0f;
+
+        // Update head bobbing effect.
+        UpdateBobbing();
     }
 
     public void UpdateBobbing()
     {
-        const float fBobbingSpeed = 7.0f;
-        const float fBobbingAngleMagnitude = 0.8f;
-        const float fBobbingPosMagnitude = 0.07f;
+        m_fVertBobbingLevel += Time.deltaTime * m_fBobbingSpeed * m_nBobbingDirection;
+        m_fVertBobbingLevel = Mathf.Clamp(m_fVertBobbingLevel, 0.0f, 1.0f);
 
-        m_fBobbingLevel += Time.deltaTime * fBobbingSpeed * m_nBobbingDirection;
-        m_fBobbingLevel = Mathf.Clamp(m_fBobbingLevel, 0.0f, 1.0f);
-
-        m_fSideBobbingLevel = Mathf.MoveTowards(m_fSideBobbingLevel, m_nBobbingSideDirection, fBobbingSpeed * Time.deltaTime);
-
-        if (m_fBobbingLevel >= 1.0f)
+        if (!m_bBobbing) // Bobbing not enabled.
         {
+            // Lower bobbing levels towards zero.
             m_nBobbingDirection = -1;
-            m_nBobbingSideDirection = -m_nBobbingSideDirection;
+            m_fSideBobbingLevel = Mathf.MoveTowards(m_fSideBobbingLevel, 0.0f, m_fBobbingSpeed * Time.deltaTime);
+        }
+        else // Bobbing enabled.
+        {
+            // Progress side bobbing level.
+            m_fSideBobbingLevel += Time.deltaTime * m_fBobbingSpeed * m_nBobbingDirection;
+            m_fSideBobbingLevel = Mathf.Clamp(m_fSideBobbingLevel, -1.0f, 1.0f);
         }
 
-        m_v3BobbingEuler.x = Mathf.Abs(Mathf.Sin(m_fBobbingLevel * Mathf.PI * 0.5f)) * fBobbingAngleMagnitude;
-        //m_v3BobbingEuler.y = Mathf.Abs(Mathf.Sin(m_fSideBobbingLevel * Mathf.PI * 0.5f)) * 2.0f;
+        // Change vertical bobbing direction if the downwards bob is complete.
+        if (m_fVertBobbingLevel >= 1.0f)
+        {
+            m_nBobbingDirection = -1;
+        }
 
-        m_v3BobbingOffset.y = -Mathf.Abs(Mathf.Sin(m_fBobbingLevel * Mathf.PI * 0.5f)) * fBobbingPosMagnitude;
+        // Vertical bobbing value used for position and angle offset.
+        float fVertBobbingValue = Mathf.Abs(Mathf.Sin(m_fVertBobbingLevel * Mathf.PI * 0.5f));
+
+        m_v3BobbingEuler.x = fVertBobbingValue * m_fBobbingXAngleMagnitude; // X angle offset. (Vertical)
+        m_v3BobbingEuler.y = Mathf.Sin(m_fSideBobbingLevel * Mathf.PI * 0.5f) * m_fBobbingYAngleMagnitude * m_nBobbingSideDirection; // Y angle offset. (Horizontal)
+
+        m_v3BobbingOffset.y = -fVertBobbingValue * m_fBobbingPosMagnitude; // Vertical offset.
     }
 
-    public void Bob()
+    /*
+    Description: Set whether or not head bobbing from ground movement is enabled.
+    Param:
+        bool bEnable: Whether or not to enable ground head bobbing.
+    */
+    public void SetBobbingEnabled(bool bEnable)
+    {
+        m_bBobbing = bEnable;
+    }
+
+    /*
+    Description: Add a step the the head bobbing effect.
+    */
+    public void Step()
     {
         if (m_nBobbingDirection < 0)
             m_nBobbingDirection = 1;
 
-        //m_nBobbingSideDirection = -m_nBobbingSideDirection;
+        // Alternate side bobbing direction and preserve bobbing level by removing sign.
+        m_nBobbingSideDirection = -m_nBobbingSideDirection;
+        m_fSideBobbingLevel = Mathf.Abs(m_fSideBobbingLevel);
     }
 
     /*
@@ -132,13 +170,33 @@ public class CameraEffects : MonoBehaviour
     }
 
     /*
-    Description: Set the FOV offset of the camera. The current FOV will lerp to the start FOV + offset.
+    Description: Set the rate in which FOV will change over time.
+    Param:
+        float Rate: The new rate in which FOV will change over time.
+    */
+    public void SetFOVChangeRate(float fRate)
+    {
+        m_fFOVChangeRate = fRate;
+    }
+
+    /*
+    Description: Set the FOV offset of the camera. The current FOV will move to the start FOV + offset.
     Param:
         float fOffset: The FOV offset to use. This will be reset after application.
     */
     public void SetFOVOffset(float fOffset)
     {
         m_fFOVOffset = Mathf.Max(m_fFOVOffset, fOffset);
+    }
+
+    /*
+    Description: Add to the FOV offset of the camera. The current FOV will move to the start FOV + offset.
+    Param:
+        float fOffset: The FOV offset to add. This will be reset after application.
+    */
+    public void AddFOVOffset(float fOffset)
+    {
+        m_fFOVOffset += fOffset;
     }
 
     /*
@@ -239,7 +297,6 @@ public class CameraEffects : MonoBehaviour
     */
     public void StartCamSpline()
     {
-        m_fSplineInterp = 0.0f;
         m_nSplineIndex = m_camSpline.Count - 2;
 
         m_currentSplineState = m_camSpline[Mathf.Max(m_camSpline.Count - 1, 0)];

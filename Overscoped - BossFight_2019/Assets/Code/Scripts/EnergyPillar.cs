@@ -43,8 +43,9 @@ public class EnergyPillar : MonoBehaviour
     public void Explode(BossBehaviour bossScript)
     {
         m_explosion.transform.position = new Vector3(transform.position.x,transform.position.y + 70, transform.position.z);
+
         // Stun boss.
-        bossScript.m_bIsStuck = true;
+        bossScript.EnterStuckState();
 
         m_explosion.Play();
 
@@ -61,13 +62,7 @@ public class EnergyPillar : MonoBehaviour
     */
     public static bool PlayerWithinVicinity()
     {
-        bool bResult = m_bPlayerWithinVicinity;
-
-        // Reset if true.
-        //if (m_bPlayerWithinVicinity)
-        //    m_bPlayerWithinVicinity = false;
-
-        return bResult;
+        return m_bPlayerWithinVicinity;
     }
 
     private void ResetCharge()
@@ -82,7 +77,7 @@ public class EnergyPillar : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other = m_player.GetComponent<Collider>())
+        if (other.gameObject == m_player)
             m_bPlayerWithinVicinity = false;
     }
 

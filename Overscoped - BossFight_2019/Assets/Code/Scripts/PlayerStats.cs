@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -49,6 +50,19 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fPortalPunchForce = 100.0f;
 
+    [Header("Death")]
+    [Tooltip("Amount of time's worth of movement captured by the camera spline.")]
+    [SerializeField]
+    private float m_fDeathRecordTime = 20.0f;
+
+    [Tooltip("Speed curve for death rewind.")]
+    [SerializeField]
+    private AnimationCurve m_rewindCurve = null;
+
+    [Tooltip("Checkpoint to restart at after dying.")]
+    [SerializeField]
+    private Transform m_checkpoint = null;
+
     [Tooltip("Regen mode for mana regen.")]
     [SerializeField]
     private ERegenMode m_manaRegenMode = ERegenMode.REGEN_LINEAR;
@@ -63,8 +77,8 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private Material m_manaFillMat = null;
 
-    //[SerializeField]
-    //private Material m_beamFillMat = null;
+    [SerializeField]
+    private Material m_reticleMat = null;
 
     [SerializeField]
     private Material m_armHealthMat = null;
@@ -76,27 +90,62 @@ public class PlayerStats : MonoBehaviour
 
     private GrappleHook m_hookScript;
     private PlayerController m_controller;
+    private PlayerBeam m_beamScript;
     private CameraEffects m_camEffects;
+    private Transform m_camPivot;
 
+    // Resources
     private float m_fHealth;
     private float m_fMana;
     private float m_fCurrentRegenDelay;
+    private static bool m_bCheckpointReached = false;
+    private bool m_bIsAlive;
+
+    // Camera backtracking
+    private float m_fSplineInterval;
+    private float m_fCurrentSplineTime;
+    private float m_fSplineProgress;
 
     void Awake()
     {
         m_hookScript = GetComponent<GrappleHook>();
         m_controller = GetComponent<PlayerController>();
+        m_beamScript = GetComponent<PlayerBeam>();
         m_camEffects = GetComponentInChildren<CameraEffects>(false);
+        m_camPivot = transform.Find("CameraPivot");
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
-        m_fCurrentRegenDelay = 1.0f;   
+        m_fCurrentRegenDelay = 1.0f;
+        m_bIsAlive = true;
+
+        m_fSplineInterval = m_fDeathRecordTime / m_camEffects.MaxSplineCount();
+        m_fCurrentSplineTime = 0.0f;
+
+        // Spawn at checkpoint if it has been reached.
+        if(m_bCheckpointReached && m_checkpoint)
+        {
+            transform.position = m_checkpoint.position;
+            m_controller.SetLookRotation(m_checkpoint.rotation);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(m_hookScript.IsActive())
+        if(m_bIsAlive)
+        {
+            AliveUpdate();
+        }
+        else
+        {
+            DeathUpdate();
+        }
+    }
+
+    private void AliveUpdate()
+    {
+        if (m_hookScript.IsActive())
         {
             // Reset mana regen delay.
             m_fCurrentRegenDelay = m_fManaRegenDelay;
@@ -112,7 +161,7 @@ public class PlayerStats : MonoBehaviour
             if (m_fCurrentRegenDelay <= 0.0f)
             {
                 // Regenerate mana.
-                switch(m_manaRegenMode)
+                switch (m_manaRegenMode)
                 {
                     case ERegenMode.REGEN_LINEAR:
                         m_fMana += m_fManaRegenRate * Time.deltaTime;
@@ -125,6 +174,22 @@ public class PlayerStats : MonoBehaviour
             }
         }
 
+        m_fCurrentSplineTime -= Time.deltaTime;
+
+        if (m_fCurrentSplineTime <= 0.0f)
+        {
+            m_fCurrentSplineTime = m_fSplineInterval;
+
+            // Record current camera state.
+            m_camEffects.RecordCameraState();
+        }
+
+        // Kill button
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            KillPlayer();
+        }
+
         // Clamp health and mana.
         m_fHealth = Mathf.Clamp(m_fHealth, 0.0f, m_fMaxHealth);
         m_fMana = Mathf.Clamp(m_fMana, 0.0f, m_fMaxMana);
@@ -132,14 +197,37 @@ public class PlayerStats : MonoBehaviour
         m_armHealthMat.SetFloat("_Mana", 1.0f - (m_fHealth / m_fMaxHealth));
         m_armManaMat.SetFloat("_Mana", 1.0f - (m_fMana / m_fMaxMana));
 
-        //m_healthFillMat.sizeDelta = new Vector2((m_fHealth / m_fMaxHealth) * 300.0f, m_healthFillMat.sizeDelta.y);
-        //m_manaFillMat.sizeDelta = new Vector3((m_fMana / m_fMaxMana) * 300.0f, m_manaFillMat.sizeDelta.y);
-
-        //m_healthFillMat.SetFloat("_Resource%", m_fHealth / m_fMaxHealth);
+        if (m_hookScript.InGrappleRange())
+            m_reticleMat.SetInt("_InRange", 1);
+        else
+            m_reticleMat.SetInt("_InRange", 0);
 
         m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
         m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
-        //m_beamFillMat.SetFloat("_Resource%", m_fMana / m_fMaxMana);
+    }
+
+    private void DeathUpdate()
+    {
+        CameraSplineState splineState = m_camEffects.EvaluateCamSpline(Mathf.Clamp(m_fSplineProgress, 0.0f, 1.0f));
+
+        m_fSplineProgress += m_rewindCurve.Evaluate(m_fSplineProgress) * Time.deltaTime;
+
+        m_camEffects.transform.localRotation = Quaternion.identity;
+
+        m_camPivot.transform.position = splineState.m_v4Position;
+        m_camPivot.transform.rotation = splineState.m_rotation;
+
+        // Resurrect player.
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Resurrect();
+        }
+
+        // Reset scene when spline is complete.
+        if(m_fSplineProgress >= 1.0f)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     /*
@@ -168,6 +256,20 @@ public class PlayerStats : MonoBehaviour
         m_fHealth = m_fMaxHealth;
 
         // Reverse death effects...
+
+        // Reset spline.
+        m_camEffects.ClearCamSpline();
+        m_fSplineProgress = 0.0f;
+
+        m_camPivot.parent = transform;
+        m_camPivot.localPosition = new Vector3(0.0f, 0.7f, 0.0f);
+
+        // Enable scripts.
+        m_controller.enabled = true;
+        m_hookScript.enabled = true;
+        m_beamScript.enabled = true;
+
+        m_bIsAlive = true;
     }
 
     /*
@@ -192,7 +294,34 @@ public class PlayerStats : MonoBehaviour
             m_fHealth = 0.0f;
 
             // Kill player...
+
+            KillPlayer();
         }
+    }
+
+    private void KillPlayer()
+    {
+        m_fHealth = 0.0f;
+
+        // Set health bar value to zero.
+        m_armHealthMat.SetFloat("_Mana", 0.0f);
+
+        // Detach camera from player.
+        m_camPivot.parent = null;
+
+        // Begin spline.
+        m_camEffects.StartCamSpline();
+
+        // Disable control scripts.
+        m_controller.enabled = false;
+        m_hookScript.enabled = false;
+        m_beamScript.enabled = false;
+
+        // Assume checkpoint is reached.
+        m_bCheckpointReached = true;
+
+        // Flag as dead.
+        m_bIsAlive = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -211,6 +340,9 @@ public class PlayerStats : MonoBehaviour
 
             // Shake camera.
             m_camEffects.ApplyShake(0.5f, 2.0f, true);
+
+            // Break hook.
+            m_hookScript.ReleaseGrapple();
 
             // Deal damage.
             DealDamage(m_fPortalPunchDamage);

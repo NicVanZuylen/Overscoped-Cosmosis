@@ -82,19 +82,22 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	float3 f3RippleVec = float3(0.0f, 0.0f, 0.0f);
 
-	if (id.x > 0 && id.x < nOutPointCount) 
-	{
-		outPoints[nOutPointCount + id.x] = MoveTowards(outPoints[nOutPointCount + id.x], EvaluateCurve(bezierPoints, id.x, inPointCount, inWobblePointCount, fProgress), inDeltaTime * 0.3f);
+	// --------------------------------------------------------------------------------------------------------------
+	// Wobble vector outputs.
 
-		float fPower = pow((1.0f - fProgress), 5);
+	outPoints[nOutPointCount + id.x] = MoveTowards(outPoints[nOutPointCount + id.x], EvaluateCurve(bezierPoints, id.x, inPointCount, inWobblePointCount, fProgress), inDeltaTime * 0.3f);
 
-		f3RippleVec = (f3RippleDir * fPower  * fCurveMag) + (float3(0.0f, 1.0f, 0.0f) * fPower * fCurveMagY); // Ripple vector
+	float fPower = pow((1.0f - fProgress), 5);
 
-		// Multipliers
-		f3RippleVec *= max((inRippleMagnitude - (pow(inFlyProgress, 5) * inRippleMagnitude)), 0.8f);
-		f3RippleVec *= inRippleMagnitude;
-		f3RippleVec *= fProgress / 0.1f;
-	}
+	f3RippleVec = (f3RippleDir * fPower  * fCurveMag) + (float3(0.0f, 1.0f, 0.0f) * fPower * fCurveMagY); // Ripple vector
+
+	// Multipliers
+	f3RippleVec *= max((inRippleMagnitude - (pow(inFlyProgress, 5) * inRippleMagnitude)), 0.8f);
+	f3RippleVec *= inRippleMagnitude;
+	f3RippleVec *= fProgress / 0.1f;
+
+	// --------------------------------------------------------------------------------------------------------------
+	// Main point outputs.
 
 	// Evaluate curve for output point.
 	outPoints[id.x] = EvaluateCurve(bezierPoints, id.x, 0, inPointCount, fProgress) + outPoints[nOutPointCount + id.x] + f3RippleVec;

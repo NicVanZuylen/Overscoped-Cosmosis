@@ -19,7 +19,7 @@ public class Switch : PullObject
 
     private EventFunc m_eventFunc;
 
-    void Awake()
+    new void Awake()
     {
         m_fStartAngle = transform.parent.rotation.eulerAngles.x;
         m_fEndAngle = -m_fStartAngle;
@@ -33,7 +33,7 @@ public class Switch : PullObject
     public override void Trigger(Vector3 v3PlayerDirection)
     {
         // Play activation animation.
-        transform.parent.rotation = Quaternion.Euler(m_fEndAngle, 0.0f, 0.0f);
+        transform.localPosition = new Vector3(0.0f, 0.0f, 0.3f);
 
         // Run event callback once.
         m_eventFunc();

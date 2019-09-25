@@ -95,12 +95,12 @@ public class PlayerController : MonoBehaviour
     private float m_fJumpInitialVelocity; // Initial impulse applied when jumping.
     private float m_fCurrentGravity;
     private int m_nJumpFrame;
+    private bool m_bJumping;
 
     // Looking
     Transform m_cameraTransform;
     private float m_fLookEulerX;
     private float m_fLookEulerY;
-    private float m_fFOVIncrease;
     private bool m_bFocused; // Whether or not the player's cursor is locked and focused on camera movement.
 
     // Overrides
@@ -279,6 +279,7 @@ public class PlayerController : MonoBehaviour
     {
         m_overrideFunction = function;
         m_bOverridden = true;
+        m_bJumping = false;
     }
 
     /*
@@ -591,6 +592,7 @@ public class PlayerController : MonoBehaviour
 
             m_bShouldJump = false;
             m_bOnGround = false;
+            m_bJumping = true;
 
             --m_nJumpFrame;
         }
@@ -670,6 +672,15 @@ public class PlayerController : MonoBehaviour
 
         m_bOnGround &= !m_bSlopeLimit;
 
+        if (m_bOnGround)
+            m_bJumping = false;
+
+
+        if (!bPrevGrounded && m_v3Velocity.y < 0.0f && m_bOnGround)
+        {
+            m_cameraEffects.Land();
+        }
+
         // ------------------------------------------------------------------------------------------------------
         // Jumping
 
@@ -687,28 +698,37 @@ public class PlayerController : MonoBehaviour
 
         // Reset grounded max speed and FOV offset.
         m_fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
-        m_fFOVIncrease = 0.0f;
+        float fFOVIncrease = 0.0f;
 
         float fMoveDirDot = Vector3.Dot(m_v3MoveDirection, LookForward());
 
         if (m_bOnGround && Input.GetKey(KeyCode.LeftShift) && fMoveDirDot >= m_fSprintDot)
         {
-            m_fFOVIncrease = 10.0f;
+            fFOVIncrease = 10.0f;
             m_fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
         }
 
         // ---------------------------------------------------------------------------------------------------
         // FOV velocity effect.
 
-        float fFOVOffset = Mathf.Clamp((m_v3Velocity.magnitude - m_fMaxGroundMoveSpeed) + m_fFOVIncrease, 0.0f, 15.0f);
-
         if (m_bOnGround)
         {
-            m_cameraEffects.AddFOVOffset(m_fFOVIncrease);
+            m_cameraEffects.AddFOVOffset(fFOVIncrease);
             m_cameraEffects.SetFOVChangeRate(75.0f);
+        }
+        else if(!m_bJumping)
+        {
+            float fFOVOffset = Mathf.Clamp(m_v3Velocity.magnitude - m_fMaxGroundMoveSpeed + fFOVIncrease, 0.0f, 15.0f);
+
+            m_cameraEffects.AddFOVOffset(fFOVOffset);
+            m_cameraEffects.SetFOVChangeRate(20.0f);
         }
         else
         {
+            Vector3 v3VelNoY = m_v3Velocity;
+            v3VelNoY.y = 0.0f;
+            float fFOVOffset = Mathf.Clamp(v3VelNoY.magnitude - m_fMaxGroundMoveSpeed + fFOVIncrease, 0.0f, 15.0f);
+
             m_cameraEffects.AddFOVOffset(fFOVOffset);
             m_cameraEffects.SetFOVChangeRate(20.0f);
         }

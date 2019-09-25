@@ -50,8 +50,10 @@ public class CameraEffects : MonoBehaviour
     private Vector3 m_v3BobbingOffset;
     private float m_fVertBobbingLevel; // Range between 0 and 1.
     private float m_fSideBobbingLevel; // Range between -1 and 1.
+    private float m_fLandingBobbingLevel; // Range between 0 and 1.
     private int m_nBobbingDirection; // 1 or -1.
     private int m_nBobbingSideDirection; // 1 or -1.
+    private int m_nLandingBobDirection; // 1 or -1.
     private float m_fShakeDuration;
     private float m_fShakeReturnTime;
     private float m_fCurrentShakeDelay;
@@ -79,6 +81,7 @@ public class CameraEffects : MonoBehaviour
 
         m_nBobbingDirection = -1;
         m_nBobbingSideDirection = -1;
+        m_nLandingBobDirection = -1;
     }
 
     void Update()
@@ -92,6 +95,9 @@ public class CameraEffects : MonoBehaviour
         m_camera.fieldOfView = Mathf.MoveTowards(m_camera.fieldOfView, m_fStartFOV + m_fFOVOffset, m_fFOVChangeRate * Time.deltaTime);
         m_fFOVOffset = 0.0f;
 
+        if (Input.GetKey(KeyCode.L))
+            Land();
+
         // Update head bobbing effect.
         UpdateBobbing();
     }
@@ -100,6 +106,9 @@ public class CameraEffects : MonoBehaviour
     {
         m_fVertBobbingLevel += Time.deltaTime * m_fBobbingSpeed * m_nBobbingDirection;
         m_fVertBobbingLevel = Mathf.Clamp(m_fVertBobbingLevel, 0.0f, 1.0f);
+
+        m_fLandingBobbingLevel += Time.deltaTime * 10.0f * m_nLandingBobDirection;
+        m_fLandingBobbingLevel = Mathf.Clamp(m_fLandingBobbingLevel, 0.0f, 1.0f);
 
         if (!m_bBobbing) // Bobbing not enabled.
         {
@@ -120,6 +129,9 @@ public class CameraEffects : MonoBehaviour
             m_nBobbingDirection = -1;
         }
 
+        if (m_fLandingBobbingLevel >= 1.0f)
+            m_nLandingBobDirection = -1;
+
         // Vertical bobbing value used for position and angle offset.
         float fVertBobbingValue = Mathf.Abs(Mathf.Sin(m_fVertBobbingLevel * Mathf.PI * 0.5f));
 
@@ -127,6 +139,7 @@ public class CameraEffects : MonoBehaviour
         m_v3BobbingEuler.y = Mathf.Sin(m_fSideBobbingLevel * Mathf.PI * 0.5f) * m_fBobbingYAngleMagnitude * m_nBobbingSideDirection; // Y angle offset. (Horizontal)
 
         m_v3BobbingOffset.y = -fVertBobbingValue * m_fBobbingPosMagnitude; // Vertical offset.
+        m_v3BobbingOffset.y -= m_fLandingBobbingLevel * 0.35f;
     }
 
     /*
@@ -150,6 +163,14 @@ public class CameraEffects : MonoBehaviour
         // Alternate side bobbing direction and preserve bobbing level by removing sign.
         m_nBobbingSideDirection = -m_nBobbingSideDirection;
         m_fSideBobbingLevel = Mathf.Abs(m_fSideBobbingLevel);
+    }
+
+    /*
+    Description: Add a landing the the head bobbing effect.
+    */
+    public void Land()
+    {
+        m_nLandingBobDirection = 1;
     }
 
     /*

@@ -236,6 +236,9 @@ public class GrappleHook : MonoBehaviour
 
     void Update()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         // ------------------------------------------------------------------------------------------------------------------------------
         // Shooting
 
@@ -338,7 +341,7 @@ public class GrappleHook : MonoBehaviour
                 m_fGrappleTime += Time.deltaTime;
 
                 // Add small FOV offset.
-                m_cameraEffects.SetFOVOffset(5.0f);
+                m_cameraEffects.AddFOVOffset(7.0f);
 
                 // Begin grapple override.
                 m_controller.OverrideMovement(GrappleFly);
@@ -401,6 +404,9 @@ public class GrappleHook : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         m_grapLineEffects.ProcessLine(m_grappleLine, m_controller, m_grappleNode, m_v3GrapplePoint, m_fGrappleLineProgress / m_fGrapLineLength, m_bGrappleHookActive);
         m_pullLineEffects.ProcessLine(m_pullLine, m_controller, m_pullNode, m_pullEndPoint.transform.position, m_fPullLineProgress / m_fPullLineLength, m_bPullHookActive);
     }

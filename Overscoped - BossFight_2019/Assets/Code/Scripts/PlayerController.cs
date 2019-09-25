@@ -82,8 +82,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_v3SurfaceRight;
     private Vector3 m_v3SurfaceUp;
     private Vector3 m_v3SurfaceForward;
-    private Vector3 m_v3Velocity;
+    public Vector3 m_v3Velocity;
     private float m_fSprintDot;
+    private float m_fCurrentGroundMaxSpeed;
     private bool m_bShouldSprint;
     private bool m_bShouldJump;
     private bool m_bSlopeLimit;
@@ -100,12 +101,14 @@ public class PlayerController : MonoBehaviour
     private float m_fLookEulerX;
     private float m_fLookEulerY;
     private float m_fFOVIncrease;
+    private bool m_bFocused; // Whether or not the player's cursor is locked and focused on camera movement.
 
     // Overrides
     public delegate Vector3 OverrideFunction(PlayerController controller);
 
     OverrideFunction m_overrideFunction;
     bool m_bOverridden;
+    bool m_bJustResumed;
 
     private void Awake()
     {
@@ -137,9 +140,8 @@ public class PlayerController : MonoBehaviour
 
         // Determine initial impulse added to vertical velocity when jumping.
         m_fJumpInitialVelocity = (2 * m_fJumpHeight) / (m_fJumpDuration * 0.5f);
-    
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+
+        SetFocus(true);
     }
 
     private void OnDisable()
@@ -150,6 +152,34 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         m_controller.enabled = true;
+    }
+
+    /*
+    Description: Set whether or not the cursor is focused on camera movement.
+    Param:
+        bool bFocus: Whether or not to focus.
+    */
+    public void SetFocus(bool bFocus)
+    {
+        m_bFocused = bFocus;
+        Cursor.visible = !bFocus;
+
+        if (bFocus)
+            Cursor.lockState = CursorLockMode.Locked;
+        else
+            Cursor.lockState = CursorLockMode.None;
+    }
+
+    /*
+    Description: Set whether or not the player controller is paused.
+    Param:
+        bool bPause: Whether or not to pause.
+    */
+    public void SetPaused(bool bPause)
+    {
+        SetFocus(!bPause);
+
+        m_bJustResumed = !bPause;
     }
 
     /*
@@ -182,6 +212,9 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 v3Direction = Vector3.zero;
         int nMoveDirectionCount = 0;
+
+        if (PauseMenu.IsPaused())
+            return Vector3.zero;
 
         // On the ground, move relative to the camera and the surface.
         if (Input.GetKey(KeyCode.W))
@@ -423,11 +456,16 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         // ------------------------------------------------------------------------------------------------------
         // Movement override
 
         if (m_bOverridden)
         {
+            m_cameraEffects.SetBobbingEnabled(false);
+
             // Run override behaviour and use it's velocity output.
             m_v3Velocity = m_overrideFunction(this);
 
@@ -443,8 +481,6 @@ public class PlayerController : MonoBehaviour
         // Movement and dragging forces are added to this vector, which is added to the final velocity.
         Vector3 v3NetForce = Vector3.zero;
 
-        m_fFOVIncrease = 0.0f;
-
         if (m_bOnGround)
         {
             // ------------------------------------------------------------------------------------------------------
@@ -454,18 +490,7 @@ public class PlayerController : MonoBehaviour
 
             if (m_v3MoveDirection.sqrMagnitude > 0.0f)
             {
-                // ------------------------------------------------------------------------------------------------------
-                // Sprinting.
-
-                float fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
-
-                float fMoveDirDot = Vector3.Dot(m_v3MoveDirection, LookForward());
-
-                if (m_bShouldSprint && fMoveDirDot >= m_fSprintDot)
-                {
-                    m_fFOVIncrease = 10.0f;
-                    fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
-                }
+                m_cameraEffects.SetBobbingEnabled(true);
                     
                 // ------------------------------------------------------------------------------------------------------
                 // Play animation...
@@ -487,12 +512,12 @@ public class PlayerController : MonoBehaviour
                 // ------------------------------------------------------------------------------------------------------
                 // Running
 
-                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, m_v3MoveDirection), 0.0f, fCurrentGroundMaxSpeed);
-                float fMoveAmount = fCurrentGroundMaxSpeed - fCompInVelocity;
+                float fCompInVelocity = Mathf.Clamp(Vector3.Dot(m_v3Velocity, m_v3MoveDirection), 0.0f, m_fCurrentGroundMaxSpeed);
+                float fMoveAmount = m_fCurrentGroundMaxSpeed - fCompInVelocity;
 
                 Vector3 v3SlideDrag = Vector3.zero;
 
-                if(m_v3Velocity.sqrMagnitude > fCurrentGroundMaxSpeed * fCurrentGroundMaxSpeed)
+                if(m_v3Velocity.sqrMagnitude > m_fCurrentGroundMaxSpeed * m_fCurrentGroundMaxSpeed)
                 {
                     v3SlideDrag -= m_v3Velocity * m_fSlideDrag * Time.fixedDeltaTime;
                 }
@@ -503,10 +528,12 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                m_cameraEffects.SetBobbingEnabled(false);
+
                 // ------------------------------------------------------------------------------------------------------
                 // When not attempting to move.
 
-                if(m_v3Velocity.sqrMagnitude <= m_fMaxGroundMoveSpeed * m_fMaxGroundMoveSpeed)
+                if (m_v3Velocity.sqrMagnitude <= m_fMaxGroundMoveSpeed * m_fMaxGroundMoveSpeed)
                 {
                     // Foot drag.
                     v3NetForce -= m_v3Velocity * m_fGroundDrag * Time.fixedDeltaTime;
@@ -522,6 +549,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            m_cameraEffects.SetBobbingEnabled(false);
+
             // ------------------------------------------------------------------------------------------------------
             // Play flying animation...
             m_animController.SetBool("isRunning", false);
@@ -530,7 +559,6 @@ public class PlayerController : MonoBehaviour
             // Reset movement vectors for airborn movement.
 
             // We're giving it the upward vector to represent a flat surface.
-            //CalculateSurfaceAxes(m_groundHit.normal);
             CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
 
             // ------------------------------------------------------------------------------------------------------
@@ -585,15 +613,22 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         // ------------------------------------------------------------------------------------------------------
         // Mouse look
 
-        m_fLookEulerX -= Input.GetAxis("Mouse Y");
-        m_fLookEulerY += Input.GetAxis("Mouse X");
+        if(m_bFocused)
+        {
+            m_fLookEulerX -= Input.GetAxis("Mouse Y");
+            m_fLookEulerY += Input.GetAxis("Mouse X");
 
-        m_fLookEulerX = Mathf.Clamp(m_fLookEulerX, -89.9f, 89.9f);
+            m_fLookEulerX = Mathf.Clamp(m_fLookEulerX, -89.9f, 89.9f);
+        }
 
-        m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler());
+        m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler() + m_cameraEffects.HeadBobbingEuler());
+        m_cameraTransform.localPosition = m_cameraEffects.HeadBobbingOffset();
 
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceUp * 3.0f), Color.green);
@@ -635,22 +670,47 @@ public class PlayerController : MonoBehaviour
 
         m_bOnGround &= !m_bSlopeLimit;
 
-        // ---------------------------------------------------------------------------------------------------
-        // FOV velocity effect.
-
-        m_cameraEffects.SetFOVOffset(Mathf.Clamp((Vector3.Dot(m_v3Velocity, m_cameraTransform.forward) - m_fMaxGroundMoveSpeed) * 3 + m_fFOVIncrease, 0.0f, 15.0f));
-
         // ------------------------------------------------------------------------------------------------------
-        // Sprint & jumping input
+        // Jumping
 
         bool bPrevShouldJump = m_bShouldJump;
 
-        m_bShouldSprint = m_bOnGround && Input.GetKey(KeyCode.LeftShift);
         m_bShouldJump = m_bOnGround && Input.GetKey(KeyCode.Space);
 
         if (!bPrevShouldJump && m_bShouldJump)
         {
             m_nJumpFrame = 4; // Give multiple frames to clear the ground.
+        }
+
+        // ------------------------------------------------------------------------------------------------------
+        // Sprinting.
+
+        // Reset grounded max speed and FOV offset.
+        m_fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
+        m_fFOVIncrease = 0.0f;
+
+        float fMoveDirDot = Vector3.Dot(m_v3MoveDirection, LookForward());
+
+        if (m_bOnGround && Input.GetKey(KeyCode.LeftShift) && fMoveDirDot >= m_fSprintDot)
+        {
+            m_fFOVIncrease = 10.0f;
+            m_fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
+        }
+
+        // ---------------------------------------------------------------------------------------------------
+        // FOV velocity effect.
+
+        float fFOVOffset = Mathf.Clamp((m_v3Velocity.magnitude - m_fMaxGroundMoveSpeed) + m_fFOVIncrease, 0.0f, 15.0f);
+
+        if (m_bOnGround)
+        {
+            m_cameraEffects.AddFOVOffset(m_fFOVIncrease);
+            m_cameraEffects.SetFOVChangeRate(75.0f);
+        }
+        else
+        {
+            m_cameraEffects.AddFOVOffset(fFOVOffset);
+            m_cameraEffects.SetFOVChangeRate(20.0f);
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -660,7 +720,10 @@ public class PlayerController : MonoBehaviour
         m_controller.Move(m_v3Velocity * Time.deltaTime);
 
         // Get modified velocity back from the controller.
-        m_v3Velocity = m_controller.velocity;
+        if(!m_bJustResumed)
+            m_v3Velocity = m_controller.velocity;
+        else
+            m_bJustResumed = false;
     }
 
     private void OnCollisionEnter(Collision collision)

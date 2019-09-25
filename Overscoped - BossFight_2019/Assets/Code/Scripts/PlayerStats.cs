@@ -78,7 +78,10 @@ public class PlayerStats : MonoBehaviour
     private Material m_manaFillMat = null;
 
     [SerializeField]
-    private Material m_reticleMat = null;
+    private Material[] m_reticleMats = null;
+
+    [SerializeField]
+    private RectTransform m_reticleOuterTransform = null;
 
     [SerializeField]
     private Material m_armHealthMat = null;
@@ -93,6 +96,7 @@ public class PlayerStats : MonoBehaviour
     private PlayerBeam m_beamScript;
     private CameraEffects m_camEffects;
     private Transform m_camPivot;
+    private ScreenFade m_fadeScript;
 
     // Resources
     private float m_fHealth;
@@ -113,6 +117,7 @@ public class PlayerStats : MonoBehaviour
         m_beamScript = GetComponent<PlayerBeam>();
         m_camEffects = GetComponentInChildren<CameraEffects>(false);
         m_camPivot = transform.Find("CameraPivot");
+        m_fadeScript = FindObjectOfType<ScreenFade>();
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
@@ -198,12 +203,27 @@ public class PlayerStats : MonoBehaviour
         m_armManaMat.SetFloat("_Mana", 1.0f - (m_fMana / m_fMaxMana));
 
         if (m_hookScript.InGrappleRange())
-            m_reticleMat.SetInt("_InRange", 1);
+        {
+            m_reticleMats[0].SetInt("_InRange", 1);
+            m_reticleMats[1].SetInt("_InRange", 1);
+
+            m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f) * 1.2f;
+        } 
         else
-            m_reticleMat.SetInt("_InRange", 0);
+        {
+            m_reticleMats[0].SetInt("_InRange", 0);
+            m_reticleMats[1].SetInt("_InRange", 0);
+
+            m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f);
+        }
 
         m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
         m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
+    }
+
+    private void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void DeathUpdate()
@@ -211,6 +231,8 @@ public class PlayerStats : MonoBehaviour
         CameraSplineState splineState = m_camEffects.EvaluateCamSpline(Mathf.Clamp(m_fSplineProgress, 0.0f, 1.0f));
 
         m_fSplineProgress += m_rewindCurve.Evaluate(m_fSplineProgress) * Time.deltaTime;
+
+        m_fadeScript.SetFade(m_fSplineProgress);
 
         m_camEffects.transform.localRotation = Quaternion.identity;
 
@@ -226,7 +248,7 @@ public class PlayerStats : MonoBehaviour
         // Reset scene when spline is complete.
         if(m_fSplineProgress >= 1.0f)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            RestartScene();
         }
     }
 
@@ -311,6 +333,11 @@ public class PlayerStats : MonoBehaviour
 
         // Begin spline.
         m_camEffects.StartCamSpline();
+
+        // Begin fade effect.
+        m_fadeScript.SetFadeRate(0.0f);
+        m_fadeScript.SetCallback(RestartScene);
+        m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
 
         // Disable control scripts.
         m_controller.enabled = false;

@@ -68,6 +68,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float m_fRespawnHeight = 10.0f;
 
+    [Tooltip("Height in which the player will be respawned above the last platform they stood on.")]
+    [SerializeField]
+    private float m_fKillZoneHeight = -80.0f;
+
     [Tooltip("Whether or not the player is standing on a walkable surface.")]
     [SerializeField]
     private bool m_bOnGround = false;
@@ -438,7 +442,7 @@ public class PlayerController : MonoBehaviour
     */
     private void RespawnBelowMinY()
     {
-        if (transform.position.y < -80.0f)
+        if (transform.position.y < m_fKillZoneHeight)
         {
             // Get velocity and remove x and z components.
             Vector3 v3BodyVelocity = m_controller.velocity;

@@ -19,6 +19,7 @@ public class PlayerStats : MonoBehaviour
 
     [SerializeField]
     private float m_fMaxHealth = 100.0f;
+
     [SerializeField]
     private float m_fMaxMana = 100.0f;
 

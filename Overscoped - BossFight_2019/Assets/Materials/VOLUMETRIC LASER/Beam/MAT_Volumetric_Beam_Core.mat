@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MAT_Volumetric_Beam_Core
+  m_Shader: {fileID: 4800000, guid: 1752fe60fd9558a43b08db6141def2a8, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Albedo:
+        m_Texture: {fileID: 2800000, guid: 4855cd84f5ba0c344b80c8009ce51491, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ColourTexture:
+        m_Texture: {fileID: 2800000, guid: 1524804b94e1abd4dabefcde29b6b7fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample0:
+        m_Texture: {fileID: 2800000, guid: 7b807fd8d5ed82d4c832d62d2e26b8a3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _VertexOffset:
+        m_Texture: {fileID: 2800000, guid: 1524804b94e1abd4dabefcde29b6b7fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _VertexTexture:
+        m_Texture: {fileID: 2800000, guid: f7389f5ab6a087a4ba093dd442286f11, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _FreqMult: 1
+    - _IntensityMult: 4.08
+    - _LineLength: 35
+    - _NoiseVertexIntensity: 1.5
+    - _NoiseVertexOffsetStrength: 2
+    - _OffsetStrength: 4
+    - _Sinespeed: 21.6
+    - _Timemult: 3
+    - _VertexStrength: 1.5
+    - _add: 1
+    - _exponential: 1
+    - _mult: 7.51
+    - _sineintensity: 0.35
+    m_Colors:
+    - _Color0: {r: 0, g: 0.003921569, b: 0.2, a: 0}
+    - _Color1: {r: 0, g: 0.0627451, b: 1.4980392, a: 0}
+    - _ColourOffset: {r: -0.2, g: 1, b: 0, a: 0}
+    - _ColourTiling: {r: 1, g: 3, b: 0, a: 0}
+    - _LineOrigin: {r: -244, g: -52, b: 105, a: 0}
+    - _Offset: {r: 0.2, g: 0.5, b: 0, a: 0}
+    - _Tiling: {r: 1, g: 3, b: 0, a: 0}
+    - _Tilling: {r: 0.66, g: 1, b: 0, a: 0}
+    - _VertexOffset: {r: 0, g: 0.5, b: 0, a: 0}
+    - _VertexTiling: {r: 1, g: 3, b: 0, a: 0}

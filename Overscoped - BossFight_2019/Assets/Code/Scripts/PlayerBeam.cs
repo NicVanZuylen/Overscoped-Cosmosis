@@ -120,6 +120,9 @@ public class PlayerBeam : MonoBehaviour
 
     void LateUpdate()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         if (m_bBeamUnlocked)
         {
             m_bCanCast = m_bBeamEnabled || (Input.GetMouseButtonDown(1) && m_fBeamCharge >= m_fMinBeamCharge);

@@ -357,7 +357,7 @@ public class GrappleHook : MonoBehaviour
 
                     // Release impulse.
                     if (m_fGrappleTime >= m_fMinReleaseBoostTime)
-                        m_controller.AddImpulse(m_controller.SurfaceForward() * m_fReleaseForce);
+                        m_controller.AddImpulse(m_controller.LookForward() * m_fReleaseForce);
                 }
             }
         }
@@ -412,7 +412,7 @@ public class GrappleHook : MonoBehaviour
     }
 
 
-    Vector3 GrappleFly(PlayerController controller)
+    Vector3 GrappleFly(PlayerController controller, float fDeltaTime)
     {
         Vector3 v3NetForce = m_v3GrappleBoost;
 
@@ -426,7 +426,7 @@ public class GrappleHook : MonoBehaviour
         Vector3 v3NonPullComponent = controller.GetVelocity() - (v3GrappleDir * fPullComponent);
 
         if (fPullComponent < m_fMaxFlySpeed)
-          v3NetForce += v3GrappleDir * m_fPullAcceleration * Time.fixedDeltaTime;
+           v3NetForce += v3GrappleDir * m_fPullAcceleration * fDeltaTime;
 
         Vector3 v3MoveDir = Vector3.zero;
 
@@ -441,22 +441,22 @@ public class GrappleHook : MonoBehaviour
         // Get player movement direction.
         if (Input.GetKey(KeyCode.W))
         {
-            v3MoveDir += m_controller.LookForward();
+            v3MoveDir += v3Forward;
             ++nDirCount;
         }
         if (Input.GetKey(KeyCode.A))
         {
-            v3MoveDir -= m_controller.LookRight();
+            v3MoveDir -= v3Right;
             ++nDirCount;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            v3MoveDir -= m_controller.LookForward();
+            v3MoveDir -= v3Forward;
             ++nDirCount;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            v3MoveDir += m_controller.LookRight();
+            v3MoveDir += v3Right;
             ++nDirCount;
         }
 
@@ -465,13 +465,13 @@ public class GrappleHook : MonoBehaviour
             v3MoveDir.Normalize();
 
         // Controls
-        v3NetForce += v3MoveDir * m_fAirAcceleration * Time.fixedDeltaTime;
+        v3NetForce += v3MoveDir * m_fAirAcceleration * fDeltaTime;
 
         // Lateral drag.
         if (v3NonPullComponent.sqrMagnitude < 1.0f)
-            v3NetForce -= v3NonPullComponent * m_fDriftTolerance * Time.fixedDeltaTime;
+            v3NetForce -= v3NonPullComponent * m_fDriftTolerance * fDeltaTime;
         else
-            v3NetForce -= v3NonPullComponent.normalized * m_fDriftTolerance * Time.fixedDeltaTime;
+            v3NetForce -= v3NonPullComponent.normalized * m_fDriftTolerance * fDeltaTime;
 
         // Stop when within radius of the hook.
         if (v3GrappleDif.sqrMagnitude <= m_fDestinationRadius * m_fDestinationRadius)
@@ -484,16 +484,19 @@ public class GrappleHook : MonoBehaviour
             m_controller.SetGravity(m_controller.JumpGravity());
         }
 
+        // The component of the velocity + net force away from the grapple point.
         float tension = Vector3.Dot(m_controller.GetVelocity() + v3NetForce, v3GrappleDir);
 
-        // Prevent the rope from stretching beyond the rope length when initially grappling.
+        // Prevent the rope from stretching beyond the rope length established when initially grappling.
         if (m_bRestrictToRopeLength && v3GrappleDif.sqrMagnitude > m_fGrapLineLength && tension < 0.0f)
+        {
             v3NetForce -= tension * v3GrappleDir;
+        }
 
         return m_controller.GetVelocity() + v3NetForce;
     }
 
-    Vector3 GrappleLand(PlayerController controller)
+    Vector3 GrappleLand(PlayerController controller, float fDeltaTime)
     {
         Vector3 v3NetForce = Vector3.zero;
 
@@ -503,13 +506,13 @@ public class GrappleHook : MonoBehaviour
 
         // Movement during grapple landing phase.
         if (Input.GetKey(KeyCode.W))
-            v3NetForce += v3ForwardVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
+            v3NetForce += v3ForwardVec * m_fLandMoveAcceleration * fDeltaTime;
         if (Input.GetKey(KeyCode.A))
-            v3NetForce -= v3RightVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
+            v3NetForce -= v3RightVec * m_fLandMoveAcceleration * fDeltaTime;
         if (Input.GetKey(KeyCode.S))
-            v3NetForce -= v3ForwardVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
+            v3NetForce -= v3ForwardVec * m_fLandMoveAcceleration * fDeltaTime;
         if (Input.GetKey(KeyCode.D))
-            v3NetForce += v3RightVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
+            v3NetForce += v3RightVec * m_fLandMoveAcceleration * fDeltaTime;
 
         // Add gravity.
         v3NetForce += Physics.gravity * Time.fixedDeltaTime;
@@ -519,14 +522,14 @@ public class GrappleHook : MonoBehaviour
         // Drag
         if(v3Velocity.sqrMagnitude < 1.0f)
         {
-            v3Velocity.x -= v3Velocity.x * 5.0f * Time.fixedDeltaTime;
-            v3Velocity.z -= v3Velocity.x * 5.0f * Time.fixedDeltaTime;
+            v3Velocity.x -= v3Velocity.x * 5.0f * fDeltaTime;
+            v3Velocity.z -= v3Velocity.x * 5.0f * fDeltaTime;
         }
         else 
         {
             Vector3 v3VelNor = v3Velocity.normalized;
-            v3Velocity.x -= v3VelNor.x * 5.0f * Time.fixedDeltaTime;
-            v3Velocity.z -= v3VelNor.z * 5.0f * Time.fixedDeltaTime;
+            v3Velocity.x -= v3VelNor.x * 5.0f * fDeltaTime;
+            v3Velocity.z -= v3VelNor.z * 5.0f * fDeltaTime;
         }
 
         // Free override on landing.

@@ -108,7 +108,7 @@ public class PlayerController : MonoBehaviour
     private bool m_bFocused; // Whether or not the player's cursor is locked and focused on camera movement.
 
     // Overrides
-    public delegate Vector3 OverrideFunction(PlayerController controller);
+    public delegate Vector3 OverrideFunction(PlayerController controller, float fDeltaTime);
 
     OverrideFunction m_overrideFunction;
     bool m_bOverridden;
@@ -459,7 +459,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void UpdateMovement(float fDeltaTime)
     {
         if (PauseMenu.IsPaused())
             return;
@@ -472,7 +472,7 @@ public class PlayerController : MonoBehaviour
             m_cameraEffects.SetBobbingEnabled(false);
 
             // Run override behaviour and use it's velocity output.
-            m_v3Velocity = m_overrideFunction(this);
+            m_v3Velocity = m_overrideFunction(this, fDeltaTime);
 
             // Respawn they player if they fall too far.
             RespawnBelowMinY();
@@ -512,7 +512,7 @@ public class PlayerController : MonoBehaviour
                 Vector3 v3NonMoveComponent = m_v3Velocity - (m_v3MoveDirection * fMoveDirComponent);
 
                 // Add force to counter act lateral velocity.
-                v3NetForce -= v3NonMoveComponent * 3.0f * Time.fixedDeltaTime;
+                v3NetForce -= v3NonMoveComponent * 3.0f * fDeltaTime;
 
                 // ------------------------------------------------------------------------------------------------------
                 // Running
@@ -524,10 +524,10 @@ public class PlayerController : MonoBehaviour
 
                 if(m_v3Velocity.sqrMagnitude > m_fCurrentGroundMaxSpeed * m_fCurrentGroundMaxSpeed)
                 {
-                    v3SlideDrag -= m_v3Velocity * m_fSlideDrag * Time.fixedDeltaTime;
+                    v3SlideDrag -= m_v3Velocity * m_fSlideDrag * fDeltaTime;
                 }
 
-                Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fGroundAcceleration * Time.fixedDeltaTime;
+                Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fGroundAcceleration * fDeltaTime;
 
                 v3NetForce += v3Acceleration + v3SlideDrag;
             }
@@ -541,12 +541,12 @@ public class PlayerController : MonoBehaviour
                 if (m_v3Velocity.sqrMagnitude <= m_fMaxGroundMoveSpeed * m_fMaxGroundMoveSpeed)
                 {
                     // Foot drag.
-                    v3NetForce -= m_v3Velocity * m_fGroundDrag * Time.fixedDeltaTime;
+                    v3NetForce -= m_v3Velocity * m_fGroundDrag * fDeltaTime;
                 }
                 else
                 {
                     // Slide drag.
-                    v3NetForce -= m_v3Velocity * m_fMomentumDrag * Time.fixedDeltaTime;
+                    v3NetForce -= m_v3Velocity * m_fMomentumDrag * fDeltaTime;
                 }
 
                 m_animController.SetBool("isRunning", false);
@@ -561,12 +561,6 @@ public class PlayerController : MonoBehaviour
             m_animController.SetBool("isRunning", false);
 
             // ------------------------------------------------------------------------------------------------------
-            // Reset movement vectors for airborn movement.
-
-            // We're giving it the upward vector to represent a flat surface.
-            CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
-
-            // ------------------------------------------------------------------------------------------------------
             // Airborne movement
 
             Vector3 v3VelNor = m_v3Velocity.normalized;
@@ -574,10 +568,10 @@ public class PlayerController : MonoBehaviour
             float fCompInVelocity = Vector3.Dot(v3VelNor, m_v3MoveDirection);
             float fMoveAmount = (1.0f - fCompInVelocity) * m_fMaxAirborneMoveSpeed;
 
-            Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fAirAcceleration * Time.fixedDeltaTime;
+            Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fAirAcceleration * fDeltaTime;
             v3Acceleration.y = 0.0f;
 
-            Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag * Time.fixedDeltaTime;
+            Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag * fDeltaTime;
             v3AirDrag.y = 0.0f;
             
             v3NetForce += v3Acceleration + v3AirDrag;
@@ -600,13 +594,13 @@ public class PlayerController : MonoBehaviour
 
             --m_nJumpFrame;
         }
-        
+
 
         // ------------------------------------------------------------------------------------------------------
         // Gravity.
 
-        m_v3Velocity.y += m_fCurrentGravity * Time.fixedDeltaTime;
-            
+        m_v3Velocity.y += m_fCurrentGravity * fDeltaTime;
+
         // ------------------------------------------------------------------------------------------------------
         // Final forces.
 
@@ -623,9 +617,14 @@ public class PlayerController : MonoBehaviour
             return;
 
         // ------------------------------------------------------------------------------------------------------
+        // Movement updates.
+
+        UpdateMovement(Time.deltaTime);
+
+        // ------------------------------------------------------------------------------------------------------
         // Mouse look
 
-        if(m_bFocused)
+        if (m_bFocused)
         {
             m_fLookEulerX -= Input.GetAxis("Mouse Y");
             m_fLookEulerY += Input.GetAxis("Mouse X");
@@ -676,9 +675,15 @@ public class PlayerController : MonoBehaviour
 
         m_bOnGround &= !m_bSlopeLimit;
 
+        // Ground detection result should be confirmed here.
         if (m_bOnGround)
             m_bJumping = false;
-
+        else
+        {
+            // Calculate surface vectors for airborne movement.
+            // We're giving it the upward vector to represent a flat surface.
+            CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
+        }
 
         if (!bPrevGrounded && m_v3Velocity.y < 0.0f && m_bOnGround)
         {
@@ -739,6 +744,12 @@ public class PlayerController : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------------
         // Movement
+
+        if (m_bOverridden)
+        {
+            // Run override behaviour and use it's velocity output.
+            //m_v3Velocity = m_overrideFunction(this);
+        }
 
         // Move using current velocity delta.
         m_controller.Move(m_v3Velocity * Time.deltaTime);

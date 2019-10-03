@@ -90,6 +90,9 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private Material m_armManaMat = null;
 
+    [SerializeField]
+    private Text m_speedText = null;
+
     // Private:
 
     private GrappleHook m_hookScript;
@@ -217,6 +220,9 @@ public class PlayerStats : MonoBehaviour
 
             m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f);
         }
+
+        if (m_speedText)
+            m_speedText.text = m_controller.GetVelocity().magnitude.ToString("n2") + "m/s";
 
         m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
         m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);

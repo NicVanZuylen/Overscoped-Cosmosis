@@ -139,6 +139,48 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    /*
+    Description: Apply velocity-based FOV adjustments.
+    */
+    void ApplyVelocityFOV()
+    {
+        // Get velocity and max ground speed.
+        Vector3 v3Velocity = m_controller.GetVelocity();
+        float fMaxGroundSpeed = m_controller.MaxGroundSpeed();
+
+        // FOV increment value.
+        float fFOVIncrease = 0.0f;
+
+        // Increment FOV if sprinting.
+        if (m_controller.IsSprinting())
+            fFOVIncrease += 10.0f;
+
+        if (m_controller.IsGrounded())
+        {
+            // Set grounded FOV change rate.
+            m_camEffects.AddFOVOffset(fFOVIncrease);
+            m_camEffects.SetFOVChangeRate(75.0f);
+        }
+        else if (!m_controller.IsJumping())
+        {
+            // Airborne FOV calculations...
+            float fFOVOffset = Mathf.Clamp(v3Velocity.magnitude - fMaxGroundSpeed + fFOVIncrease, 0.0f, 15.0f);
+
+            m_camEffects.AddFOVOffset(fFOVOffset);
+            m_camEffects.SetFOVChangeRate(20.0f);
+        }
+        else
+        {
+            // Airborne due to jumping calculations...
+            Vector3 v3VelNoY = v3Velocity;
+            v3VelNoY.y = 0.0f;
+            float fFOVOffset = Mathf.Clamp(v3VelNoY.magnitude - fMaxGroundSpeed + fFOVIncrease, 0.0f, 15.0f);
+
+            m_camEffects.AddFOVOffset(fFOVOffset);
+            m_camEffects.SetFOVChangeRate(20.0f);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -154,6 +196,9 @@ public class PlayerStats : MonoBehaviour
 
     private void AliveUpdate()
     {
+        // Apply velocity-based FOV adjustments.
+        ApplyVelocityFOV();
+
         if (m_hookScript.IsActive())
         {
             // Reset mana regen delay.

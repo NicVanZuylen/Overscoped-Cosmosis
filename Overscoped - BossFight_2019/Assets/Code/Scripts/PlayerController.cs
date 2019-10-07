@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_v3SurfaceRight;
     private Vector3 m_v3SurfaceUp;
     private Vector3 m_v3SurfaceForward;
-    public Vector3 m_v3Velocity;
+    private Vector3 m_v3Velocity;
     private float m_fSprintDot;
     private float m_fCurrentGroundMaxSpeed;
     private bool m_bShouldSprint;
@@ -268,6 +268,42 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
+    Description: Get whether or not the player is airborne as the result of a jump.
+    Return Type: bool
+    */
+    public bool IsJumping()
+    {
+        return m_bJumping;
+    }
+
+    /*
+    Description: Get whether or not the player sprinting.
+    Return Type: bool
+    */
+    public bool IsSprinting()
+    {
+        return m_fCurrentGroundMaxSpeed == m_fMaxSprintMoveSpeed;
+    }
+
+    /*
+    Description: Get the maximum non-sprinting ground movement speed.
+    Return Type: float
+    */
+    public float MaxGroundSpeed()
+    {
+        return m_fMaxGroundMoveSpeed;
+    }
+
+    /*
+    Description: Get the maximum grounded sprinting speed.
+    Return Type: float
+    */
+    public float MaxSprintSpeed()
+    {
+        return m_fMaxSprintMoveSpeed;
+    }
+
+    /*
     Description: Get the current velocity from the character controller.
     Return Type: Vector3
     */
@@ -411,11 +447,6 @@ public class PlayerController : MonoBehaviour
             // Push back on the player with a slightly larger force to allow them to slide down the surface.
             m_v3Velocity += v3VelAgainstNormal * 1.1f;
 
-            Debug.Log("Angle push!");
-            Debug.Log(m_bOnGround);
-
-            Debug.Log(m_groundHit.collider.gameObject.name);
-
             v3Normal = Vector3.up;
             m_bSlopeLimit = true;
         }
@@ -456,8 +487,6 @@ public class PlayerController : MonoBehaviour
 
             // Apply new velocity.
             m_v3Velocity = v3BodyVelocity;
-
-            Debug.Log("Below Min Y!");
 
             // Teleport to spawn point.
             m_controller.enabled = false;
@@ -582,8 +611,6 @@ public class PlayerController : MonoBehaviour
             v3AirDrag.y = 0.0f;
 
             v3NetForce += v3Acceleration + v3AirDrag;
-
-            
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -684,7 +711,9 @@ public class PlayerController : MonoBehaviour
                 m_v3RespawnPosition = m_groundHit.collider.bounds.center + new Vector3(0.0f, (m_groundHit.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
         }
 
+#if UNITY_EDITOR
         Debug.DrawLine(sphereRay.origin, m_groundHit.point, Color.magenta);
+#endif
 
         // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
         m_bOnGround |= m_controller.isGrounded;
@@ -723,39 +752,12 @@ public class PlayerController : MonoBehaviour
 
         // Reset grounded max speed and FOV offset.
         m_fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
-        float fFOVIncrease = 0.0f;
 
         float fMoveDirDot = Vector3.Dot(m_v3MoveDirection, LookForward());
 
         if (m_bOnGround && Input.GetKey(KeyCode.LeftShift) && fMoveDirDot >= m_fSprintDot)
         {
-            fFOVIncrease = 10.0f;
             m_fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
-        }
-
-        // ---------------------------------------------------------------------------------------------------
-        // FOV velocity effect.
-
-        if (m_bOnGround)
-        {
-            m_cameraEffects.AddFOVOffset(fFOVIncrease);
-            m_cameraEffects.SetFOVChangeRate(75.0f);
-        }
-        else if(!m_bJumping)
-        {
-            float fFOVOffset = Mathf.Clamp(m_v3Velocity.magnitude - m_fMaxGroundMoveSpeed + fFOVIncrease, 0.0f, 15.0f);
-
-            m_cameraEffects.AddFOVOffset(fFOVOffset);
-            m_cameraEffects.SetFOVChangeRate(20.0f);
-        }
-        else
-        {
-            Vector3 v3VelNoY = m_v3Velocity;
-            v3VelNoY.y = 0.0f;
-            float fFOVOffset = Mathf.Clamp(v3VelNoY.magnitude - m_fMaxGroundMoveSpeed + fFOVIncrease, 0.0f, 15.0f);
-
-            m_cameraEffects.AddFOVOffset(fFOVOffset);
-            m_cameraEffects.SetFOVChangeRate(20.0f);
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -768,9 +770,6 @@ public class PlayerController : MonoBehaviour
         if(!m_bJustResumed)
         {
             m_v3Velocity = m_controller.velocity;
-
-            if (m_v3Velocity.magnitude == 0.0f)
-                Debug.Log("?");
         }
         else
             m_bJustResumed = false;

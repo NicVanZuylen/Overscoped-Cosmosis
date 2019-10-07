@@ -411,6 +411,11 @@ public class PlayerController : MonoBehaviour
             // Push back on the player with a slightly larger force to allow them to slide down the surface.
             m_v3Velocity += v3VelAgainstNormal * 1.1f;
 
+            Debug.Log("Angle push!");
+            Debug.Log(m_bOnGround);
+
+            Debug.Log(m_groundHit.collider.gameObject.name);
+
             v3Normal = Vector3.up;
             m_bSlopeLimit = true;
         }
@@ -451,6 +456,8 @@ public class PlayerController : MonoBehaviour
 
             // Apply new velocity.
             m_v3Velocity = v3BodyVelocity;
+
+            Debug.Log("Below Min Y!");
 
             // Teleport to spawn point.
             m_controller.enabled = false;
@@ -573,8 +580,10 @@ public class PlayerController : MonoBehaviour
 
             Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag * fDeltaTime;
             v3AirDrag.y = 0.0f;
-            
+
             v3NetForce += v3Acceleration + v3AirDrag;
+
+            
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -635,9 +644,11 @@ public class PlayerController : MonoBehaviour
         m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler() + m_cameraEffects.HeadBobbingEuler());
         m_cameraTransform.localPosition = m_cameraEffects.HeadBobbingOffset();
 
+#if UNITY_EDITOR
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceUp * 3.0f), Color.green);
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceForward * 3.0f), Color.blue);
+#endif
 
         // ------------------------------------------------------------------------------------------------------
         // Move direction
@@ -651,8 +662,13 @@ public class PlayerController : MonoBehaviour
 
         Ray sphereRay = new Ray(transform.position, -Vector3.up);
 
+        // Hit all layers but one.
+        const int nGroundMask = ~(1 << 9); // !Player layer.
+
         // Sphere case down to the nearest surface below. Sphere cast is ignored if not falling.
-        bool bSphereCastHit = Physics.SphereCast(sphereRay, m_controller.radius, out m_groundHit, Mathf.Infinity, int.MaxValue, QueryTriggerInteraction.Ignore);
+        bool bSphereCastHit = Physics.SphereCast(sphereRay, m_controller.radius, out m_groundHit, Mathf.Infinity, nGroundMask, QueryTriggerInteraction.Ignore);
+
+        // The hit must be within the capsule height bounds.
         m_bOnGround = bSphereCastHit && m_groundHit.distance < (m_controller.height * 0.5f) - (m_controller.radius * 0.7f);
 
         // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
@@ -745,18 +761,17 @@ public class PlayerController : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------
         // Movement
 
-        if (m_bOverridden)
-        {
-            // Run override behaviour and use it's velocity output.
-            //m_v3Velocity = m_overrideFunction(this);
-        }
-
         // Move using current velocity delta.
         m_controller.Move(m_v3Velocity * Time.deltaTime);
 
         // Get modified velocity back from the controller.
         if(!m_bJustResumed)
+        {
             m_v3Velocity = m_controller.velocity;
+
+            if (m_v3Velocity.magnitude == 0.0f)
+                Debug.Log("?");
+        }
         else
             m_bJustResumed = false;
     }

@@ -357,7 +357,9 @@ public class GrappleHook : MonoBehaviour
 
                     // Release impulse.
                     if (m_fGrappleTime >= m_fMinReleaseBoostTime)
+                    {
                         m_controller.AddImpulse(m_controller.LookForward() * m_fReleaseForce);
+                    }
                 }
             }
         }

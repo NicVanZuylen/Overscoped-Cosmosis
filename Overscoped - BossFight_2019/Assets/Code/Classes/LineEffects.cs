@@ -106,9 +106,7 @@ class LineEffects
         if (!bActive)
         {
             // Expand thickness after use.
-            m_fCurrentLineThickness = Mathf.Lerp(m_fCurrentLineThickness, m_fPopThickness, m_fPopRate);
-
-            m_fCurrentLineThickness = Mathf.Clamp(m_fCurrentLineThickness, 0.0f, m_fPopThickness);
+            m_fCurrentLineThickness = Mathf.MoveTowards(m_fCurrentLineThickness, m_fPopThickness, m_fPopRate * Time.deltaTime);
 
             // Set line shader opacity.
             line.material.SetFloat("_Opacity", 1.0f - (m_fCurrentLineThickness / m_fPopThickness));
@@ -117,7 +115,7 @@ class LineEffects
             line.startWidth = m_fCurrentLineThickness;
             line.endWidth = m_fCurrentLineThickness;
 
-            line.enabled = bActive || m_fCurrentLineThickness < (m_fPopThickness - 0.1f);
+            line.enabled = m_fCurrentLineThickness < (m_fPopThickness - 0.1f);
 
             return;
         }

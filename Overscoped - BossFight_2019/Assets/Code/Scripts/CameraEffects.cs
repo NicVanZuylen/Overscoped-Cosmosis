@@ -70,6 +70,11 @@ public class CameraEffects : MonoBehaviour
     {
         m_camera = GetComponent<Camera>();
 
+        // Get player controller and add landing callback.
+        PlayerController controller = transform.parent.GetComponentInParent<PlayerController>();
+
+        controller.AddLandCallback(Land);
+
         m_camSpline = new List<CameraSplineState>(m_nMaxSplinePoints);
 
         m_v3StartPosition = transform.localPosition;
@@ -95,8 +100,10 @@ public class CameraEffects : MonoBehaviour
         m_camera.fieldOfView = Mathf.MoveTowards(m_camera.fieldOfView, m_fStartFOV + m_fFOVOffset, m_fFOVChangeRate * Time.deltaTime);
         m_fFOVOffset = 0.0f;
 
+#if UNITY_EDITOR
         if (Input.GetKey(KeyCode.L))
-            Land();
+            Land(null);
+#endif
 
         // Update head bobbing effect.
         UpdateBobbing();
@@ -167,8 +174,10 @@ public class CameraEffects : MonoBehaviour
 
     /*
     Description: Add a landing the the head bobbing effect.
+    Param:
+        PlayerController controller: For callback compatibility.
     */
-    public void Land()
+    public void Land(PlayerController controller)
     {
         m_nLandingBobDirection = 1;
     }

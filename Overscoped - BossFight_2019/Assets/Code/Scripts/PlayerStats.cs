@@ -12,7 +12,8 @@ public class PlayerStats : MonoBehaviour
         REGEN_LERP
     }
 
-    // On inspector: 
+    // Inspector:
+    // -------------------------------------------------------------------------------------------------
 
     [Header("Health & Mana")]
     [Space(10)]
@@ -68,8 +69,9 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private ERegenMode m_manaRegenMode = ERegenMode.REGEN_LINEAR;
 
+    // -------------------------------------------------------------------------------------------------
     [Space(10)]
-    [Header("Health & Mana")]
+    [Header("GUI References")]
     [Space(10)]
 
     [SerializeField]
@@ -92,6 +94,38 @@ public class PlayerStats : MonoBehaviour
 
     [SerializeField]
     private Text m_speedText = null;
+
+    // -------------------------------------------------------------------------------------------------
+    [Header("SFX")]
+
+    [Tooltip("Speed in which the wind loop will play at maximum volume.")]
+    [SerializeField]
+    private float m_fWindMaxVolSpeed = 50.0f;
+
+    [Tooltip("Minimum speed in which the player must be flying to hear the wind SFX")]
+    [SerializeField]
+    private float m_fWindMinVolSpeed = 8.0f;
+
+    [Tooltip("Speed in which wind volume will drop when grounded.")]
+    [SerializeField]
+    private float m_fWindDecayRate = 2.0f;
+
+    [SerializeField]
+    private AudioClip m_windLoopSFX = null;
+
+    [SerializeField]
+    private AudioClip[] m_hurtSFX = null;
+
+    [SerializeField]
+    private AudioClip[] m_jumpGruntSFX = null;
+
+    [SerializeField]
+    private AudioSource m_sfxSource;
+
+    [SerializeField]
+    private AudioSource m_windAudioSource = null;
+
+    // -------------------------------------------------------------------------------------------------
 
     // Private:
 
@@ -123,6 +157,16 @@ public class PlayerStats : MonoBehaviour
         m_camPivot = transform.Find("CameraPivot");
         m_fadeScript = FindObjectOfType<ScreenFade>();
 
+        m_controller.AddJumpCallback(OnJump);
+
+        if (!m_sfxSource)
+            m_sfxSource = GetComponent<AudioSource>();
+
+        if (!m_windAudioSource)
+            m_windAudioSource = GetComponent<AudioSource>();
+
+        m_windAudioSource.clip = m_windLoopSFX;
+
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
         m_fCurrentRegenDelay = 1.0f;
@@ -140,9 +184,9 @@ public class PlayerStats : MonoBehaviour
     }
 
     /*
-    Description: Apply velocity-based FOV adjustments.
+    Description: Apply velocity-based visual and audio effects.
     */
-    void ApplyVelocityFOV()
+    void ApplyVelocityFX()
     {
         // Get velocity and max ground speed.
         Vector3 v3Velocity = m_controller.GetVelocity();
@@ -179,6 +223,40 @@ public class PlayerStats : MonoBehaviour
             m_camEffects.AddFOVOffset(fFOVOffset);
             m_camEffects.SetFOVChangeRate(20.0f);
         }
+
+        // Wind effect.
+        if (!m_controller.IsGrounded())
+        {
+            // Adjust wind volume based off of velocity.
+            m_windAudioSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed, 0.0f);
+
+            if(!m_windAudioSource.isPlaying)
+                m_windAudioSource.Play();
+        }
+        else if(m_windAudioSource.isPlaying)
+        {
+            // Decay volume when landing.
+            m_windAudioSource.volume = Mathf.MoveTowards(m_windAudioSource.volume, 0.0f, m_fWindDecayRate * Time.deltaTime);
+
+            // Stop audio when volume reaches silence.
+            if(m_windAudioSource.volume <= 0.01f)
+                m_windAudioSource.Stop();
+        }
+    }
+
+    /*
+    Description: Run once when jumping.
+    Param:
+        PlayerController controller: For callback compatibility.
+    */
+    void OnJump(PlayerController controller)
+    {
+        // Get random SFX index.
+        int nRandomSFXIndex = Random.Range(0, m_jumpGruntSFX.Length);
+
+        // Perform null check and play audio.
+        if (m_jumpGruntSFX.Length > 0 && m_jumpGruntSFX[nRandomSFXIndex])
+            m_sfxSource.PlayOneShot(m_jumpGruntSFX[nRandomSFXIndex]);
     }
 
     // Update is called once per frame
@@ -196,8 +274,8 @@ public class PlayerStats : MonoBehaviour
 
     private void AliveUpdate()
     {
-        // Apply velocity-based FOV adjustments.
-        ApplyVelocityFOV();
+        // Apply velocity-based FX.
+        ApplyVelocityFX();
 
         if (m_hookScript.IsActive())
         {
@@ -238,11 +316,13 @@ public class PlayerStats : MonoBehaviour
             m_camEffects.RecordCameraState();
         }
 
+#if UNITY_EDITOR
         // Kill button
         if(Input.GetKeyDown(KeyCode.K))
         {
             KillPlayer();
         }
+#endif
 
         // Clamp health and mana.
         m_fHealth = Mathf.Clamp(m_fHealth, 0.0f, m_fMaxHealth);
@@ -362,6 +442,12 @@ public class PlayerStats : MonoBehaviour
     public void DealDamage(float fDamage)
     {
         m_fHealth -= fDamage;
+
+        // Hurt SFX
+        int nRandomSFXIndex = Random.Range(0, m_hurtSFX.Length);
+
+        if (m_hurtSFX.Length > 0 && m_hurtSFX[nRandomSFXIndex])
+            m_sfxSource.PlayOneShot(m_hurtSFX[nRandomSFXIndex]);
 
         if(m_fHealth <= 0.0f)
         {

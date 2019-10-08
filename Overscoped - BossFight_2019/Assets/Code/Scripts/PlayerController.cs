@@ -107,12 +107,20 @@ public class PlayerController : MonoBehaviour
     private float m_fLookEulerY;
     private bool m_bFocused; // Whether or not the player's cursor is locked and focused on camera movement.
 
-    // Overrides
+    // Overrides & Callbacks
+
+    // Runs once per frame on player controller update.
     public delegate Vector3 OverrideFunction(PlayerController controller, float fDeltaTime);
 
-    OverrideFunction m_overrideFunction;
-    bool m_bOverridden;
-    bool m_bJustResumed;
+    // Runs once when a jump is initiated.
+    public delegate void PlayerControllerCallback(PlayerController controller);
+
+    private OverrideFunction m_overrideFunction;
+    private bool m_bOverridden;
+    private bool m_bJustResumed;
+
+    private List<PlayerControllerCallback> m_jumpCallbacks;
+    private List<PlayerControllerCallback> m_landCallbacks;
 
     private void Awake()
     {
@@ -121,6 +129,13 @@ public class PlayerController : MonoBehaviour
         m_animController = GetComponentInChildren<Animator>();
         m_cameraTransform = GetComponentInChildren<Camera>().transform;
         m_v3RespawnPosition = transform.position;
+
+        // Callbacks.
+        if (m_jumpCallbacks != null)
+            m_jumpCallbacks = new List<PlayerControllerCallback>();
+
+        if (m_landCallbacks != null)
+            m_landCallbacks = new List<PlayerControllerCallback>();
 
         // Set intitial camrera look rotation.
         SetLookRotation(m_cameraTransform.rotation);
@@ -337,6 +352,32 @@ public class PlayerController : MonoBehaviour
     public bool IsOverridden()
     {
         return m_bOverridden;
+    }
+
+    /*
+    Desciption: Add a function to be called when the player initially jumps.
+    Param:
+        PlayerControllerCallback callback: The callback function.
+    */
+    public void AddJumpCallback(PlayerControllerCallback callback)
+    {
+        if (m_jumpCallbacks == null)
+            m_jumpCallbacks = new List<PlayerControllerCallback>();
+
+        m_jumpCallbacks.Add(callback);   
+    }
+
+    /*
+    Desciption: Add a function to be called when the player initially lands.
+    Param:
+        PlayerControllerCallback callback: The callback function.
+    */
+    public void AddLandCallback(PlayerControllerCallback callback)
+    {
+        if (m_landCallbacks == null)
+            m_landCallbacks = new List<PlayerControllerCallback>();
+
+        m_landCallbacks.Add(callback);
     }
 
     /*
@@ -732,7 +773,9 @@ public class PlayerController : MonoBehaviour
 
         if (!bPrevGrounded && m_v3Velocity.y < 0.0f && m_bOnGround)
         {
-            m_cameraEffects.Land();
+            // Landing callbacks.
+            for (int i = 0; i < m_landCallbacks.Count; ++i)
+                m_landCallbacks[i](this);
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -742,8 +785,12 @@ public class PlayerController : MonoBehaviour
 
         m_bShouldJump = m_bOnGround && Input.GetKey(KeyCode.Space);
 
-        if (!bPrevShouldJump && m_bShouldJump)
+        if (!bPrevShouldJump && m_bShouldJump && m_nJumpFrame <= 0)
         {
+            // Jump callbacks...
+            for (int i = 0; i < m_jumpCallbacks.Count; ++i)
+                m_jumpCallbacks[i](this);
+
             m_nJumpFrame = 4; // Give multiple frames to clear the ground.
         }
 

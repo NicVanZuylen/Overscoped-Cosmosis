@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/*
+ * Description: Contains all data and functions related to the player's in-game state.
+ * Author: Nic Van Zuylen
+*/
+
 public class PlayerStats : MonoBehaviour
 {
     public enum ERegenMode
@@ -122,9 +127,6 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private AudioSource m_sfxSource;
 
-    [SerializeField]
-    private AudioSource m_windAudioSource = null;
-
     // -------------------------------------------------------------------------------------------------
 
     // Private:
@@ -135,6 +137,7 @@ public class PlayerStats : MonoBehaviour
     private CameraEffects m_camEffects;
     private Transform m_camPivot;
     private ScreenFade m_fadeScript;
+    private AudioLoop m_windAudioLoop;
 
     // Resources
     private float m_fHealth;
@@ -162,10 +165,7 @@ public class PlayerStats : MonoBehaviour
         if (!m_sfxSource)
             m_sfxSource = GetComponent<AudioSource>();
 
-        if (!m_windAudioSource)
-            m_windAudioSource = GetComponent<AudioSource>();
-
-        m_windAudioSource.clip = m_windLoopSFX;
+        m_windAudioLoop = new AudioLoop(m_windLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
@@ -224,23 +224,25 @@ public class PlayerStats : MonoBehaviour
             m_camEffects.SetFOVChangeRate(20.0f);
         }
 
+        AudioSource windSource = m_windAudioLoop.GetSource();
+
         // Wind effect.
         if (!m_controller.IsGrounded())
         {
             // Adjust wind volume based off of velocity.
-            m_windAudioSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed, 0.0f);
+            windSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed, 0.0f);
 
-            if(!m_windAudioSource.isPlaying)
-                m_windAudioSource.Play();
+            if (!m_windAudioLoop.IsPlaying())
+                m_windAudioLoop.Play();
         }
-        else if(m_windAudioSource.isPlaying)
+        else if(m_windAudioLoop.IsPlaying())
         {
             // Decay volume when landing.
-            m_windAudioSource.volume = Mathf.MoveTowards(m_windAudioSource.volume, 0.0f, m_fWindDecayRate * Time.deltaTime);
+            windSource.volume = Mathf.MoveTowards(windSource.volume, 0.0f, m_fWindDecayRate * Time.deltaTime);
 
             // Stop audio when volume reaches silence.
-            if(m_windAudioSource.volume <= 0.01f)
-                m_windAudioSource.Stop();
+            if (windSource.volume <= 0.01f)
+                m_windAudioLoop.Stop();
         }
     }
 

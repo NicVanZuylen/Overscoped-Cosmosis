@@ -4,6 +4,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/*
+ * Description: Handles line stretching, bending and coiling effects using bezier curves and a compute shader to position line points.
+ * Author: Nic Van Zuylen
+*/
+
 struct LineEffectParameters
 {
     public int m_nWaveCount;

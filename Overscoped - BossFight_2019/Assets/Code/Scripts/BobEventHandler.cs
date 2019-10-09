@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Picks up bobbing events from the adjacent animator component.
+ * Author: Nic Van Zuylen
+*/
+
+[RequireComponent(typeof(Animator))]
+
 public class BobEventHandler : MonoBehaviour
 {
     private Animator m_animator;

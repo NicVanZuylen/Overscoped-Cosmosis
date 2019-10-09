@@ -8,6 +8,10 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
+/*
+ * Description: Editor node class for the Behaviour Tree Editor.
+ * Author: Nic Van Zuylen
+*/
 
 namespace BTreeEditor
 {

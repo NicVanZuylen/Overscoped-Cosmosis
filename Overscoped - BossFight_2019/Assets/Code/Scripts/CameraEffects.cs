@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Handles all camera related effects. Such as shake, head bobbing, FOV adjustments, rewind etc.
+ * Author: Nic Van Zuylen
+*/
+
 public struct CameraSplineState
 {
     public Vector4 m_v4Position;

@@ -2,11 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Handles behaviour and VFX of the player's cosmic beam attack.
+ * Author: Nic Van Zuylen
+*/
+
 public class PlayerBeam : MonoBehaviour
 {
+    // -------------------------------------------------------------------------------------------------
+    [Header("Object References")]
+
     [Tooltip("Beam GUI material.")]
     [SerializeField]
     private Material m_guiMaterial = null;
+
+    [SerializeField]
+    private GameObject[] m_beamParticleObjects = null;
+
+    // -------------------------------------------------------------------------------------------------
+    [Header("Beam Attack Properties")]
 
     [Tooltip("Maximum beam charge value.")]
     [SerializeField]
@@ -28,13 +42,28 @@ public class PlayerBeam : MonoBehaviour
     [SerializeField]
     private int m_nBeamLength = 512;
 
+    // -------------------------------------------------------------------------------------------------
+    [Header("Audio")]
+
     [SerializeField]
-    private GameObject[] m_beamParticleObjects = null;
+    private AudioClip m_chargeLoopSFX = null;
+
+    [SerializeField]
+    private AudioClip m_fireLoopSFX = null;
+
+    [SerializeField]
+    private AudioClip m_impactLoopSFX = null;
+
+    private AudioLoop m_chargeAudioLoop;
+    private AudioLoop m_fireAudioLoop;
+    private AudioLoop m_impactAudioLoop;
+
+    // -------------------------------------------------------------------------------------------------
 
     private PlayerController m_controller;
     private CameraEffects m_camEffects;
     private RaycastHit m_sphereCastHit;
-    private Vector3 m_v3BeamDestination;
+    private GameObject m_endObj;
     private float m_fBeamCharge; // Actual current charge value.
     private float m_fCurrentMeterLevel; // Current charge as displayed on the HUD.
     private int m_nDissolveBracerIndex;
@@ -64,7 +93,7 @@ public class PlayerBeam : MonoBehaviour
         m_beamParticles = new ParticleSystem[m_beamParticleObjects.Length];
         m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticleObjects.Length];
 
-        for(int i = 0; i < m_beamParticleObjects.Length; ++i)
+        for (int i = 0; i < m_beamParticleObjects.Length; ++i)
         {
             m_beamParticles[i] = m_beamParticleObjects[i].GetComponent<ParticleSystem>();
             m_beamParticleRenderers[i] = m_beamParticleObjects[i].GetComponent<ParticleSystemRenderer>();
@@ -73,6 +102,12 @@ public class PlayerBeam : MonoBehaviour
         m_particles = new ParticleSystem.Particle[m_nBeamLength / 2];
 
         m_fMeshLength = 2.0f;
+
+        m_endObj = new GameObject("Player_Beam_End_Point");
+
+        m_chargeAudioLoop = new AudioLoop(m_chargeLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
+        m_fireAudioLoop = new AudioLoop(m_fireLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
+        m_impactAudioLoop = new AudioLoop(m_impactLoopSFX, m_endObj, ESpacialMode.AUDIO_SPACE_WORLD, (m_nBeamLength * m_fMeshLength) + 10.0f);
     }
 
     /*
@@ -143,6 +178,13 @@ public class PlayerBeam : MonoBehaviour
                 // Apply camera shake.
                 m_camEffects.ApplyShake(0.1f, 0.3f);
 
+                // Play SFX loops.
+                if (!m_fireAudioLoop.IsPlaying())
+                    m_fireAudioLoop.Play();
+
+                if (!m_impactAudioLoop.IsPlaying())
+                    m_impactAudioLoop.Play();
+
                 const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
                 Ray sphereRay = new Ray(m_beamOrigin.position, m_beamOrigin.forward);
                 bool bRayHit = Physics.Raycast(sphereRay, out m_sphereCastHit, (float)m_nBeamLength, nRaymask, QueryTriggerInteraction.Ignore);
@@ -158,23 +200,23 @@ public class PlayerBeam : MonoBehaviour
 
                     float fProjDiff = fHitProj - fOriginProj;
 
-                    m_v3BeamDestination = m_beamOrigin.position + (m_beamOrigin.forward * fProjDiff);
+                    m_endObj.transform.position = m_beamOrigin.position + (m_beamOrigin.forward * fProjDiff);
                 }
                 else
                 {
                     // Update volumetric beam particle positions.
                     UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_nBeamLength, false);
 
-                    m_v3BeamDestination = m_beamOrigin.position + (m_beamOrigin.forward * m_nBeamLength);
+                    m_endObj.transform.position = m_beamOrigin.position + (m_beamOrigin.forward * m_nBeamLength);
                 }
-
-                // Set linerenderer points.
-                //m_beamLine.SetPosition(0, m_beamOrigin.position);
-                //m_beamLine.SetPosition(1, m_v3BeamDestination);
-
 
                 // Reduce beam charge.
                 m_fBeamCharge -= m_fChargeLossRate * Time.deltaTime;
+            }
+            else if (m_fireAudioLoop.IsPlaying() || m_impactAudioLoop.IsPlaying())
+            {
+                m_fireAudioLoop.Stop();
+                m_impactAudioLoop.Stop();
             }
         }
 

@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Handles all input and physics for the grapple and pull core game mechanics.
+ * Author: Nic Van Zuylen
+*/
+
 [RequireComponent(typeof(PlayerController))]
-[RequireComponent(typeof(AudioSource))]
 
 public class GrappleHook : MonoBehaviour
 {
@@ -174,9 +178,6 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private AudioSource m_sfxSource = null;
 
-    [SerializeField]
-    private AudioSource m_grappleLoopAudioSource = null;
-
     // -------------------------------------------------------------------------------------------------
 
     private PlayerController m_controller;
@@ -190,6 +191,7 @@ public class GrappleHook : MonoBehaviour
     private PlayerBeam m_beamScript;
     private RaycastHit m_fireHit;
     private AudioSource m_impactAudioSource;
+    private AudioLoop m_grappleLoopAudio;
     private Vector3 m_v3GrappleNormal;
     private Vector3 m_v3GrappleBoost;
     private float m_fGrapLineLength; // Distance from casting point to destination, (linear unlike the rope itself).
@@ -253,10 +255,7 @@ public class GrappleHook : MonoBehaviour
         if (!m_sfxSource)
             m_sfxSource = GetComponent<AudioSource>();
 
-        if (!m_grappleLoopAudioSource)
-            m_grappleLoopAudioSource = GetComponent<AudioSource>();
-
-        m_grappleLoopAudioSource.clip = m_grapplePullLoopSFX;
+        m_grappleLoopAudio = new AudioLoop(m_grapplePullLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
 
         Camera cam = GetComponentInChildren<Camera>();
 
@@ -396,8 +395,8 @@ public class GrappleHook : MonoBehaviour
                 }
 
                 // Play loop SFX
-                if (!m_grappleLoopAudioSource.isPlaying)
-                    m_grappleLoopAudioSource.Play();
+                if (!m_grappleLoopAudio.IsPlaying())
+                    m_grappleLoopAudio.Play();
 
                 // Increment grapple time.
                 m_fGrappleTime += Time.deltaTime;
@@ -417,7 +416,7 @@ public class GrappleHook : MonoBehaviour
                     m_bGrappleHookActive = false;
                     m_fGrappleLineProgress = 0.0f;
 
-                    m_grappleLoopAudioSource.Stop();
+                    m_grappleLoopAudio.Stop();
 
                     // Release impulse.
                     if (m_fGrappleTime >= m_fMinReleaseBoostTime)
@@ -547,7 +546,7 @@ public class GrappleHook : MonoBehaviour
             m_fGrappleLineProgress = 0.0f;
 
             // Stop looping SFX.
-            m_grappleLoopAudioSource.Stop();
+            m_grappleLoopAudio.Stop();
 
             m_controller.FreeOverride();
             m_controller.SetGravity(m_controller.JumpGravity());

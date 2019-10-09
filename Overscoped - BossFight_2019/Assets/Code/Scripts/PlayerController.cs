@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Handles all movement and look input and physics for the player character.
+ * Author: Nic Van Zuylen
+*/
+
 [RequireComponent(typeof(CharacterController))]
 
 public class PlayerController : MonoBehaviour

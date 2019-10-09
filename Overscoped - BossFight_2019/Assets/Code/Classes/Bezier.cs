@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Helper class creating and sampling from bezier curves.
+ * Author: Nic Van Zuylen
+*/
+
 public struct Bezier
 {
-    //public Vector3 m_v3Start;
     public Vector3[] m_v3Points;
-    //public Vector3 m_v3End;
     public Vector3[] m_v3InterpolatedPoints;
 
     /*

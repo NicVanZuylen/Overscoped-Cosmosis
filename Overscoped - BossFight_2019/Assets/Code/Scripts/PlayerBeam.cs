@@ -87,8 +87,7 @@ public class PlayerBeam : MonoBehaviour
 
         m_fBeamCharge = m_fMaxBeamCharge;
 
-        m_fMaxBeamCharge = 100000.0f;
-        m_fBeamCharge = 100000.0f;
+        m_fBeamCharge = 0.0f;
 
         m_beamParticles = new ParticleSystem[m_beamParticleObjects.Length];
         m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticleObjects.Length];

@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class ArmorPull : PullObject
 {
-    [Tooltip("Index of this bracer, 0 for left, 1 for right.")]
-    [SerializeField]
-    private int m_nBracerIndex = 0;
-
     [Tooltip("Amount of time until the object will dissolve.")]
     [SerializeField]
     private float m_fDissolveTime = 10.0f;
@@ -44,7 +40,7 @@ public class ArmorPull : PullObject
         float fDissolveLevel = Mathf.Min(m_fDissolveTime, 1.0f);
 
         m_material.SetFloat("_Dissolve", fDissolveLevel);
-        m_playerBeamScript.SetBracerDissolve(m_nBracerIndex, transform.position, 1.0f - fDissolveLevel);
+        //m_playerBeamScript.SetBracerDissolve(m_nBracerIndex, transform.position, 1.0f - fDissolveLevel);
 
         // Disable when fully dissolved.
         if (m_fDissolveTime <= 0.0f)

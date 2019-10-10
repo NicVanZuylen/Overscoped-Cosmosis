@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/*
+ * Description: Contains all data and functions related to the player's in-game state.
+ * Author: Nic Van Zuylen
+*/
+
 public class PlayerStats : MonoBehaviour
 {
     public enum ERegenMode
@@ -12,13 +17,15 @@ public class PlayerStats : MonoBehaviour
         REGEN_LERP
     }
 
-    // On inspector: 
+    // Inspector:
+    // -------------------------------------------------------------------------------------------------
 
     [Header("Health & Mana")]
     [Space(10)]
 
     [SerializeField]
     private float m_fMaxHealth = 100.0f;
+
     [SerializeField]
     private float m_fMaxMana = 100.0f;
 
@@ -67,8 +74,9 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private ERegenMode m_manaRegenMode = ERegenMode.REGEN_LINEAR;
 
+    // -------------------------------------------------------------------------------------------------
     [Space(10)]
-    [Header("Health & Mana")]
+    [Header("GUI References")]
     [Space(10)]
 
     [SerializeField]
@@ -78,13 +86,48 @@ public class PlayerStats : MonoBehaviour
     private Material m_manaFillMat = null;
 
     [SerializeField]
-    private Material m_reticleMat = null;
+    private Material[] m_reticleMats = null;
+
+    [SerializeField]
+    private RectTransform m_reticleOuterTransform = null;
 
     [SerializeField]
     private Material m_armHealthMat = null;
 
     [SerializeField]
     private Material m_armManaMat = null;
+
+    [SerializeField]
+    private Text m_speedText = null;
+
+    // -------------------------------------------------------------------------------------------------
+    [Header("SFX")]
+
+    [Tooltip("Speed in which the wind loop will play at maximum volume.")]
+    [SerializeField]
+    private float m_fWindMaxVolSpeed = 50.0f;
+
+    [Tooltip("Minimum speed in which the player must be flying to hear the wind SFX")]
+    [SerializeField]
+    private float m_fWindMinVolSpeed = 8.0f;
+
+    [Tooltip("Speed in which wind volume will drop when grounded.")]
+    [SerializeField]
+    private float m_fWindDecayRate = 2.0f;
+
+    [SerializeField]
+    private AudioClip m_windLoopSFX = null;
+
+    [SerializeField]
+    private AudioClip[] m_hurtSFX = null;
+
+    [SerializeField]
+    private AudioClip[] m_jumpGruntSFX = null;
+
+    [SerializeField]
+    private AudioSource m_sfxSource;
+
+    // -------------------------------------------------------------------------------------------------
 
     // Private:
 
@@ -93,6 +136,8 @@ public class PlayerStats : MonoBehaviour
     private PlayerBeam m_beamScript;
     private CameraEffects m_camEffects;
     private Transform m_camPivot;
+    private ScreenFade m_fadeScript;
+    private AudioLoop m_windAudioLoop;
 
     // Resources
     private float m_fHealth;
@@ -113,6 +158,14 @@ public class PlayerStats : MonoBehaviour
         m_beamScript = GetComponent<PlayerBeam>();
         m_camEffects = GetComponentInChildren<CameraEffects>(false);
         m_camPivot = transform.Find("CameraPivot");
+        m_fadeScript = FindObjectOfType<ScreenFade>();
+
+        m_controller.AddJumpCallback(OnJump);
+
+        if (!m_sfxSource)
+            m_sfxSource = GetComponent<AudioSource>();
+
+        m_windAudioLoop = new AudioLoop(m_windLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
@@ -130,6 +183,84 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    /*
+    Description: Apply velocity-based visual and audio effects.
+    */
+    void ApplyVelocityFX()
+    {
+        // Get velocity and max ground speed.
+        Vector3 v3Velocity = m_controller.GetVelocity();
+        float fMaxGroundSpeed = m_controller.MaxGroundSpeed();
+
+        // FOV increment value.
+        float fFOVIncrease = 0.0f;
+
+        // Increment FOV if sprinting.
+        if (m_controller.IsSprinting())
+            fFOVIncrease += 10.0f;
+
+        if (m_controller.IsGrounded())
+        {
+            // Set grounded FOV change rate.
+            m_camEffects.AddFOVOffset(fFOVIncrease);
+            m_camEffects.SetFOVChangeRate(75.0f);
+        }
+        else if (!m_controller.IsJumping())
+        {
+            // Airborne FOV calculations...
+            float fFOVOffset = Mathf.Clamp(v3Velocity.magnitude - fMaxGroundSpeed + fFOVIncrease, 0.0f, 15.0f);
+
+            m_camEffects.AddFOVOffset(fFOVOffset);
+            m_camEffects.SetFOVChangeRate(20.0f);
+        }
+        else
+        {
+            // Airborne due to jumping calculations...
+            Vector3 v3VelNoY = v3Velocity;
+            v3VelNoY.y = 0.0f;
+            float fFOVOffset = Mathf.Clamp(v3VelNoY.magnitude - fMaxGroundSpeed + fFOVIncrease, 0.0f, 15.0f);
+
+            m_camEffects.AddFOVOffset(fFOVOffset);
+            m_camEffects.SetFOVChangeRate(20.0f);
+        }
+
+        AudioSource windSource = m_windAudioLoop.GetSource();
+
+        // Wind effect.
+        if (!m_controller.IsGrounded())
+        {
+            // Adjust wind volume based off of velocity.
+            windSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed, 0.0f);
+
+            if (!m_windAudioLoop.IsPlaying())
+                m_windAudioLoop.Play();
+        }
+        else if(m_windAudioLoop.IsPlaying())
+        {
+            // Decay volume when landing.
+            windSource.volume = Mathf.MoveTowards(windSource.volume, 0.0f, m_fWindDecayRate * Time.deltaTime);
+
+            // Stop audio when volume reaches silence.
+            if (windSource.volume <= 0.01f)
+                m_windAudioLoop.Stop();
+        }
+    }
+
+    /*
+    Description: Run once when jumping.
+    Param:
+        PlayerController controller: For callback compatibility.
+    */
+    void OnJump(PlayerController controller)
+    {
+        // Get random SFX index.
+        int nRandomSFXIndex = Random.Range(0, m_jumpGruntSFX.Length);
+
+        // Perform null check and play audio.
+        if (m_jumpGruntSFX.Length > 0 && m_jumpGruntSFX[nRandomSFXIndex])
+            m_sfxSource.PlayOneShot(m_jumpGruntSFX[nRandomSFXIndex]);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -145,6 +276,9 @@ public class PlayerStats : MonoBehaviour
 
     private void AliveUpdate()
     {
+        // Apply velocity-based FX.
+        ApplyVelocityFX();
+
         if (m_hookScript.IsActive())
         {
             // Reset mana regen delay.
@@ -184,11 +318,13 @@ public class PlayerStats : MonoBehaviour
             m_camEffects.RecordCameraState();
         }
 
+#if UNITY_EDITOR
         // Kill button
         if(Input.GetKeyDown(KeyCode.K))
         {
             KillPlayer();
         }
+#endif
 
         // Clamp health and mana.
         m_fHealth = Mathf.Clamp(m_fHealth, 0.0f, m_fMaxHealth);
@@ -198,12 +334,30 @@ public class PlayerStats : MonoBehaviour
         m_armManaMat.SetFloat("_Mana", 1.0f - (m_fMana / m_fMaxMana));
 
         if (m_hookScript.InGrappleRange())
-            m_reticleMat.SetInt("_InRange", 1);
+        {
+            m_reticleMats[0].SetInt("_InRange", 1);
+            m_reticleMats[1].SetInt("_InRange", 1);
+
+            m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f) * 1.2f;
+        } 
         else
-            m_reticleMat.SetInt("_InRange", 0);
+        {
+            m_reticleMats[0].SetInt("_InRange", 0);
+            m_reticleMats[1].SetInt("_InRange", 0);
+
+            m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f);
+        }
+
+        if (m_speedText)
+            m_speedText.text = m_controller.GetVelocity().magnitude.ToString("n2") + "m/s";
 
         m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
         m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
+    }
+
+    private void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void DeathUpdate()
@@ -211,6 +365,8 @@ public class PlayerStats : MonoBehaviour
         CameraSplineState splineState = m_camEffects.EvaluateCamSpline(Mathf.Clamp(m_fSplineProgress, 0.0f, 1.0f));
 
         m_fSplineProgress += m_rewindCurve.Evaluate(m_fSplineProgress) * Time.deltaTime;
+
+        m_fadeScript.SetFade(m_fSplineProgress);
 
         m_camEffects.transform.localRotation = Quaternion.identity;
 
@@ -226,7 +382,7 @@ public class PlayerStats : MonoBehaviour
         // Reset scene when spline is complete.
         if(m_fSplineProgress >= 1.0f)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            RestartScene();
         }
     }
 
@@ -289,6 +445,12 @@ public class PlayerStats : MonoBehaviour
     {
         m_fHealth -= fDamage;
 
+        // Hurt SFX
+        int nRandomSFXIndex = Random.Range(0, m_hurtSFX.Length);
+
+        if (m_hurtSFX.Length > 0 && m_hurtSFX[nRandomSFXIndex])
+            m_sfxSource.PlayOneShot(m_hurtSFX[nRandomSFXIndex]);
+
         if(m_fHealth <= 0.0f)
         {
             m_fHealth = 0.0f;
@@ -311,6 +473,11 @@ public class PlayerStats : MonoBehaviour
 
         // Begin spline.
         m_camEffects.StartCamSpline();
+
+        // Begin fade effect.
+        m_fadeScript.SetFadeRate(0.0f);
+        m_fadeScript.SetCallback(RestartScene);
+        m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
 
         // Disable control scripts.
         m_controller.enabled = false;

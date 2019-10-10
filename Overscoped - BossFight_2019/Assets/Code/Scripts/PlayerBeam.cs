@@ -1,13 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.VFX;
+
+/*
+ * Description: Handles behaviour and VFX of the player's cosmic beam attack.
+ * Author: Nic Van Zuylen
+*/
 
 public class PlayerBeam : MonoBehaviour
 {
+    // -------------------------------------------------------------------------------------------------
+    [Header("Object References")]
+
     [Tooltip("Beam GUI material.")]
     [SerializeField]
     private Material m_guiMaterial = null;
+
+    [SerializeField]
+    private GameObject[] m_beamParticleObjects = null;
+
+    // -------------------------------------------------------------------------------------------------
+    [Header("Beam Attack Properties")]
 
     [Tooltip("Maximum beam charge value.")]
     [SerializeField]
@@ -21,96 +34,142 @@ public class PlayerBeam : MonoBehaviour
     [SerializeField]
     private float m_fMinBeamCharge = 15.0f;
 
-    [Tooltip("Rate of which beam charge will replenish.")]
-    [SerializeField]
-    private float m_fRechargeRate = 50.0f;
-
-    [Tooltip("Delay before beam recharge.")]
-    [SerializeField]
-    private float m_fRechargeDelay = 1.0f;
-
-    [Tooltip("Beam line renderer reference.")]
-    [SerializeField]
-    private LineRenderer m_beamLine = null;
-
     [Tooltip("Start point of the beam effect.")]
     [SerializeField]
     private Transform m_beamOrigin = null;
 
-    [Tooltip("Maximum range of the beam.")]
+    [Tooltip("Maximum range of the beam in metres.")]
     [SerializeField]
-    private float m_fBeamRange = 500.0f;
+    private int m_nBeamLength = 512;
 
-    [Tooltip("Reference to the player's bracers, 0 for left, 1 for right.")]
-    [SerializeField]
-    private GameObject[] m_bracers = null;
+    // -------------------------------------------------------------------------------------------------
+    [Header("Audio")]
 
-    [Tooltip("Origin object for the bracer dissolve particle effect.")]
     [SerializeField]
-    private GameObject m_particleVFXObject = null;
+    private AudioClip m_chargeLoopSFX = null;
 
-    [Tooltip("Reference to the boss chestplate script.")]
     [SerializeField]
-    private ChestPlate m_bossChestScript = null;
+    private AudioClip m_fireLoopSFX = null;
+
+    [SerializeField]
+    private AudioClip m_impactLoopSFX = null;
+
+    private AudioLoop m_chargeAudioLoop;
+    private AudioLoop m_fireAudioLoop;
+    private AudioLoop m_impactAudioLoop;
+
+    // -------------------------------------------------------------------------------------------------
 
     private PlayerController m_controller;
     private CameraEffects m_camEffects;
     private RaycastHit m_sphereCastHit;
-    private Material[] m_bracerMats;
-    private VisualEffect m_bracerDissolveParticles;
-    private Vector3 m_v3BeamDestination;
-    private float m_fBeamCharge;
-    private float m_fCurrentRechargeDelay;
-    private float m_fParticleDisableWaitTime;
-    private float m_fCurrentParticleDisableWaitTime;
+    private GameObject m_endObj;
+    private float m_fBeamCharge; // Actual current charge value.
+    private float m_fCurrentMeterLevel; // Current charge as displayed on the HUD.
     private int m_nDissolveBracerIndex;
-    private bool[] m_bBracersGained;
     private bool m_bCanCast;
     private bool m_bBeamUnlocked;
-    private bool m_bParticleDisableTimerEnable;
+    private bool m_bBeamEnabled;
+
+    // Volumetric beam effect.
+    private ParticleSystem[] m_beamParticles;
+    private ParticleSystemRenderer[] m_beamParticleRenderers;
+    private ParticleSystem.Particle[] m_particles;
+    private float m_fMeshLength;
 
     void Awake()
     {
+        // Component retreival.
         m_controller = GetComponent<PlayerController>();
         m_camEffects = GetComponentInChildren<CameraEffects>();
-        m_beamLine.enabled = false;
+
+        m_bBeamUnlocked = true;
 
         m_fBeamCharge = m_fMaxBeamCharge;
 
-        // Component retreival.
+        m_fBeamCharge = 0.0f;
 
-        m_bracerMats = new Material[m_bracers.Length];
+        m_beamParticles = new ParticleSystem[m_beamParticleObjects.Length];
+        m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticleObjects.Length];
 
-        for (int i = 0; i < m_bracerMats.Length; ++i)
-            m_bracerMats[i] = m_bracers[i].GetComponent<MeshRenderer>().material;
+        for (int i = 0; i < m_beamParticleObjects.Length; ++i)
+        {
+            m_beamParticles[i] = m_beamParticleObjects[i].GetComponent<ParticleSystem>();
+            m_beamParticleRenderers[i] = m_beamParticleObjects[i].GetComponent<ParticleSystemRenderer>();
+        }
 
-        m_particleVFXObject.transform.parent = null;
+        m_particles = new ParticleSystem.Particle[m_nBeamLength / 2];
 
-        m_bracerDissolveParticles = m_particleVFXObject.GetComponent<VisualEffect>();
-        m_fParticleDisableWaitTime = m_bracerDissolveParticles.GetFloat("Lifetime Max");
-        m_bracerDissolveParticles.enabled = false;
+        m_fMeshLength = 2.0f;
 
-        m_fCurrentParticleDisableWaitTime = m_fParticleDisableWaitTime;
+        m_endObj = new GameObject("Player_Beam_End_Point");
 
-        m_bBracersGained = new bool[2];
+        m_chargeAudioLoop = new AudioLoop(m_chargeLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
+        m_fireAudioLoop = new AudioLoop(m_fireLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
+        m_impactAudioLoop = new AudioLoop(m_impactLoopSFX, m_endObj, ESpacialMode.AUDIO_SPACE_WORLD, (m_nBeamLength * m_fMeshLength) + 10.0f);
     }
 
-    private void OnDestroy()
+    /*
+    Description: Update volumetric beam particle systems.
+    Param:
+        ParticleSystem[] particleSystems: The particlesystems to update.
+        ParticleSystemRenderer[] renderers: The particle renderers to update material properties on.
+        ParticleSystem.Particle[] particles: Pre-allocated array of particles to update.
+        Vector3 v3Origin: Origin point of the beam.
+        float fLength: The length of the beam.
+        bool bHit: Whether or not the beam hit a surface.
+    */
+    private void UpdateParticlePositions(ParticleSystem[] particleSystems, ParticleSystemRenderer[] renderers, ParticleSystem.Particle[] particles, Vector3 v3Origin, float fLength, bool bHit)
     {
-        // Reset material values.
-        for (int i = 0; i < m_bracerMats.Length; ++i)
-            m_bracerMats[i].SetFloat("_Dissolve", 0.0f);
+        int nParticleAmount = 0;
+
+        // Loop through all particles/segments and set their positions.
+        for(int i = 0; i < particles.Length; ++i)
+        {
+            float fOffset = i * m_fMeshLength;
+
+            // Set new offset.
+            particles[i].position = new Vector3(0.0f, 0.0f, fOffset);
+            particles[i].startSize = 1.0f;
+            particles[i].startColor = Color.white;
+            ++nParticleAmount;
+
+            // Stop once length is exceeded.
+            if (bHit && fOffset + m_fMeshLength >= fLength)
+            {
+                break;
+            }
+        }
+
+        for(int i = 0; i < m_beamParticles.Length; ++i)
+        {
+            // Set particle data.
+            particleSystems[i].SetParticles(m_particles, nParticleAmount);
+
+            // Set origin and length in shader.
+            renderers[i].material.SetVector("_LineOrigin", v3Origin);
+            renderers[i].material.SetFloat("_LineLength", fLength);
+        }
     }
 
     void LateUpdate()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         if (m_bBeamUnlocked)
         {
-            m_bCanCast = m_beamLine.enabled || (Input.GetMouseButtonDown(1) && m_fBeamCharge >= m_fMinBeamCharge);
+            m_bCanCast = m_bBeamEnabled || (Input.GetMouseButtonDown(1) && m_fBeamCharge >= m_fMinBeamCharge);
 
-            m_beamLine.enabled = Input.GetMouseButton(1) && m_bCanCast && m_fBeamCharge >= 0.0f;
+            m_bBeamEnabled = Input.GetMouseButton(1) && m_bCanCast && m_fBeamCharge >= 0.0f;
 
-            if (m_beamLine.enabled)
+            // Enable/Disable effects.
+            for (int i = 0; i < m_beamParticles.Length; ++i)
+            {
+                m_beamParticleRenderers[i].enabled = m_bBeamEnabled;
+            }
+
+            if (m_bBeamEnabled)
             {
                 // Use the player controller's look rotation, to avoid offsets from camera shake.
                 m_beamOrigin.rotation = m_controller.LookRotation();
@@ -118,72 +177,52 @@ public class PlayerBeam : MonoBehaviour
                 // Apply camera shake.
                 m_camEffects.ApplyShake(0.1f, 0.3f);
 
+                // Play SFX loops.
+                if (!m_fireAudioLoop.IsPlaying())
+                    m_fireAudioLoop.Play();
+
+                if (!m_impactAudioLoop.IsPlaying())
+                    m_impactAudioLoop.Play();
+
                 const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
                 Ray sphereRay = new Ray(m_beamOrigin.position, m_beamOrigin.forward);
-                bool bRayHit = Physics.Raycast(sphereRay, out m_sphereCastHit, m_fBeamRange, nRaymask, QueryTriggerInteraction.Ignore);
+                bool bRayHit = Physics.Raycast(sphereRay, out m_sphereCastHit, (float)m_nBeamLength, nRaymask, QueryTriggerInteraction.Ignore);
 
                 // Find end point of the line.
                 if (bRayHit)
                 {
+                    // Update volumetric beam particle positions.
+                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_sphereCastHit.distance, true);
+
                     float fHitProj = Vector3.Dot(m_sphereCastHit.point, m_beamOrigin.forward);
                     float fOriginProj = Vector3.Dot(m_beamOrigin.position, m_beamOrigin.forward);
 
                     float fProjDiff = fHitProj - fOriginProj;
 
-                    // Check if boss chestplate was hit, and if so deal damage.
-                    if (m_sphereCastHit.collider.gameObject == m_bossChestScript.gameObject)
-                        m_bossChestScript.DealBeamDamage();
-
-                    m_v3BeamDestination = m_beamOrigin.position + (m_beamOrigin.forward * fProjDiff);
+                    m_endObj.transform.position = m_beamOrigin.position + (m_beamOrigin.forward * fProjDiff);
                 }
                 else
                 {
-                    m_v3BeamDestination = m_beamOrigin.position + (m_beamOrigin.forward * m_fBeamRange);
+                    // Update volumetric beam particle positions.
+                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_nBeamLength, false);
+
+                    m_endObj.transform.position = m_beamOrigin.position + (m_beamOrigin.forward * m_nBeamLength);
                 }
 
-                // Set linerenderer points.
-                m_beamLine.SetPosition(0, m_beamOrigin.position);
-                m_beamLine.SetPosition(1, m_v3BeamDestination);
-
-                // Beam charge.
+                // Reduce beam charge.
                 m_fBeamCharge -= m_fChargeLossRate * Time.deltaTime;
-                m_fCurrentRechargeDelay = m_fRechargeDelay;
-
-                // Set GUI material property.
-                m_guiMaterial.SetFloat("_Resource", m_fBeamCharge / m_fMaxBeamCharge);
             }
-            else if (m_bBeamUnlocked)
+            else if (m_fireAudioLoop.IsPlaying() || m_impactAudioLoop.IsPlaying())
             {
-                m_fCurrentRechargeDelay -= Time.deltaTime;
-
-                if (m_fCurrentRechargeDelay <= 0.0f && m_fBeamCharge < m_fMaxBeamCharge)
-                {
-                    m_fBeamCharge += m_fRechargeRate * Time.deltaTime;
-
-                    // Clamp beam charge level to max.
-                    m_fBeamCharge = Mathf.Clamp(m_fBeamCharge, 0.0f, m_fMaxBeamCharge);
-                }
-
-                // Set GUI material property.
-                m_guiMaterial.SetFloat("_Resource", m_fBeamCharge / m_fMaxBeamCharge);
+                m_fireAudioLoop.Stop();
+                m_impactAudioLoop.Stop();
             }
         }
 
-        // Dissolve particle effect
+        m_fCurrentMeterLevel = Mathf.MoveTowards(m_fCurrentMeterLevel, m_fBeamCharge, 30.0f * Time.deltaTime);
 
-        if (m_bParticleDisableTimerEnable)
-        {
-            m_fCurrentParticleDisableWaitTime -= Time.deltaTime;
-            m_bracerDissolveParticles.SetVector3(">>Target Position<<", m_bracers[m_nDissolveBracerIndex].transform.position);
-
-            // Disable particles when the timer expires.
-            if (m_fCurrentParticleDisableWaitTime <= 0.0f)
-            {
-                m_fCurrentParticleDisableWaitTime = m_fParticleDisableWaitTime;
-                m_bParticleDisableTimerEnable = false;
-                m_bracerDissolveParticles.enabled = false;
-            }
-        }
+        // Set GUI material property.
+        m_guiMaterial.SetFloat("_Resource", m_fCurrentMeterLevel / m_fMaxBeamCharge);
     }
 
     /*
@@ -192,52 +231,8 @@ public class PlayerBeam : MonoBehaviour
     public void UnlockBeam(bool bUnlock)
     {
         m_bBeamUnlocked = bUnlock;
-        m_beamLine.enabled = false;
+        m_bBeamEnabled = false;
         enabled = bUnlock;
-    }
-
-    /*
-    Description: Set the dissolve level of a bracer on the player's arm, and unlock the player beam when both are fully materialized.
-    Param:
-        int nIndex: Index of the bracer to dissolve/re-materialize.
-        Vector3 v3ParticleOrigin: The origin point of the dissolve particle effect (should be the boss bracer position).
-        float fDissolveLevel: The dissolve level of the boss bracer.
-    */
-    public void SetBracerDissolve(int nIndex, Vector3 v3ParticleOrigin, float fDissolveLevel)
-    {
-        m_nDissolveBracerIndex = nIndex;
-
-        // Activate bracers if they are not active yet.
-        if (!m_bracers[nIndex].activeInHierarchy)
-        {
-            m_bracers[nIndex].SetActive(true);
-
-            // Enable particle effect and set particle count.
-            m_bracerDissolveParticles.enabled = true;
-            m_bracerDissolveParticles.SetInt("Particle Count", 10000);
-        }
-
-        // Set player bracer material dissolve level.
-        m_bracerMats[nIndex].SetFloat("_Dissolve", fDissolveLevel);
-        
-        // Set particle origin position to provided position.
-        m_particleVFXObject.transform.position = v3ParticleOrigin;
-
-        // Set particle target position to bracer position.
-        m_bracerDissolveParticles.SetVector3(">>Target Position<<", m_bracers[nIndex].transform.position);
-
-        if (fDissolveLevel >= 1.0f)
-        {
-            m_bBracersGained[nIndex] = true;
-            m_bracerDissolveParticles.SetInt("Particle Count", 0);
-            m_bParticleDisableTimerEnable = true;
-
-            // Unlock beam when both bracers are gained.
-            if (m_bBracersGained[0] && m_bBracersGained[1])
-            {
-                UnlockBeam(true);
-            }
-        }
     }
 
     /*
@@ -253,6 +248,16 @@ public class PlayerBeam : MonoBehaviour
     */
     public bool BeamEnabled()
     {
-        return m_beamLine.enabled;
+        return m_bBeamEnabled;
+    }
+
+    /*
+    Description: Increase the beam charge level by the specified amount.
+    Param:
+       float fCharge: The charge level to add.
+    */
+    public void IncreaseCharge(float fCharge)
+    {
+        m_fBeamCharge = Mathf.Min(m_fBeamCharge + fCharge, m_fMaxBeamCharge);
     }
 }

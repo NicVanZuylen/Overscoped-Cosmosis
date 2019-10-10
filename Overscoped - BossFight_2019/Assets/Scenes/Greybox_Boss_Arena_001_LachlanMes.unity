@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12588271, g: 0.17536473, b: 0.25914234, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &8893359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1285,9 +1285,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8febd43635046d54792c5f20819f0c40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_pullHealth: 100
   m_decoupleVector: {fileID: 0}
-  m_decoupleForce: 5
+  m_fDecoupleForce: 5
+  m_fShakeMagnitude: 4.5
+  m_fShakeTime: 0.05
+  m_fShakeSpeed: 10
 --- !u!54 &154909389
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2229,6 +2231,16 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
   - _gameObject: {fileID: 432104092}
     _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
+  - _gameObject: {fileID: 432104092}
+    _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
+  - _gameObject: {fileID: 432104092}
+    _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
+  - _gameObject: {fileID: 432104092}
+    _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
+  - _gameObject: {fileID: 432104092}
+    _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
+  - _gameObject: {fileID: 5528784100356115723}
+    _prefab: Assets/VFX/VFX Graphs/VFX_Boss_Bracer.prefab
   - _gameObject: {fileID: 70851863}
     _prefab: Assets/Prefabs/Environment/RespawnNode.prefab
   - _gameObject: {fileID: 529775000}
@@ -2237,14 +2249,26 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/Environment/GameManager.prefab
   - _gameObject: {fileID: 535304911}
     _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
-  - _gameObject: {fileID: 1301231932}
-    _prefab: Assets/Prefabs/Boss/Portal.prefab
   - _gameObject: {fileID: 1052553494603693008}
     _prefab: Assets/Meshes/SK_BOSSDUMMY_Again.fbx
   - _gameObject: {fileID: 535304911}
     _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
-  - _gameObject: {fileID: 1052553494603693007}
+  - _gameObject: {fileID: 535304911}
+    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 535304911}
+    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 535304911}
+    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 535304911}
+    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 535304911}
+    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 1052553494603693009}
     _prefab: Assets/Prefabs/Boss/Meteor.prefab
+  - _gameObject: {fileID: 1052553494603693007}
+    _prefab: Assets/Prefabs/Boss/MeteorAOE.prefab
+  - _gameObject: {fileID: 1301231932}
+    _prefab: Assets/Prefabs/Boss/Portal.prefab
   - _gameObject: {fileID: 1740376335}
     _prefab: Assets/Prefabs/GUI/GameCanvas.prefab
   - _gameObject: {fileID: 1122998244082260069}
@@ -11052,13 +11076,19 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 15224bf2b194e9c47af1aa65c1964291, type: 3}
 --- !u!1 &1052553494603693007 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 1042704758854634759, guid: 15224bf2b194e9c47af1aa65c1964291,
+  m_CorrespondingSourceObject: {fileID: 470953300, guid: 15224bf2b194e9c47af1aa65c1964291,
     type: 3}
   m_PrefabInstance: {fileID: 1052553494603693006}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1052553494603693008 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3800206674758254174, guid: 15224bf2b194e9c47af1aa65c1964291,
+    type: 3}
+  m_PrefabInstance: {fileID: 1052553494603693006}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1052553494603693009 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8578484948228314763, guid: 15224bf2b194e9c47af1aa65c1964291,
     type: 3}
   m_PrefabInstance: {fileID: 1052553494603693006}
   m_PrefabAsset: {fileID: 0}
@@ -11556,6 +11586,12 @@ PrefabInstance:
       objectReference: {fileID: 897261187}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08267407a60da1046ac8f6f1de23b161, type: 3}
+--- !u!1 &5528784100356115723 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2329551347053224587, guid: 08267407a60da1046ac8f6f1de23b161,
+    type: 3}
+  m_PrefabInstance: {fileID: 5528784100356115722}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5617994807379193972
 GameObject:
   m_ObjectHideFlags: 0

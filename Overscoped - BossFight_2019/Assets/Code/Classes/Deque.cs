@@ -4,6 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/* [UNUSED]
+ * Description: Experimental C# double-ended queue class.
+ * Author: Nic Van Zuylen
+*/
+
 class Deque<T>
 {
     private T[] m_contents;

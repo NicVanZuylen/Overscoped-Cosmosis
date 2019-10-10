@@ -45,7 +45,7 @@ public class EnergyPillar : MonoBehaviour
         m_explosion.transform.position = new Vector3(transform.position.x,transform.position.y + 70, transform.position.z);
 
         // Stun boss.
-        bossScript.EnterStuckState();
+        //bossScript.EnterStuckState();
 
         m_explosion.Play();
 

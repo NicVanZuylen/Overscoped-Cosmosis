@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(LineRenderer))]
 
 public class BossBehaviour : MonoBehaviour
 {
@@ -14,19 +13,9 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject m_player = null;
 
-    [Tooltip("Meteor object reference.")]
+    [Tooltip("Meteor object references.")]
     [SerializeField]
-    private Meteor m_meteor = null;
-
-    public MeteorManager m_meteorManager;
-
-    [Tooltip("Armour object reference.")]
-    [SerializeField]
-    private GameObject[] m_armorPeices = null;
-
-    [Tooltip("Armor pulse material reference.")]
-    [SerializeField]
-    private Material m_armorMaterial = null;
+    private Meteor[] m_meteors = null;
 
     [SerializeField]
     private GameObject m_portal = null;
@@ -84,6 +73,10 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private float m_fMaxBeamTrackSpeed = 200.0f;
 
+    [Tooltip("Volumetric beam particle systems.")]
+    [SerializeField]
+    private ParticleSystem[] m_beamParticles = null;
+
     [Header("Misc.")]
     [Tooltip("Amount of time spent stuck.")]
     [SerializeField]
@@ -93,12 +86,10 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private float m_fTimeBetweenAttacks = 5.0f;
 
-
     private PlayerController m_playerController;
     private PlayerStats m_playerStats;
     private Animator m_animator;
     private float m_fTimeSinceGlobalAttack = 0.0f;
-    private bool m_bIsStuck;
     private GameObject end_Portal;
 
     // Stages
@@ -110,17 +101,17 @@ public class BossBehaviour : MonoBehaviour
     private float m_fPortalPunchCDTimer;
 
     // Beam attack
-    public Vector3 m_v3BeamEnd;
+    private Vector3 m_v3BeamEnd;
     private Vector3 m_v3BeamDirection;
-    private EnergyPillar[] m_energyPillars;
+    private ParticleSystemRenderer[] m_beamParticleRenderers;
+    private ParticleSystem.Particle[] m_beamSegmentParticles;
+    private const int m_nMaxBeamParticles = 512;
     private float m_fBeamAttackCDTimer;
     private float m_fBeamTime;
     public float factor = 0.5f;
-    public GameObject mesh;
 
     // Meteor attack
-    public List<MeteorInitialize> m_availableMeteorSpawns;
-    public List<MeteorInitialize> m_chosenMeteorSpawns;
+    public Queue<MeteorTarget> m_availableTargets;
     private float m_fMeteorCDTimer;
     private bool m_bRandomMeteor;
     private static BoxCollider m_meteorWithPlayer;
@@ -150,39 +141,38 @@ public class BossBehaviour : MonoBehaviour
         m_fBeamTime = m_fBeamDuration;
         m_v3BeamEnd = m_player.transform.position;
 
+        // Initialize beam effect buffers.
+        m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticles.Length];
+
+        for(int i = 0; i < m_beamParticles.Length; ++i)
+        {
+            m_beamParticleRenderers[i] = m_beamParticles[i].GetComponent<ParticleSystemRenderer>();
+            m_beamParticleRenderers[i].enabled = false;
+        }
+
+        m_beamSegmentParticles = new ParticleSystem.Particle[m_nMaxBeamParticles];
+
         // Meteor
         GameObject[] allMeteorSpawns = GameObject.FindGameObjectsWithTag("MeteorSpawn");
         
+        m_availableTargets = new Queue<MeteorTarget>();
 
-        m_availableMeteorSpawns = new List<MeteorInitialize>();
-
-        // Add meteor spawns to spawn object pool.
+        // Add meteor spawns to spawn object pool and initialize them.
         for (int i = 0; i < allMeteorSpawns.Length; ++i)
         {
-            MeteorInitialize meteor = allMeteorSpawns[i].GetComponent<MeteorInitialize>();
-            m_availableMeteorSpawns.Add(meteor);
+            MeteorTarget targetScript = allMeteorSpawns[i].GetComponent<MeteorTarget>();
+            targetScript.Init(m_player, m_availableTargets);
+
+            m_availableTargets.Enqueue(targetScript);
         }
 
-        // Initialize meteor.
-        //m_meteor.Init(m_availableMeteorSpawns);
+        for (int i = 0; i < m_meteors.Length; ++i)
+            m_meteors[i].Init(m_player);
 
+        // Portal punch
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.tag = "NoGrapple";
         m_portal.SetActive(false);
-
-        // Armor components
-        m_armorPullScripts = new PullObject[m_armorPeices.Length];
-        m_armorMaterials = new Material[m_armorPeices.Length];
-
-        for(int i = 0; i < m_armorPeices.Length; ++i)
-        {
-            m_armorMaterials[i] = m_armorPeices[i].GetComponent<MeshRenderer>().material;
-
-            m_armorPullScripts[i] = m_armorPeices[i].GetComponent<PullObject>();
-
-            if (m_armorPullScripts[i] == null)
-                Debug.LogError("Invalid armor object!");
-        }
 
 #if (UNITY_EDITOR)
         treePath = Application.dataPath + "/Code/BossBehaviours/";
@@ -204,12 +194,10 @@ public class BossBehaviour : MonoBehaviour
         if (CondIsIdleAnimation() == ENodeResult.NODE_FAILURE)
             m_animator.SetInteger("AttackID", 0);
 
-        // Stuck state debug.
-        if (Input.GetKeyDown(KeyCode.G))
-            EnterStuckState();
-
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.P))
             ProgressStage();
+#endif
 
         m_bossTreeStages[m_nStageIndex].Run();  
 
@@ -224,14 +212,14 @@ public class BossBehaviour : MonoBehaviour
             m_fMeteorCDTimer -= Time.deltaTime;
 
         // Only reduce beam cooldown when not in use.
-        if(!mesh.activeInHierarchy)
+        if(m_beamParticleRenderers[0].enabled)
             m_fBeamAttackCDTimer -= Time.deltaTime;
     }
 
     public void ProgressStage()
     {
         // Exit stuck state.
-        ExitStuckState();
+        //ExitStuckState();
 
         // Progress stage.
         ++m_nStageIndex;
@@ -245,6 +233,7 @@ public class BossBehaviour : MonoBehaviour
         end_Portal.SetActive(true);
     }
 
+    /*
     public void EnterStuckState()
     {
         m_bIsStuck = true;
@@ -287,6 +276,7 @@ public class BossBehaviour : MonoBehaviour
             m_armorPeices[i].tag = "Untagged";
         }
     }
+    */
 
     // ----------------------------------------------------------------------------------------------
     // Conditions
@@ -392,15 +382,17 @@ public class BossBehaviour : MonoBehaviour
         return ENodeResult.NODE_FAILURE;
     }
 
+    
     public ENodeResult CondBossStuck()
     {
-        if (m_bIsStuck)
-        {
-            return ENodeResult.NODE_SUCCESS;
-        }
+        //if (m_bIsStuck)
+        //{
+        //    return ENodeResult.NODE_SUCCESS;
+        //}
 
         return ENodeResult.NODE_FAILURE;
     }
+    
 
     public ENodeResult CondPortalNotActive()
     {
@@ -424,13 +416,15 @@ public class BossBehaviour : MonoBehaviour
     
         if (CondBeamCD() == ENodeResult.NODE_SUCCESS || m_fBeamTime > 0.0f)
         {
-            //SetPos(m_beamOrigin.position, m_beamOrigin.position + (m_v3BeamDirection * m_fBeamMaxRange));
             return ENodeResult.NODE_SUCCESS;
         }
         else if (m_fBeamTime <= 0.0f)
         {
             // Beam attack is complete.
-            mesh.SetActive(false);
+
+            // Disable beam effects.
+            for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
+                m_beamParticleRenderers[i].enabled = false;
         }
     
         return ENodeResult.NODE_FAILURE;
@@ -475,91 +469,26 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult ActPlayMeteorAnim()
     {
+        Debug.Log("Meteor Attack!");
+
         //Sets the cooldown timers
         m_fMeteorCDTimer = m_fMeteorCD;
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
-        //Sets the animator to the meteor animation
+        // Sets the animator to the meteor animation
         m_animator.SetInteger("AttackID", 2);
 
-        //Gets a random amount of meteors to spawn
-        int m_AmountOfMeteors = Random.Range(1, 4);
+        // Gets a random amount of meteors to spawn
+        int nMeteorAmount = Random.Range(1, m_meteors.Length + 1);
 
-        //Copys the availableMeteorSpawns list
-        List<MeteorInitialize> m_MeteorSpawns = new List<MeteorInitialize>(m_availableMeteorSpawns);
-
-        //Resets the chosenMeteorSpawns list
-        m_chosenMeteorSpawns = new List<MeteorInitialize>();
-        //Goes though the amount of meteors to spawn
-        for (int i = 0; i < m_AmountOfMeteors; i++)
+        // Summon meteors.
+        for(int i = 0; i < nMeteorAmount; ++i)
         {
-            //Chooses a random meteor spawn
-            MeteorInitialize meteor = m_MeteorSpawns[Random.Range(1, m_MeteorSpawns.Count)];
-            //Pops meteor out so it isn't chosen again
-            m_MeteorSpawns.Remove(meteor);
-            //Adds the chosen meteor spawn into the list
-            m_chosenMeteorSpawns.Add(meteor);
+            MeteorTarget newTarget = m_availableTargets.Dequeue();
 
-            m_meteorManager.Add(meteor);
+            newTarget.SummonMeteor(m_meteors[i], transform.position + new Vector3(0.0f, 100.0f, 0.0f));
         }
-
-        m_meteorManager.SummonList();
-
-        //Resets the list
-        m_meteorManager.Reset();
-
-
-
-
-
-
-
-
-
-
-        //if(m_meteorWithPlayer != null && !m_bRandomMeteor)
-        //{
-        //    Debug.Log("Meteor Attack!");
-        //
-        //    m_availableMeteorSpawns.Remove(m_meteorSpawnVol.transform.parent.gameObject);
-        //
-        //    // Calculate random spawn point and summon meteor.
-        //    Vector3 v3RandomSpawn = m_meteorSpawnVol.transform.position;
-        //
-        //    v3RandomSpawn.x += m_meteorSpawnVol.center.x + Random.Range(m_meteorSpawnVol.size.x * 0.5f, m_meteorSpawnVol.size.x * -0.5f);
-        //    v3RandomSpawn.y += m_meteorSpawnVol.center.y + Random.Range(m_meteorSpawnVol.size.y * 0.5f, m_meteorSpawnVol.size.y * -0.5f);
-        //    v3RandomSpawn.z += m_meteorSpawnVol.center.z + Random.Range(m_meteorSpawnVol.size.z * 0.5f, m_meteorSpawnVol.size.z * -0.5f);
-        //
-        //    m_meteor.Summon(v3RandomSpawn, m_meteorSpawnVol.transform.parent.gameObject);
-        //}
-        //else if(m_bRandomMeteor)
-        //{
-        //    Debug.Log("Random Meteor Attack!");
-        //
-        //    if (m_availableMeteorSpawns.Count <= 0)
-        //        return ENodeResult.NODE_SUCCESS;
-        //
-        //    int nRandomIndex = Random.Range(0, m_availableMeteorSpawns.Count);
-        //
-        //    // Pick random spawn point object.
-        //    GameObject spawnObj = m_availableMeteorSpawns[nRandomIndex].transform.GetChild(0).gameObject;
-        //    m_availableMeteorSpawns.RemoveAt(nRandomIndex);
-        //
-        //    // Get the spawn volume.
-        //    BoxCollider spawnBox = spawnObj.GetComponent<BoxCollider>();
-        //
-        //    // Calculate random spawn point and summon meteor.
-        //    Vector3 v3RandomSpawn = spawnObj.transform.position;
-        //
-        //    v3RandomSpawn.x += spawnBox.center.x + Random.Range(spawnBox.size.x * 0.5f, spawnBox.size.x * -0.5f);
-        //    v3RandomSpawn.y += spawnBox.center.y + Random.Range(spawnBox.size.y * 0.5f, spawnBox.size.y * -0.5f);
-        //    v3RandomSpawn.z += spawnBox.center.z + Random.Range(spawnBox.size.z * 0.5f, spawnBox.size.z * -0.5f);
-        //
-        //    m_meteor.Summon(v3RandomSpawn, spawnObj.transform.parent.gameObject);
-        //
-        //    m_bRandomMeteor = false;
-        //}
-
+        
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -583,21 +512,12 @@ public class BossBehaviour : MonoBehaviour
     // Track the beam's aim. Even if the beam is not in use.
     public ENodeResult ActBeamTrack()
     {
-        //Vector3 direction = m_player.transform.position - mesh.transform.position;
-       // Quaternion toRotation = Quaternion.LookRotation(direction);
-        //mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
-
-
         float fSphereMag = (m_player.transform.position - m_beamOrigin.position).magnitude;
 
         Vector3 v3EndOnRadius = PointOnSphere(m_v3BeamEnd, m_beamOrigin.position, fSphereMag);
 
-        if (mesh.activeInHierarchy)
+        if (m_beamParticleRenderers[0].enabled)
         {
-            Vector3 direction = m_player.transform.position - mesh.transform.position;
-            Quaternion toRotation = Quaternion.LookRotation(direction);
-            mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
-
             float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
 
             float fTrackSpeed = m_fMinBeamTrackSpeed + (fBeamProgress * (m_fMaxBeamTrackSpeed - m_fMinBeamTrackSpeed));
@@ -619,10 +539,6 @@ public class BossBehaviour : MonoBehaviour
         else
         {
             m_v3BeamEnd = PointOnSphere(m_player.transform.position + new Vector3(10,0,0), m_beamOrigin.position, fSphereMag);
-
-            Vector3 direction = (m_player.transform.position + new Vector3(30,0,0)) - mesh.transform.position;
-            Quaternion toRotation = Quaternion.LookRotation(direction);
-            mesh.transform.rotation = Quaternion.Slerp(mesh.transform.rotation, toRotation, .7f * Time.deltaTime);
         }
 
         return ENodeResult.NODE_SUCCESS;
@@ -631,28 +547,36 @@ public class BossBehaviour : MonoBehaviour
     public ENodeResult ActUseBeam()
     {
         // Enable beam if it is disabled.
-        if (!mesh.activeInHierarchy)
+        if (!m_beamParticleRenderers[0].enabled)
         {
-            mesh.SetActive(true);
+            for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
+                m_beamParticleRenderers[i].enabled = true;
         }
 
-        // Look at player.
+        // Track to face player.
         ActTrackPlayer();
 
         Ray beamRay = new Ray(m_beamOrigin.position, m_v3BeamDirection);
         RaycastHit beamHit;
-        if(Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
+
+        // Rotate beam effects...
+        m_beamOrigin.rotation = Quaternion.LookRotation(m_v3BeamDirection, Vector3.up);
+
+        // Raycast to get hit information.
+        if (Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
         {
+            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, beamHit.distance, 2.0f, true);
+
             if (beamHit.collider.gameObject == m_player)
             {
                 m_playerStats.DealDamage(m_fBeamDPS * Time.deltaTime);
             }
-            else if (beamHit.collider.GetComponent<EnergyPillar>())
-            {
-                beamHit.collider.GetComponent<EnergyPillar>().Charge(this.transform.GetComponent<BossBehaviour>());
-            }
-
         }
+        else
+        {
+            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, m_nMaxBeamParticles, 2.0f, false);
+        }
+
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -677,7 +601,7 @@ public class BossBehaviour : MonoBehaviour
     IEnumerator ResetStuck()
     {
         yield return new WaitForSeconds(m_fStuckTime);
-        ExitStuckState();
+        //ExitStuckState();
     }
 
     public void SummonPortal()
@@ -712,17 +636,6 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.SetPunchDirection(-v3PortalOffset);
 
         return;
-    }
-
-    void SetPos(Vector3 start, Vector3 end)
-    {
-        Vector3 dir = end - start;
-        Vector3 mid = (dir) / 2.0f + start;
-        mesh.transform.position = mid;
-        mesh.transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
-        Vector3 scale = mesh.transform.localScale;
-        scale.y = dir.magnitude * factor;
-        mesh.transform.localScale = scale;
     }
 
     private void OnDrawGizmosSelected()

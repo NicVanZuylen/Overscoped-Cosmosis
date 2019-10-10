@@ -82,7 +82,6 @@
     <Compile Include="Assets\Code\Classes\Node.cs" />
     <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
     <Compile Include="Assets\Code\Scripts\ArmorPull.cs" />
-    <Compile Include="Assets\Code\Scripts\Beam.cs" />
     <Compile Include="Assets\Code\Scripts\BeamPickup.cs" />
     <Compile Include="Assets\Code\Scripts\BobEventHandler.cs" />
     <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
@@ -98,9 +97,7 @@
     <Compile Include="Assets\Code\Scripts\Menus\PauseMenu.cs" />
     <Compile Include="Assets\Code\Scripts\Menus\ScreenFade.cs" />
     <Compile Include="Assets\Code\Scripts\Meteor.cs" />
-    <Compile Include="Assets\Code\Scripts\MeteorAOE.cs" />
-    <Compile Include="Assets\Code\Scripts\MeteorInitialize.cs" />
-    <Compile Include="Assets\Code\Scripts\MeteorManager.cs" />
+    <Compile Include="Assets\Code\Scripts\MeteorTarget.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerBeam.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerStats.cs" />
@@ -119,6 +116,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SimpleSubtractOpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\SimpleTerrain\SimpleTerrainAddPass.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_FmodOpNode.shader" />
+    <None Include="Assets\Materials\Shaders\SHD_Boss_Heart_Force_Field.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Translucency\Translucency.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Shaders\ASESShaderSelectorUnlit.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_NegateNode.shader" />
@@ -223,6 +221,7 @@
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Outline\Outline.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ClampOpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Credits.txt" />
+    <None Include="Assets\Materials\Shaders\SHD_Boss_Heart_Tendrils.shader" />
     <None Include="Assets\Materials\Shaders\SHD_Boss_Projectile_Trail.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\HighlightAnimated\Highlight_Animated.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\Melting\Melting.shader" />
@@ -336,6 +335,7 @@
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\ObjectNormalRefraction\ShaderBallInterior.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\HDSRPLit.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\CustomLightingToon\CustomLightingToon.shader" />
+    <None Include="Assets\Materials\Shaders\SHD_Boss_Heart_Thumpy.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\LinearPreviews.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\SimpleTerrain\SimpleWater.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WeightedBlendNode.shader" />

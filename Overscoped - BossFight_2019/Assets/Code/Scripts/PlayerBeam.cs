@@ -64,6 +64,7 @@ public class PlayerBeam : MonoBehaviour
     private CameraEffects m_camEffects;
     private RaycastHit m_sphereCastHit;
     private GameObject m_endObj;
+    private ChestPlate m_bossChestScript;
     private float m_fBeamCharge; // Actual current charge value.
     private float m_fCurrentMeterLevel; // Current charge as displayed on the HUD.
     private int m_nDissolveBracerIndex;
@@ -85,8 +86,6 @@ public class PlayerBeam : MonoBehaviour
 
         m_bBeamUnlocked = true;
 
-        m_fBeamCharge = m_fMaxBeamCharge;
-
         m_fBeamCharge = 0.0f;
 
         m_beamParticles = new ParticleSystem[m_beamParticleObjects.Length];
@@ -104,6 +103,8 @@ public class PlayerBeam : MonoBehaviour
 
         m_endObj = new GameObject("Player_Beam_End_Point");
 
+        m_bossChestScript = GameObject.FindGameObjectWithTag("BossChest").GetComponentInChildren<ChestPlate>();
+
         m_chargeAudioLoop = new AudioLoop(m_chargeLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
         m_fireAudioLoop = new AudioLoop(m_fireLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
         m_impactAudioLoop = new AudioLoop(m_impactLoopSFX, m_endObj, ESpacialMode.AUDIO_SPACE_WORLD, (m_nBeamLength * m_fMeshLength) + 10.0f);
@@ -116,17 +117,18 @@ public class PlayerBeam : MonoBehaviour
         ParticleSystemRenderer[] renderers: The particle renderers to update material properties on.
         ParticleSystem.Particle[] particles: Pre-allocated array of particles to update.
         Vector3 v3Origin: Origin point of the beam.
-        float fLength: The length of the beam.
+        float fLength: The maximum length of the beam.
+        float fSegmentLength: The length of each mesh segment.
         bool bHit: Whether or not the beam hit a surface.
     */
-    private void UpdateParticlePositions(ParticleSystem[] particleSystems, ParticleSystemRenderer[] renderers, ParticleSystem.Particle[] particles, Vector3 v3Origin, float fLength, bool bHit)
+    public static void UpdateParticlePositions(ParticleSystem[] particleSystems, ParticleSystemRenderer[] renderers, ParticleSystem.Particle[] particles, Vector3 v3Origin, float fMaxLength, float fSegmentLength, bool bHit)
     {
         int nParticleAmount = 0;
 
         // Loop through all particles/segments and set their positions.
         for(int i = 0; i < particles.Length; ++i)
         {
-            float fOffset = i * m_fMeshLength;
+            float fOffset = i * fSegmentLength;
 
             // Set new offset.
             particles[i].position = new Vector3(0.0f, 0.0f, fOffset);
@@ -135,20 +137,20 @@ public class PlayerBeam : MonoBehaviour
             ++nParticleAmount;
 
             // Stop once length is exceeded.
-            if (bHit && fOffset + m_fMeshLength >= fLength)
+            if (bHit && fOffset + fSegmentLength >= fMaxLength)
             {
                 break;
             }
         }
 
-        for(int i = 0; i < m_beamParticles.Length; ++i)
+        for(int i = 0; i < particleSystems.Length; ++i)
         {
             // Set particle data.
-            particleSystems[i].SetParticles(m_particles, nParticleAmount);
+            particleSystems[i].SetParticles(particles, nParticleAmount);
 
             // Set origin and length in shader.
             renderers[i].material.SetVector("_LineOrigin", v3Origin);
-            renderers[i].material.SetFloat("_LineLength", fLength);
+            renderers[i].material.SetFloat("_LineLength", fMaxLength);
         }
     }
 
@@ -192,7 +194,7 @@ public class PlayerBeam : MonoBehaviour
                 if (bRayHit)
                 {
                     // Update volumetric beam particle positions.
-                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_sphereCastHit.distance, true);
+                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_sphereCastHit.distance, m_fMeshLength, true);
 
                     float fHitProj = Vector3.Dot(m_sphereCastHit.point, m_beamOrigin.forward);
                     float fOriginProj = Vector3.Dot(m_beamOrigin.position, m_beamOrigin.forward);
@@ -200,11 +202,17 @@ public class PlayerBeam : MonoBehaviour
                     float fProjDiff = fHitProj - fOriginProj;
 
                     m_endObj.transform.position = m_beamOrigin.position + (m_beamOrigin.forward * fProjDiff);
+
+                    // Deal damage if the beam ray hits the force field.
+                    if(m_sphereCastHit.collider.tag == "BossChest")
+                    {
+                        m_bossChestScript.DealBeamDamage();
+                    }
                 }
                 else
                 {
                     // Update volumetric beam particle positions.
-                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_nBeamLength, false);
+                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_nBeamLength, m_fMeshLength, false);
 
                     m_endObj.transform.position = m_beamOrigin.position + (m_beamOrigin.forward * m_nBeamLength);
                 }

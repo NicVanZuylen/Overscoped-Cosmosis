@@ -51,6 +51,8 @@ public class ChestPlate : PullObject
     {
         m_fHealth -= Time.deltaTime;
 
+        Debug.Log("Damage!");
+
         if(m_fHealth <= 0.0f)
         {
             // Remove chestplate & progress stage.

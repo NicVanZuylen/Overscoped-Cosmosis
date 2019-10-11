@@ -11,11 +11,12 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 		_ColourTiling("Colour Tiling", Vector) = (0,0,0,0)
 		[HDR]_Colour("Colour", Color) = (2,2,2,0)
 		_AlphaAdjust("Alpha Adjust", Float) = 0
+		_ColourVertexStrength("Colour Vertex Strength", Float) = 0
 		_VertexTexture("Vertex Texture", 2D) = "white" {}
 		_VertexStrength("Vertex Strength", Float) = 0
 		_VertexTiling("Vertex Tiling", Vector) = (1,1,0,0)
 		_VertexOffset("Vertex Offset", Vector) = (0,0,0,0)
-		_NoiseVertexIntensity("Noise Vertex Intensity", Float) = 0
+		_BeamTaper("Beam Taper", Range( 0 , 50)) = 10
     }
 
     SubShader
@@ -47,7 +48,6 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
             HLSLPROGRAM
         
 				#define _SURFACE_TYPE_TRANSPARENT 1
-				#define _BLENDMODE_ADD 1
 				#define _BLENDMODE_ALPHA 1
 
         
@@ -98,7 +98,8 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 				float _LineLength;
 				float2 _ColourTiling;
 				float2 _ColourOffset;
-				float _NoiseVertexIntensity;
+				float _BeamTaper;
+				float _ColourVertexStrength;
 				sampler2D _VertexTexture;
 				float2 _VertexTiling;
 				float2 _VertexOffset;
@@ -138,16 +139,18 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 					UNITY_TRANSFER_INSTANCE_ID(inputMesh, outputPackedVaryingsMeshToPS);
 
 					float2 uv067 = inputMesh.ase_texcoord * float2( 1,1 ) + float2( 0,0 );
-					float temp_output_57_0 = ( 1.0 - ( distance( inputMesh.positionOS , _LineOrigin ) / _LineLength ) );
+					float temp_output_8_0 = ( distance( inputMesh.positionOS , _LineOrigin ) / _LineLength );
+					float temp_output_57_0 = ( 1.0 - temp_output_8_0 );
 					float2 appendResult66 = (float2(uv067.y , temp_output_57_0));
 					float4 tex2DNode74 = tex2Dlod( _ColourTexture, float4( (appendResult66*_ColourTiling + ( _Time.y * _ColourOffset )), 0, 0.0) );
+					float temp_output_123_0 = min( ( 1.0 - pow( ( 1.0 - temp_output_57_0 ) , _BeamTaper ) ) , ( 1.0 - pow( ( 1.0 - temp_output_8_0 ) , _BeamTaper ) ) );
 					
 					outputPackedVaryingsMeshToPS.ase_texcoord.xy = inputMesh.ase_texcoord.xy;
 					outputPackedVaryingsMeshToPS.ase_texcoord1 = float4(inputMesh.positionOS,0);
 					
 					//setting value to unused interpolator channels and avoid initialization warnings
 					outputPackedVaryingsMeshToPS.ase_texcoord.zw = 0;
-					float3 vertexValue =  ( ( tex2DNode74.r * temp_output_57_0 * _NoiseVertexIntensity * inputMesh.normalOS.xyz ) + ( temp_output_57_0 * inputMesh.normalOS.xyz * tex2Dlod( _VertexTexture, float4( (appendResult66*_VertexTiling + ( _Time.y * _VertexOffset )), 0, 0.0) ).r * _VertexStrength ) );
+					float3 vertexValue =  ( ( tex2DNode74.r * temp_output_123_0 * _ColourVertexStrength * inputMesh.normalOS.xyz ) + ( temp_output_123_0 * inputMesh.normalOS.xyz * tex2Dlod( _VertexTexture, float4( (appendResult66*_VertexTiling + ( _Time.y * _VertexOffset )), 0, 0.0) ).r * _VertexStrength ) );
 					#ifdef ASE_ABSOLUTE_VERTEX_POS
 					inputMesh.positionOS.xyz = vertexValue;
 					#else
@@ -190,7 +193,8 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 					BuiltinData builtinData;
 					SurfaceDescription surfaceDescription = (SurfaceDescription)0;
 					float2 uv067 = packedInput.ase_texcoord.xy * float2( 1,1 ) + float2( 0,0 );
-					float temp_output_57_0 = ( 1.0 - ( distance( packedInput.ase_texcoord1.xyz , _LineOrigin ) / _LineLength ) );
+					float temp_output_8_0 = ( distance( packedInput.ase_texcoord1.xyz , _LineOrigin ) / _LineLength );
+					float temp_output_57_0 = ( 1.0 - temp_output_8_0 );
 					float2 appendResult66 = (float2(uv067.y , temp_output_57_0));
 					float4 tex2DNode74 = tex2D( _ColourTexture, (appendResult66*_ColourTiling + ( _Time.y * _ColourOffset )) );
 					
@@ -231,7 +235,6 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
             HLSLPROGRAM
         
 				#define _SURFACE_TYPE_TRANSPARENT 1
-				#define _BLENDMODE_ADD 1
 				#define _BLENDMODE_ALPHA 1
 
         
@@ -288,7 +291,8 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 				float _LineLength;
 				float2 _ColourTiling;
 				float2 _ColourOffset;
-				float _NoiseVertexIntensity;
+				float _BeamTaper;
+				float _ColourVertexStrength;
 				sampler2D _VertexTexture;
 				float2 _VertexTiling;
 				float2 _VertexOffset;
@@ -332,9 +336,11 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 					UNITY_TRANSFER_INSTANCE_ID(inputMesh, outputPackedVaryingsMeshToPS);
 
 					float2 uv067 = inputMesh.ase_texcoord * float2( 1,1 ) + float2( 0,0 );
-					float temp_output_57_0 = ( 1.0 - ( distance( inputMesh.positionOS , _LineOrigin ) / _LineLength ) );
+					float temp_output_8_0 = ( distance( inputMesh.positionOS , _LineOrigin ) / _LineLength );
+					float temp_output_57_0 = ( 1.0 - temp_output_8_0 );
 					float2 appendResult66 = (float2(uv067.y , temp_output_57_0));
 					float4 tex2DNode74 = tex2Dlod( _ColourTexture, float4( (appendResult66*_ColourTiling + ( _Time.y * _ColourOffset )), 0, 0.0) );
+					float temp_output_123_0 = min( ( 1.0 - pow( ( 1.0 - temp_output_57_0 ) , _BeamTaper ) ) , ( 1.0 - pow( ( 1.0 - temp_output_8_0 ) , _BeamTaper ) ) );
 					
 					outputPackedVaryingsMeshToPS.ase_color = inputMesh.ase_color;
 					outputPackedVaryingsMeshToPS.ase_texcoord.xy = inputMesh.ase_texcoord.xy;
@@ -342,7 +348,7 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 					
 					//setting value to unused interpolator channels and avoid initialization warnings
 					outputPackedVaryingsMeshToPS.ase_texcoord.zw = 0;
-					float3 vertexValue = ( ( tex2DNode74.r * temp_output_57_0 * _NoiseVertexIntensity * inputMesh.normalOS.xyz ) + ( temp_output_57_0 * inputMesh.normalOS.xyz * tex2Dlod( _VertexTexture, float4( (appendResult66*_VertexTiling + ( _Time.y * _VertexOffset )), 0, 0.0) ).r * _VertexStrength ) );
+					float3 vertexValue = ( ( tex2DNode74.r * temp_output_123_0 * _ColourVertexStrength * inputMesh.normalOS.xyz ) + ( temp_output_123_0 * inputMesh.normalOS.xyz * tex2Dlod( _VertexTexture, float4( (appendResult66*_VertexTiling + ( _Time.y * _VertexOffset )), 0, 0.0) ).r * _VertexStrength ) );
 					#ifdef ASE_ABSOLUTE_VERTEX_POS
 					inputMesh.positionOS.xyz = vertexValue;
 					#else
@@ -372,7 +378,8 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 					BuiltinData builtinData;
 					SurfaceDescription surfaceDescription = (SurfaceDescription)0;
 					float2 uv067 = packedInput.ase_texcoord.xy * float2( 1,1 ) + float2( 0,0 );
-					float temp_output_57_0 = ( 1.0 - ( distance( packedInput.ase_texcoord1.xyz , _LineOrigin ) / _LineLength ) );
+					float temp_output_8_0 = ( distance( packedInput.ase_texcoord1.xyz , _LineOrigin ) / _LineLength );
+					float temp_output_57_0 = ( 1.0 - temp_output_8_0 );
 					float2 appendResult66 = (float2(uv067.y , temp_output_57_0));
 					float4 tex2DNode74 = tex2D( _ColourTexture, (appendResult66*_ColourTiling + ( _Time.y * _ColourOffset )) );
 					
@@ -406,7 +413,6 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
             HLSLPROGRAM
         
 				#define _SURFACE_TYPE_TRANSPARENT 1
-				#define _BLENDMODE_ADD 1
 				#define _BLENDMODE_ALPHA 1
 
         
@@ -578,7 +584,8 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 						BuiltinData builtinData;
 						SurfaceDescription surfaceDescription = (SurfaceDescription)0;
 						float2 uv067 = packedInput.ase_texcoord.xy * float2( 1,1 ) + float2( 0,0 );
-						float temp_output_57_0 = ( 1.0 - ( distance( packedInput.ase_texcoord1.xyz , _LineOrigin ) / _LineLength ) );
+						float temp_output_8_0 = ( distance( packedInput.ase_texcoord1.xyz , _LineOrigin ) / _LineLength );
+						float temp_output_57_0 = ( 1.0 - temp_output_8_0 );
 						float2 appendResult66 = (float2(uv067.y , temp_output_57_0));
 						float4 tex2DNode74 = tex2D( _ColourTexture, (appendResult66*_ColourTiling + ( _Time.y * _ColourOffset )) );
 						
@@ -620,7 +627,6 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
             HLSLPROGRAM
         
 				#define _SURFACE_TYPE_TRANSPARENT 1
-				#define _BLENDMODE_ADD 1
 				#define _BLENDMODE_ALPHA 1
 
         
@@ -684,7 +690,8 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 				float _LineLength;
 				float2 _ColourTiling;
 				float2 _ColourOffset;
-				float _NoiseVertexIntensity;
+				float _BeamTaper;
+				float _ColourVertexStrength;
 				sampler2D _VertexTexture;
 				float2 _VertexTiling;
 				float2 _VertexOffset;
@@ -736,9 +743,11 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 					UNITY_TRANSFER_INSTANCE_ID(inputMesh, outputPackedVaryingsMeshToPS);
 
 					float2 uv067 = inputMesh.uv0.xy * float2( 1,1 ) + float2( 0,0 );
-					float temp_output_57_0 = ( 1.0 - ( distance( inputMesh.positionOS , _LineOrigin ) / _LineLength ) );
+					float temp_output_8_0 = ( distance( inputMesh.positionOS , _LineOrigin ) / _LineLength );
+					float temp_output_57_0 = ( 1.0 - temp_output_8_0 );
 					float2 appendResult66 = (float2(uv067.y , temp_output_57_0));
 					float4 tex2DNode74 = tex2Dlod( _ColourTexture, float4( (appendResult66*_ColourTiling + ( _Time.y * _ColourOffset )), 0, 0.0) );
+					float temp_output_123_0 = min( ( 1.0 - pow( ( 1.0 - temp_output_57_0 ) , _BeamTaper ) ) , ( 1.0 - pow( ( 1.0 - temp_output_8_0 ) , _BeamTaper ) ) );
 					
 					outputPackedVaryingsMeshToPS.ase_color = inputMesh.color;
 					outputPackedVaryingsMeshToPS.ase_texcoord.xy = inputMesh.uv0.xy;
@@ -746,7 +755,7 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 					
 					//setting value to unused interpolator channels and avoid initialization warnings
 					outputPackedVaryingsMeshToPS.ase_texcoord.zw = 0;
-					float3 vertexValue = ( ( tex2DNode74.r * temp_output_57_0 * _NoiseVertexIntensity * inputMesh.normalOS ) + ( temp_output_57_0 * inputMesh.normalOS * tex2Dlod( _VertexTexture, float4( (appendResult66*_VertexTiling + ( _Time.y * _VertexOffset )), 0, 0.0) ).r * _VertexStrength ) );
+					float3 vertexValue = ( ( tex2DNode74.r * temp_output_123_0 * _ColourVertexStrength * inputMesh.normalOS ) + ( temp_output_123_0 * inputMesh.normalOS * tex2Dlod( _VertexTexture, float4( (appendResult66*_VertexTiling + ( _Time.y * _VertexOffset )), 0, 0.0) ).r * _VertexStrength ) );
 					#ifdef ASE_ABSOLUTE_VERTEX_POS
 					inputMesh.positionOS.xyz = vertexValue; 
 					#else
@@ -786,7 +795,8 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 					BuiltinData builtinData;
 					SurfaceDescription surfaceDescription = (SurfaceDescription)0;
 					float2 uv067 = packedInput.ase_texcoord.xy * float2( 1,1 ) + float2( 0,0 );
-					float temp_output_57_0 = ( 1.0 - ( distance( packedInput.ase_texcoord1.xyz , _LineOrigin ) / _LineLength ) );
+					float temp_output_8_0 = ( distance( packedInput.ase_texcoord1.xyz , _LineOrigin ) / _LineLength );
+					float temp_output_57_0 = ( 1.0 - temp_output_8_0 );
 					float2 appendResult66 = (float2(uv067.y , temp_output_57_0));
 					float4 tex2DNode74 = tex2D( _ColourTexture, (appendResult66*_ColourTiling + ( _Time.y * _ColourOffset )) );
 					
@@ -821,72 +831,97 @@ Shader "Cosmosis/Burt/Volumetric_Beam_Edge"
 }
 /*ASEBEGIN
 Version=16900
-1920;1;1906;1011;486.0924;-305.6822;1;True;False
-Node;AmplifyShaderEditor.CommentaryNode;72;-1203.734,291.7307;Float;False;828.7672;405.3825;0-1 Gradient + UVs;12;66;67;57;8;5;9;6;4;0;3;2;73;;1,1,1,1;0;0
-Node;AmplifyShaderEditor.Vector3Node;6;-1190.734,533.1134;Float;False;Property;_LineOrigin;LineOrigin;0;0;Create;True;0;0;False;0;-244,-52,105;-244,-52,105;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
-Node;AmplifyShaderEditor.PosVertexDataNode;4;-1161.734,390.1132;Float;False;0;0;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.RangedFloatNode;9;-951.734,558.1133;Float;False;Property;_LineLength;LineLength;1;0;Create;True;0;0;False;0;35;35;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.DistanceOpNode;5;-946.734,457.1132;Float;False;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleDivideOpNode;8;-790.7344,485.1132;Float;False;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.TextureCoordinatesNode;67;-738.967,341.7307;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.OneMinusNode;57;-666.7791,488.9094;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+1920;1;1906;1010;919.448;-468.5148;1;True;False
+Node;AmplifyShaderEditor.CommentaryNode;72;-1358.812,551.2109;Float;False;885.7672;505.3825;0-1 Gradient + UVs;11;106;2;66;57;67;8;5;9;4;6;105;;1,1,1,1;0;0
+Node;AmplifyShaderEditor.Vector3Node;6;-1345.812,792.5935;Float;False;Property;_LineOrigin;LineOrigin;0;0;Create;True;0;0;False;0;-244,-52,105;-242.109,-51.79,105.99;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
+Node;AmplifyShaderEditor.PosVertexDataNode;4;-1316.812,649.5933;Float;False;0;0;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;9;-1106.812,817.5934;Float;False;Property;_LineLength;LineLength;1;0;Create;True;0;0;False;0;35;33;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.DistanceOpNode;5;-1101.812,716.5933;Float;False;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleDivideOpNode;8;-945.8114,744.5933;Float;False;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.CommentaryNode;106;-642.0117,911.4846;Float;False;154;120;B to W;1;107;;1,1,1,1;0;0
+Node;AmplifyShaderEditor.OneMinusNode;57;-821.8561,748.3895;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.CommentaryNode;105;-647.8591,786.8701;Float;False;154;120;W to B;1;73;;1,1,1,1;0;0
+Node;AmplifyShaderEditor.RelayNode;107;-619.0117,952.4846;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.CommentaryNode;109;-402.4566,-50;Float;False;1265.658;731.5038;Colour;13;68;90;87;92;89;91;3;0;64;62;63;65;74;;0.9716981,0.8218863,0.4720986,1;0;0
+Node;AmplifyShaderEditor.CommentaryNode;108;-303.4575,1092.9;Float;False;1129.105;392.1022;Spiral Vertex Offset;8;101;94;93;96;95;97;99;98;;0.4930127,0.3899519,0.6509434,1;0;0
+Node;AmplifyShaderEditor.CommentaryNode;116;-324.0559,784.7089;Float;False;721.731;273.6603;Beam Taper;8;124;123;122;121;120;119;118;117;;1,1,1,1;0;0
+Node;AmplifyShaderEditor.RelayNode;73;-624.8591,827.8701;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.OneMinusNode;118;-195.482,969.4305;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.OneMinusNode;117;-188.9381,820.7278;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;124;-298.7702,893.2841;Float;False;Property;_BeamTaper;Beam Taper;12;0;Create;True;0;0;False;0;10;10;0;50;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleTimeNode;93;-253.4575,1256.002;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
+Node;AmplifyShaderEditor.Vector2Node;94;-242.4575,1324.002;Float;False;Property;_VertexOffset;Vertex Offset;11;0;Create;True;0;0;False;0;0,0;0,0.5;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
 Node;AmplifyShaderEditor.Vector2Node;62;-327.5565,520.5038;Float;False;Property;_ColourOffset;Colour Offset;3;0;Create;True;0;0;False;0;0,0;0.2,1.8;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
-Node;AmplifyShaderEditor.SimpleTimeNode;93;-665.8264,1055.306;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleTimeNode;64;-352.4566,445.4037;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
-Node;AmplifyShaderEditor.Vector2Node;94;-654.8264,1123.306;Float;False;Property;_VertexOffset;Vertex Offset;10;0;Create;True;0;0;False;0;0,0;0,0.5;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
-Node;AmplifyShaderEditor.Vector2Node;68;-198.667,306.6308;Float;False;Property;_ColourTiling;Colour Tiling;4;0;Create;True;0;0;False;0;0,0;1,2;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
-Node;AmplifyShaderEditor.DynamicAppendNode;66;-502.9668,387.7307;Float;False;FLOAT2;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT;0;False;1;FLOAT2;0
-Node;AmplifyShaderEditor.Vector2Node;95;-504.8264,951.3057;Float;False;Property;_VertexTiling;Vertex Tiling;9;0;Create;True;0;0;False;0;1,1;1,2.9;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;96;-473.8264,1078.306;Float;False;2;2;0;FLOAT;0;False;1;FLOAT2;0,0;False;1;FLOAT2;0
+Node;AmplifyShaderEditor.TextureCoordinatesNode;67;-894.044,601.2108;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.Vector2Node;95;-92.4575,1152.002;Float;False;Property;_VertexTiling;Vertex Tiling;10;0;Create;True;0;0;False;0;1,1;1,2.9;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;63;-149.8564,465.0038;Float;False;2;2;0;FLOAT;0;False;1;FLOAT2;0,0;False;1;FLOAT2;0
-Node;AmplifyShaderEditor.ScaleAndOffsetNode;97;-298.8264,973.3057;Float;False;3;0;FLOAT2;0,0;False;1;FLOAT2;1,0;False;2;FLOAT2;0,0;False;1;FLOAT2;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;96;-61.45747,1279.002;Float;False;2;2;0;FLOAT;0;False;1;FLOAT2;0,0;False;1;FLOAT2;0
+Node;AmplifyShaderEditor.Vector2Node;68;-198.667,306.6308;Float;False;Property;_ColourTiling;Colour Tiling;4;0;Create;True;0;0;False;0;0,0;1,2;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
+Node;AmplifyShaderEditor.PowerNode;120;-28.78111,929.9582;Float;False;2;0;FLOAT;0;False;1;FLOAT;1;False;1;FLOAT;0
+Node;AmplifyShaderEditor.PowerNode;119;-28.66003,834.6186;Float;False;2;0;FLOAT;0;False;1;FLOAT;1;False;1;FLOAT;0
+Node;AmplifyShaderEditor.DynamicAppendNode;66;-658.0438,647.2109;Float;False;FLOAT2;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT;0;False;1;FLOAT2;0
 Node;AmplifyShaderEditor.ScaleAndOffsetNode;65;-1.804382,394.8735;Float;False;3;0;FLOAT2;0,0;False;1;FLOAT2;1,0;False;2;FLOAT2;0,0;False;1;FLOAT2;0
-Node;AmplifyShaderEditor.NormalVertexDataNode;100;-285.6181,830.9518;Float;False;0;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.SamplerNode;99;-91.6181,973.9518;Float;True;Property;_VertexTexture;Vertex Texture;7;0;Create;True;0;0;False;0;None;8372be772f2b6da4596e8a7b8d2f5eec;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.RangedFloatNode;98;-0.6781921,1166.881;Float;False;Property;_VertexStrength;Vertex Strength;8;0;Create;True;0;0;False;0;0;2;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;103;241.6367,735.7942;Float;False;Property;_NoiseVertexIntensity;Noise Vertex Intensity;11;0;Create;True;0;0;False;0;0;2;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.ScaleAndOffsetNode;97;113.5425,1174.002;Float;False;3;0;FLOAT2;0,0;False;1;FLOAT2;1,0;False;2;FLOAT2;0,0;False;1;FLOAT2;0
+Node;AmplifyShaderEditor.OneMinusNode;122;122.0012,854.9203;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.OneMinusNode;121;123.3681,925.8528;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;98;411.6907,1367.577;Float;False;Property;_VertexStrength;Vertex Strength;9;0;Create;True;0;0;False;0;0;0.45;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMinOpNode;123;275.286,875.1319;Float;False;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SamplerNode;99;320.7509,1174.648;Float;True;Property;_VertexTexture;Vertex Texture;8;0;Create;True;0;0;False;0;None;8372be772f2b6da4596e8a7b8d2f5eec;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.NormalVertexDataNode;100;426.9075,854.1027;Float;False;0;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;103;343.6996,688.3125;Float;False;Property;_ColourVertexStrength;Colour Vertex Strength;7;0;Create;True;0;0;False;0;0;0.75;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.SamplerNode;74;222.5178,379.29;Float;True;Property;_ColourTexture;Colour Texture;2;0;Create;True;0;0;False;0;None;e451e4a7415133e499b571c26159bd98;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.RelayNode;73;-493.7821,614.39;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;92;521.2019,477.7246;Float;False;Property;_AlphaAdjust;Alpha Adjust;6;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.VertexColorNode;87;305.0809,42.70461;Float;False;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;101;242.3819,909.9519;Float;False;4;4;0;FLOAT;0;False;1;FLOAT3;0,0,0;False;2;FLOAT;0;False;3;FLOAT;0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;102;573.6367,710.7942;Float;False;4;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.ColorNode;90;277.2019,206.7246;Float;False;Property;_Colour;Colour;5;1;[HDR];Create;True;0;0;False;0;2,2,2,0;8.031373,0,191.749,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;102;632.4492,703.2054;Float;False;4;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.VertexColorNode;87;305.0809,42.70461;Float;False;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;101;656.6479,1142.9;Float;False;4;4;0;FLOAT;0;False;1;FLOAT3;0,0,0;False;2;FLOAT;0;False;3;FLOAT;0;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;89;543.2019,202.7246;Float;False;3;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT;0;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleAddOpNode;91;709.2019,406.7246;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleAddOpNode;104;799.9076,834.6823;Float;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.SimpleAddOpNode;104;811.2906,846.0654;Float;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;3;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;4;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;META;0;3;META;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;True;2;False;-1;False;False;False;False;False;True;1;LightMode=Meta;False;0;Hidden/InternalErrorShader;0;0;Standard;0;5;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;4;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;Depth prepass;0;0;Depth prepass;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=DepthForwardOnly;False;0;Hidden/InternalErrorShader;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;1522.3,672.8;Float;False;True;2;Float;ASEMaterialInspector;0;4;Cosmosis/Burt/Volumetric_Beam_Edge;dfe2f27ac20b08c469b2f95c236be0c3;True;Forward Unlit;0;1;Forward Unlit;5;True;2;5;False;-1;10;False;-1;2;5;False;-1;10;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;True;5;0;False;False;False;False;True;True;True;True;True;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=ForwardOnly;False;0;Hidden/InternalErrorShader;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;4;True;True;True;True;False;5;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2;-381.3,420.0999;Float;False;False;2;Float;ASEMaterialInspector;0;4;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;ShadowCaster;0;2;ShadowCaster;1;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;False;False;False;False;True;1;LightMode=ShadowCaster;False;0;Hidden/InternalErrorShader;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2;-536.377,679.5801;Float;False;False;2;Float;ASEMaterialInspector;0;4;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;ShadowCaster;0;2;ShadowCaster;1;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;False;False;False;False;True;1;LightMode=ShadowCaster;False;0;Hidden/InternalErrorShader;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;4;Hidden/Templates/HDSRPUnlit;dfe2f27ac20b08c469b2f95c236be0c3;True;Depth prepass;0;0;Depth prepass;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=DepthForwardOnly;False;0;Hidden/InternalErrorShader;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
 WireConnection;5;0;4;0
 WireConnection;5;1;6;0
 WireConnection;8;0;5;0
 WireConnection;8;1;9;0
 WireConnection;57;0;8;0
-WireConnection;66;0;67;2
-WireConnection;66;1;57;0
-WireConnection;96;0;93;0
-WireConnection;96;1;94;0
+WireConnection;107;0;8;0
+WireConnection;73;0;57;0
+WireConnection;118;0;107;0
+WireConnection;117;0;73;0
 WireConnection;63;0;64;0
 WireConnection;63;1;62;0
-WireConnection;97;0;66;0
-WireConnection;97;1;95;0
-WireConnection;97;2;96;0
+WireConnection;96;0;93;0
+WireConnection;96;1;94;0
+WireConnection;120;0;118;0
+WireConnection;120;1;124;0
+WireConnection;119;0;117;0
+WireConnection;119;1;124;0
+WireConnection;66;0;67;2
+WireConnection;66;1;57;0
 WireConnection;65;0;66;0
 WireConnection;65;1;68;0
 WireConnection;65;2;63;0
+WireConnection;97;0;66;0
+WireConnection;97;1;95;0
+WireConnection;97;2;96;0
+WireConnection;122;0;119;0
+WireConnection;121;0;120;0
+WireConnection;123;0;122;0
+WireConnection;123;1;121;0
 WireConnection;99;1;97;0
 WireConnection;74;1;65;0
-WireConnection;73;0;57;0
-WireConnection;101;0;73;0
+WireConnection;102;0;74;1
+WireConnection;102;1;123;0
+WireConnection;102;2;103;0
+WireConnection;102;3;100;0
+WireConnection;101;0;123;0
 WireConnection;101;1;100;0
 WireConnection;101;2;99;1
 WireConnection;101;3;98;0
-WireConnection;102;0;74;1
-WireConnection;102;1;73;0
-WireConnection;102;2;103;0
-WireConnection;102;3;100;0
 WireConnection;89;0;87;0
 WireConnection;89;1;90;0
 WireConnection;89;2;74;1
@@ -898,4 +933,4 @@ WireConnection;1;0;89;0
 WireConnection;1;1;91;0
 WireConnection;1;3;104;0
 ASEEND*/
-//CHKSM=D9247F435B2B05495A318C5D7BFF677FA092739A
+//CHKSM=97037744CE51B6F16AF5B6E94F8C69572D50BE45

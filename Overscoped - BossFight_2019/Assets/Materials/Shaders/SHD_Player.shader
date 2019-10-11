@@ -2506,15 +2506,15 @@ Shader "Cosmosis/Player/Player"
 }
 /*ASEBEGIN
 Version=16900
-1920;1;1906;1011;1799.599;322.3751;1;True;False
-Node;AmplifyShaderEditor.TexturePropertyNode;12;-1245.81,3.864811;Float;True;Property;_Mask;Mask;2;0;Create;True;0;0;False;0;15a5f9ac93ec54241a05f416e77e5870;f6df8509372384f48bb3fa1a762ba9b3;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
+2263;103;1083;828;1388.099;227.8751;1;True;False
+Node;AmplifyShaderEditor.TexturePropertyNode;12;-1245.81,3.864811;Float;True;Property;_Mask;Mask;2;0;Create;True;0;0;False;0;15a5f9ac93ec54241a05f416e77e5870;4855cd84f5ba0c344b80c8009ce51491;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
 Node;AmplifyShaderEditor.RangedFloatNode;19;-1577.438,322.9559;Float;False;Property;_Mana;Mana;3;0;Create;True;0;0;False;0;0.5;1;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.SamplerNode;11;-936.8106,81.86481;Float;True;Property;_TextureSample1;Texture Sample 1;0;0;Create;True;0;0;False;0;None;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.RangedFloatNode;29;-588.4216,-90.3549;Float;False;Constant;_Float0;Float 0;4;0;Create;True;0;0;False;0;0.5;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.OneMinusNode;32;-588.6632,-16.20129;Float;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.TFHCRemapNode;39;-1302.599,333.6249;Float;False;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;-0.1;False;4;FLOAT;1.2;False;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;20;-1285.438,494.9561;Float;False;Constant;_Float1;Float 1;3;0;Create;True;0;0;False;0;0.05;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.TexturePropertyNode;10;-547.2016,-281.9413;Float;True;Property;_Albedo;Albedo;0;0;Create;True;0;0;False;0;ca1a5e504324857499d1fdeb25489439;84d76c914224da14a8210ba4ba8a2992;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
+Node;AmplifyShaderEditor.TexturePropertyNode;10;-547.2016,-281.9413;Float;True;Property;_Albedo;Albedo;0;0;Create;True;0;0;False;0;ca1a5e504324857499d1fdeb25489439;ca1a5e504324857499d1fdeb25489439;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
 Node;AmplifyShaderEditor.TextureCoordinatesNode;26;-1179.914,206.838;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.SimpleAddOpNode;33;-427.6632,-86.20129;Float;False;2;2;0;FLOAT;0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleAddOpNode;21;-1070.438,425.9561;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
@@ -2564,4 +2564,4 @@ WireConnection;0;4;13;0
 WireConnection;0;6;15;0
 WireConnection;0;7;14;0
 ASEEND*/
-//CHKSM=57E69099AEE7B09688655221F8B7290FC995C2EA
+//CHKSM=93F1F2DF6762ACFE5A621CC7B737370EC4478E1A

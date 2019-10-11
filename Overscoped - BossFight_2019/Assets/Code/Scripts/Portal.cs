@@ -14,6 +14,10 @@ public class Portal : MonoBehaviour
     [SerializeField]
     private GameObject m_arm = null;
 
+    [Tooltip("Animator component on the boss.")]
+    [SerializeField]
+    private Animator m_bossAnimator = null;
+
     [Tooltip("Arm materials")]
     [SerializeField]
     private Material[] m_armMaterials = null;
@@ -123,6 +127,8 @@ public class Portal : MonoBehaviour
 
         m_portalMat.SetFloat("_Opacity", fScaleProgress);
 
+        m_bossAnimator.SetBool("PortalPunchComplete", false);
+
         if (m_fCurrentTime <= 0.0f)
         {
             m_arm.SetActive(true);
@@ -214,6 +220,8 @@ public class Portal : MonoBehaviour
             m_bActive = false;
 
             gameObject.SetActive(false);
+
+            m_bossAnimator.SetBool("PortalPunchComplete", true);
 
             m_fCurrentTime = 0.0f;
         }

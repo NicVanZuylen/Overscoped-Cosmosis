@@ -145,4 +145,36 @@ namespace BehaviourTree
             return result;
         }
     }
+
+    public class SelectorOffshoot : BehaviourNode
+    {
+        public override ENodeResult Run()
+        {
+            // Run all children, exit if one fails.
+            for (int i = 0; i < m_children.Count; ++i)
+            {
+
+                Debug.Log("K");
+                if (m_children[i].Run() == ENodeResult.NODE_SUCCESS)
+                    return ENodeResult.NODE_SUCCESS;
+            }
+
+            return ENodeResult.NODE_SUCCESS;
+        }
+    }
+
+    public class SequenceOffshoot : BehaviourNode
+    {
+        public override ENodeResult Run()
+        {
+            // Run all children, exit if one fails.
+            for (int i = 0; i < m_children.Count; ++i)
+            {
+                if (m_children[i].Run() == ENodeResult.NODE_FAILURE)
+                    return ENodeResult.NODE_SUCCESS;
+            }
+
+            return ENodeResult.NODE_SUCCESS;
+        }
+    }
 }

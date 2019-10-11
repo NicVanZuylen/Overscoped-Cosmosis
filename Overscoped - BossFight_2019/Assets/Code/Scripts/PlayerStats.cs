@@ -493,11 +493,6 @@ public class PlayerStats : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "MeteorSpawn")
-        {
-            BossBehaviour.SetMeteorSpawn(other.transform.GetChild(0).gameObject.GetComponent<BoxCollider>());
-        }
-
         if(other.gameObject.tag == "PushPlayer")
         {
             Debug.Log("Portal Punch Hit!");
@@ -513,15 +508,6 @@ public class PlayerStats : MonoBehaviour
 
             // Deal damage.
             DealDamage(m_fPortalPunchDamage);
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag == "MeteorSpawn")
-        {
-            // Remove meteor spawn.
-            BossBehaviour.SetMeteorSpawn(null);
         }
     }
 }

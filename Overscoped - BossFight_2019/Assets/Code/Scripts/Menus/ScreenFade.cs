@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/*
+ * Description: Screen fade-to-black effects.
+ * Author: Nic Van Zuylen
+*/
+
 public class ScreenFade : MonoBehaviour
 {
     public enum EFadeMode

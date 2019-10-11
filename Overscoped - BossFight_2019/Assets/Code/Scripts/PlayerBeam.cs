@@ -43,6 +43,17 @@ public class PlayerBeam : MonoBehaviour
     private int m_nBeamLength = 512;
 
     // -------------------------------------------------------------------------------------------------
+    [Header("Effects")]
+
+    [Tooltip("VFX played at the beam's origin point.")]
+    [SerializeField]
+    private ParticleSystem m_originParticles = null;
+
+    [Tooltip("VFX played at the beam impact point.")]
+    [SerializeField]
+    private GameObject m_impactParticles = null;
+
+    // -------------------------------------------------------------------------------------------------
     [Header("Audio")]
 
     [SerializeField]
@@ -78,6 +89,9 @@ public class PlayerBeam : MonoBehaviour
     private ParticleSystem.Particle[] m_particles;
     private float m_fMeshLength;
 
+    // Impact particle effects.
+    private ParticleSystem m_impactEffect;
+
     void Awake()
     {
         // Component retreival.
@@ -102,6 +116,15 @@ public class PlayerBeam : MonoBehaviour
         m_fMeshLength = 2.0f;
 
         m_endObj = new GameObject("Player_Beam_End_Point");
+
+        // Instantiate impact effect object as a child of the end point object.
+        if(m_impactParticles)
+        {
+            GameObject newImpactObj = Instantiate(m_impactParticles, m_endObj.transform, false);
+            newImpactObj.transform.localPosition = Vector3.zero;
+
+            m_impactEffect = newImpactObj.GetComponent<ParticleSystem>();
+        }
 
         m_bossChestScript = GameObject.FindGameObjectWithTag("BossChest").GetComponentInChildren<ChestPlate>();
 
@@ -179,6 +202,10 @@ public class PlayerBeam : MonoBehaviour
                 // Apply camera shake.
                 m_camEffects.ApplyShake(0.1f, 0.3f);
 
+                // Play origin effect.
+                if (m_originParticles && !m_originParticles.isPlaying)
+                    m_originParticles.Play();
+
                 // Play SFX loops.
                 if (!m_fireAudioLoop.IsPlaying())
                     m_fireAudioLoop.Play();
@@ -193,6 +220,10 @@ public class PlayerBeam : MonoBehaviour
                 // Find end point of the line.
                 if (bRayHit)
                 {
+                    // Play impact particle effects.
+                    if (m_impactEffect && !m_impactEffect.isPlaying)
+                        m_impactEffect.Stop();
+
                     // Update volumetric beam particle positions.
                     UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_sphereCastHit.distance, m_fMeshLength, true);
 
@@ -211,6 +242,10 @@ public class PlayerBeam : MonoBehaviour
                 }
                 else
                 {
+                    // Stop impact effect.
+                    if (m_impactEffect && m_impactEffect.isPlaying)
+                        m_impactEffect.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+                    
                     // Update volumetric beam particle positions.
                     UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_nBeamLength, m_fMeshLength, false);
 
@@ -220,10 +255,14 @@ public class PlayerBeam : MonoBehaviour
                 // Reduce beam charge.
                 m_fBeamCharge -= m_fChargeLossRate * Time.deltaTime;
             }
-            else if (m_fireAudioLoop.IsPlaying() || m_impactAudioLoop.IsPlaying())
+            else if (m_fireAudioLoop.IsPlaying() || m_impactAudioLoop.IsPlaying() || (m_originParticles && m_originParticles.isPlaying))
             {
+                // Stop audio and particle effects.
                 m_fireAudioLoop.Stop();
                 m_impactAudioLoop.Stop();
+
+                if(m_originParticles)
+                    m_originParticles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
             }
         }
 

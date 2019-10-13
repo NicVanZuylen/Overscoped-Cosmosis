@@ -7,9 +7,16 @@
   <m_children>
     <NodeData>
       <m_eType>NODE_ACTION</m_eType>
-      <m_name>PerformAttack</m_name>
-      <m_funcName>ActPerformAttack</m_funcName>
-      <m_description>Performs the currently chosen attack.</m_description>
+      <m_name>Track Beam</m_name>
+      <m_funcName>ActBeamTrack</m_funcName>
+      <m_description>Continue tracking of the beam attack at all times.</m_description>
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_ACTION</m_eType>
+      <m_name>Face Player</m_name>
+      <m_funcName>ActTrackPlayer</m_funcName>
+      <m_description />
       <m_children />
     </NodeData>
     <NodeData>
@@ -24,6 +31,13 @@
       <m_name>Global Attack CD</m_name>
       <m_funcName>CondGlobalAttackCD</m_funcName>
       <m_description>Wait for global attack cooldown.</m_description>
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_CONDITION</m_eType>
+      <m_name>Portal Not Active</m_name>
+      <m_funcName>CondPortalNotActive</m_funcName>
+      <m_description>Make sure the portal is not still in use before using it again.</m_description>
       <m_children />
     </NodeData>
     <NodeData>
@@ -116,6 +130,13 @@
               <m_name>Cooldown</m_name>
               <m_funcName>CondSlamCD</m_funcName>
               <m_description>Check cooldown.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>Portal Not Active</m_name>
+              <m_funcName>CondPortalNotActive</m_funcName>
+              <m_description>Make sure the portal is not still in use before using it again.</m_description>
               <m_children />
             </NodeData>
             <NodeData>

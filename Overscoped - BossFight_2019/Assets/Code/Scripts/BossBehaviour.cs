@@ -119,6 +119,7 @@ public class BossBehaviour : MonoBehaviour
     // Attack decision making
     private AttackRating[] m_attackRatings;
     private int m_nAttackIndex;
+    private int m_nChosenAttackIndex;
 
     // Portal punch
     private Portal m_portalScript;
@@ -132,11 +133,16 @@ public class BossBehaviour : MonoBehaviour
     private const int m_nMaxBeamParticles = 512;
     private float m_fBeamAttackCDTimer;
     private float m_fBeamTime;
-    private bool m_bChargeComplete;
+    private bool m_bBeamActive;
 
     // Meteor attack
     private Queue<MeteorTarget> m_availableTargets;
     private float m_fMeteorCDTimer;
+
+    // Attack delegates
+    delegate ENodeResult AttackFunc();
+
+    private AttackFunc[] m_attacks;
 
     void Awake()
     {
@@ -190,6 +196,12 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.tag = "NoGrapple";
         m_portal.SetActive(false);
+
+        // Attack functions...
+        m_attacks = new AttackFunc[3];
+        m_attacks[0] = ActPlayMeteorAnim;
+        m_attacks[1] = ActPlayPortalPunchAnim;
+        m_attacks[2] = ActInitializeBeam;
 
 #if (UNITY_EDITOR)
         string treePath = Application.dataPath + "/Code/BossBehaviours/";
@@ -250,51 +262,6 @@ public class BossBehaviour : MonoBehaviour
         gameObject.SetActive(false);
         end_Portal.SetActive(true);
     }
-
-    /*
-    public void EnterStuckState()
-    {
-        m_bIsStuck = true;
-
-        // Reset to idle state.
-        m_animator.SetBool("isStunned", true);
-
-        // Disable beam & reset attack.
-        mesh.SetActive(false);
-        m_fBeamTime = 0.0f;
-        m_animator.SetInteger("AttackID", 0);
-        m_fTimeSinceGlobalAttack = 0.0f;
-
-        for (int i = 0; i < m_armorPeices.Length; ++i)
-        {
-            // Enable armor material glow.
-            m_armorMaterials[i].SetFloat("_FresnelOnOff", 1.0f);
-
-            // Tag armor peices as pullable objects.
-            m_armorPeices[i].tag = "PullObj";
-        }
-
-        // Start stuck timer.
-        StartCoroutine(ResetStuck());
-    }
-
-    public void ExitStuckState()
-    {
-        m_bIsStuck = false;
-
-        // Exit stuck state in animation controller.
-        m_animator.SetBool("isStunned", false);
-
-        for (int i = 0; i < m_armorPeices.Length; ++i)
-        {
-            // Disable armor material glow.
-            m_armorMaterials[i].SetFloat("_FresnelOnOff", 0.0f);
-
-            // Untag armor peices.
-            m_armorPeices[i].tag = "Untagged";
-        }
-    }
-    */
 
     // ----------------------------------------------------------------------------------------------
     // Conditions
@@ -361,7 +328,7 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondMeteorAvailable()
     {
-        if (m_fMeteorCDTimer <= 0.0f && m_playerController.IsGrounded())
+        if (m_fMeteorCDTimer <= 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
         }
@@ -373,8 +340,6 @@ public class BossBehaviour : MonoBehaviour
     {
         if (m_fMeteorCDTimer <= 0.0f)
         {
-            m_fMeteorCDTimer = m_fMeteorCD;
-
             return ENodeResult.NODE_SUCCESS;
         }
 
@@ -385,21 +350,10 @@ public class BossBehaviour : MonoBehaviour
     {
         if (m_fBeamAttackCDTimer <= 0.0f)
         {
-            m_fBeamAttackCDTimer = m_fBeamAttackCD;
-            m_fBeamTime = m_fBeamDuration;
-
             return ENodeResult.NODE_SUCCESS;
         }
 
         return ENodeResult.NODE_FAILURE;
-    }
-
-    public ENodeResult CondPortalNotActive()
-    {
-        if (m_portalScript.IsActive())
-            return ENodeResult.NODE_FAILURE;
-
-        return ENodeResult.NODE_SUCCESS;
     }
 
     public ENodeResult CondIsIdleAnimation()
@@ -425,8 +379,6 @@ public class BossBehaviour : MonoBehaviour
             // Disable beam effects.
             for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
                 m_beamParticleRenderers[i].enabled = false;
-
-            m_bChargeComplete = false;
         }
     
         return ENodeResult.NODE_FAILURE;
@@ -484,14 +436,16 @@ public class BossBehaviour : MonoBehaviour
         return ENodeResult.NODE_FAILURE;
     }
 
+    public ENodeResult CondPortalNotActive()
+    {
+        if (!m_portalScript.IsActive())
+            return ENodeResult.NODE_SUCCESS;
+
+        return ENodeResult.NODE_FAILURE;
+    }
+
     // ----------------------------------------------------------------------------------------------
     // Actions
-
-    public ENodeResult ActPerformAttack()
-    {
-        Debug.Log("Incomplete attack performance logic!");
-        return ENodeResult.NODE_SUCCESS;
-    }
 
     public ENodeResult ActAddPrefPoint()
     {
@@ -518,7 +472,7 @@ public class BossBehaviour : MonoBehaviour
     {
         int nHighestScore = -1;
         int nAvailableCount = 0;
-        int nPreferredAttackIndex = -1;
+        int m_nChosenAttackIndex = -1;
 
         for(int i = 0; i < m_attackRatings.Length; ++i)
         {
@@ -535,18 +489,23 @@ public class BossBehaviour : MonoBehaviour
             {
                 nHighestScore = rating.m_nPrefScore;
 
-                nPreferredAttackIndex = i;
+                m_nChosenAttackIndex = i;
             }
             else if(rating.m_nPrefScore == nHighestScore && Random.Range(0.0f, 100.0f) >= 50.0f)
             {
                 // 50/50 chance to prefer the attack if it has an equal rating.
-                nPreferredAttackIndex = i;
+                m_nChosenAttackIndex = i;
             }
         }
 
         // Report result.
-        if (nPreferredAttackIndex > -1)
-            Debug.Log("Attack Index: " + nPreferredAttackIndex + ", " + nAvailableCount + " Attacks available.");
+        if (m_nChosenAttackIndex > -1)
+        {
+            Debug.Log("Attack Index: " + m_nChosenAttackIndex + ", " + nAvailableCount + " Attacks available.");
+
+            // Perform attack.
+            m_attacks[1]();
+        }
         else
             Debug.Log("No attacks available!");
 
@@ -558,6 +517,9 @@ public class BossBehaviour : MonoBehaviour
         Debug.Log("Portal Punch!");
 
         m_animator.SetInteger("AttackID", 1);
+
+        // Set cooldown timers.
+        m_fPortalPunchCDTimer = m_fPortalPunchCD;
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
         return ENodeResult.NODE_SUCCESS;
@@ -567,7 +529,7 @@ public class BossBehaviour : MonoBehaviour
     {
         Debug.Log("Meteor Attack!");
 
-        //Sets the cooldown timers
+        // Set cooldown timers
         m_fMeteorCDTimer = m_fMeteorCD;
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
@@ -584,6 +546,9 @@ public class BossBehaviour : MonoBehaviour
         // Summon meteors.
         for(int i = 0; i < nMeteorAmount; ++i)
         {
+            if (m_availableTargets.Count == 0)
+                break;
+
             MeteorTarget newTarget = m_availableTargets.Dequeue();
 
             newTarget.SummonMeteor(m_meteors[i], transform.position + new Vector3(0.0f, 100.0f, 0.0f));
@@ -602,11 +567,65 @@ public class BossBehaviour : MonoBehaviour
         return ENodeResult.NODE_SUCCESS;
     }
 
+    public ENodeResult ActInitializeBeam()
+    {
+        // Enable beam renderers.
+        if (!m_bBeamActive)
+        {
+            for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
+                m_beamParticleRenderers[i].enabled = true;
+
+            // Set timers and flag the beam as active.
+            m_fBeamAttackCDTimer = m_fBeamAttackCD;
+            m_fBeamTime = m_fBeamDuration;
+            m_bBeamActive = true;
+        }
+
+        return ENodeResult.NODE_SUCCESS;
+    }
+
     public Vector3 PointOnSphere(Vector3 v3Point, Vector3 v3SpherePos, float fSphereRadius)
     {
         Vector3 v3Dir = (v3Point - v3SpherePos).normalized;
 
         return v3SpherePos + (v3Dir * fSphereRadius);
+    }
+
+    /*
+    Description: Allow beam raycasting and damage dealing to the player.
+    Return Type: ENodeResult
+    */
+    public ENodeResult ActUseBeam()
+    {
+        // Ensure global attack cooldown remains for the duration of the beam attack.
+        m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+
+        Debug.Log("Beam!");
+
+        Ray beamRay = new Ray(m_beamOrigin.position, m_v3BeamDirection);
+        RaycastHit beamHit;
+
+        // Rotate beam effects...
+        m_beamOrigin.rotation = Quaternion.LookRotation(m_v3BeamDirection, Vector3.up);
+
+        // Raycast to get hit information.
+        if (Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
+        {
+            Debug.DrawLine(m_beamOrigin.position, m_v3BeamEnd, Color.white);
+
+            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, beamHit.distance, 2.0f, true);
+
+            if (beamHit.collider.gameObject == m_player)
+            {
+                m_playerStats.DealDamage(m_fBeamDPS * Time.deltaTime);
+            }
+        }
+        else
+        {
+            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, m_nMaxBeamParticles, 2.0f, false);
+        }
+
+        return ENodeResult.NODE_SUCCESS;
     }
 
     // Track the beam's aim. Even if the beam is not in use.
@@ -641,43 +660,21 @@ public class BossBehaviour : MonoBehaviour
             m_v3BeamEnd = PointOnSphere(m_player.transform.position + new Vector3(10,0,0), m_beamOrigin.position, fSphereMag);
         }
 
-        return ENodeResult.NODE_SUCCESS;
-    }
-
-    public ENodeResult ActUseBeam()
-    {
-        if (!m_bChargeComplete)
-            return ENodeResult.NODE_SUCCESS;
-
-        // Enable beam if it is disabled.
-        if (!m_beamParticleRenderers[0].enabled)
+        // Run beam attack effects when beam is enabled.
+        if (m_bBeamActive)
         {
-            for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
-                m_beamParticleRenderers[i].enabled = true;
-        }
+            ActUseBeam();
 
-        // Track to face player.
-        ActTrackPlayer();
+            // Count down beam timer and deactivate once expired.
+            m_fBeamTime -= Time.deltaTime;
 
-        Ray beamRay = new Ray(m_beamOrigin.position, m_v3BeamDirection);
-        RaycastHit beamHit;
-
-        // Rotate beam effects...
-        m_beamOrigin.rotation = Quaternion.LookRotation(m_v3BeamDirection, Vector3.up);
-
-        // Raycast to get hit information.
-        if (Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
-        {
-            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, beamHit.distance, 2.0f, true);
-
-            if (beamHit.collider.gameObject == m_player)
+            if (m_fBeamTime <= 0.0f)
             {
-                m_playerStats.DealDamage(m_fBeamDPS * Time.deltaTime);
+                for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
+                    m_beamParticleRenderers[i].enabled = false;
+
+                m_bBeamActive = false;
             }
-        }
-        else
-        {
-            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, m_nMaxBeamParticles, 2.0f, false);
         }
 
         return ENodeResult.NODE_SUCCESS;
@@ -691,12 +688,27 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetInteger("AttackID", 0);
     }
 
-    /*
-    Description: Indicate that the beam charge animation has complete and the beam will activate.
-    */
-    public void FinishBeamCharge()
+    public void AdvancePunchAnim()
     {
-        m_bChargeComplete = true;
+        m_animator.SetBool("PortalPunchComplete", true);
+    }
+
+    public void SetArmEnterStage()
+    {
+        if (m_portalScript.IsActive())
+            m_portalScript.SetArmEnterStage();
+    }
+
+    public void SetArmExitStage()
+    {
+        if (m_portalScript.IsActive())
+            m_portalScript.SetArmExitStage();
+    }
+
+    public void SetPortalCloseStage()
+    {
+        if (m_portalScript.IsActive())
+            m_portalScript.SetPortalCloseStage();
     }
 
     public void SummonPortal()
@@ -722,12 +734,12 @@ public class BossBehaviour : MonoBehaviour
 
         v3PortalOffset.Normalize();
 
-        m_portal.SetActive(true);
         m_portal.transform.position = m_player.transform.position + m_playerController.GetVelocity() + (v3PortalOffset * 50.0f);
 
         Vector3 v3PlayerDir = (m_player.transform.position - m_portal.transform.position).normalized;
         m_portal.transform.rotation = Quaternion.LookRotation(-v3PortalOffset, Vector3.up);
 
+        m_portal.SetActive(true);
         m_portalScript.SetPunchDirection(-v3PortalOffset);
 
         return;

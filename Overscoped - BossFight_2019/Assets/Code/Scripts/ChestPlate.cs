@@ -34,6 +34,9 @@ public class ChestPlate : MonoBehaviour
         m_fHealth = m_fMaxHealth;
 
         m_material.SetFloat("_Lerp", 0.0f);
+
+        // Disable script to prevent premature popping.
+        enabled = false;
     }
 
     private void Update()

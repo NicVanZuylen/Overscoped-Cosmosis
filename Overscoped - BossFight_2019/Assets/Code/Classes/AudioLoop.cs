@@ -22,7 +22,8 @@ public class AudioLoop
     {
         // Add audio source to the provided object.
         obj.AddComponent<AudioSource>();
-        m_source = obj.GetComponent<AudioSource>();
+        AudioSource[] sources = obj.GetComponents<AudioSource>();
+        m_source = sources[sources.Length - 1];
 
         m_bClipIsNull = clip == null;
 

@@ -320,6 +320,13 @@ public class GrappleHook : MonoBehaviour
         // Pull casting.
         if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) && m_bWithinRange && m_fireHit.collider.tag == "PullObj")
         {
+            // Play SFX
+            if (m_grappleFireSFX)
+                m_sfxSource.PlayOneShot(m_grappleFireSFX);
+
+            if (m_grappleExtendSFX)
+                m_sfxSource.PlayOneShot(m_grappleExtendSFX);
+
             // Find & enable pull object script.
             m_pullObj = m_fireHit.collider.gameObject.GetComponent<PullObject>();
 

@@ -105,7 +105,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7650911253342666419}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -277,8 +277,8 @@ RectTransform:
   - {fileID: 7650911254552688748}
   - {fileID: 7650911253678892925}
   - {fileID: 7650911253446875579}
-  - {fileID: 279105730127499571}
   - {fileID: 443508038566483525}
+  - {fileID: 279105730127499571}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -543,10 +543,10 @@ RectTransform:
   m_Father: {fileID: 7650911253342666419}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -730.3, y: 55.7}
-  m_SizeDelta: {x: 357.2, y: 81.4}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 229.70001, y: -372.3}
+  m_SizeDelta: {x: 357.2, y: 81.400024}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7650911253678892926
 CanvasRenderer:
@@ -675,10 +675,10 @@ RectTransform:
   m_Father: {fileID: 7650911253342666419}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -730.3, y: 147.7}
-  m_SizeDelta: {x: 357.2, y: 81.4}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 229.70001, y: -274}
+  m_SizeDelta: {x: 357.2, y: 81.400024}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7650911254552688745
 CanvasRenderer:
@@ -803,11 +803,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7650911253342666419}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -614.7, y: 332.8}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 345.3, y: -108.79999}
   m_SizeDelta: {x: 849.7, y: 390.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7617494983414549193
@@ -832,13 +832,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 355181cc2cbf7784dbb6ad7736e42557, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9cceb7b227310af42aee43588019421b, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

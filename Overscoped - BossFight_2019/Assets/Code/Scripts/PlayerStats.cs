@@ -138,12 +138,13 @@ public class PlayerStats : MonoBehaviour
     private Transform m_camPivot;
     private ScreenFade m_fadeScript;
     private AudioLoop m_windAudioLoop;
+    private static bool m_bCheckpointReached = false;
+    private bool m_bNearPickup = false;
 
     // Resources
     private float m_fHealth;
     private float m_fMana;
     private float m_fCurrentRegenDelay;
-    private static bool m_bCheckpointReached = false;
     private bool m_bIsAlive;
 
     // Camera backtracking
@@ -264,6 +265,9 @@ public class PlayerStats : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (PauseMenu.IsPaused())
+            return;
+
         if(m_bIsAlive)
         {
             AliveUpdate();
@@ -384,6 +388,15 @@ public class PlayerStats : MonoBehaviour
         {
             RestartScene();
         }
+    }
+
+    /*
+    Description: Return whether or not the player is within the trigger volume of a nearby resource pickup.
+    Return Type: bool
+    */
+    public bool NearPickup()
+    {
+        return m_bNearPickup;
     }
 
     /*
@@ -508,6 +521,24 @@ public class PlayerStats : MonoBehaviour
 
             // Deal damage.
             DealDamage(m_fPortalPunchDamage);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if(other.tag == "Pickup")
+        {
+            Debug.Log("Player near pickup.");
+
+            m_bNearPickup = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Pickup")
+        {
+            m_bNearPickup = false;
         }
     }
 }

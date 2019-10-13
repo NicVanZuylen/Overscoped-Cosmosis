@@ -104,6 +104,29 @@ public class Portal : MonoBehaviour
         m_stage = CloseStage;
     }
 
+    public void Activate()
+    {
+        m_stage = OpenStage;
+        m_bActive = true;
+        m_fCurrentTime = 0.0f;
+
+        // Set arm rotation.
+        m_arm.transform.rotation = Quaternion.LookRotation(m_v3PunchDirection, Vector3.up);
+    }
+
+    public void Deactivate()
+    {
+        // Reset stage.
+        m_stage = OpenStage;
+
+        // Deactivate portal and arm.
+        gameObject.SetActive(false);
+        m_arm.SetActive(false);
+        m_bActive = false;
+
+        m_fCurrentTime = 0.0f;
+    }
+
     private void Awake()
     {
         Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_playerCollider);
@@ -120,23 +143,6 @@ public class Portal : MonoBehaviour
 
         m_stage = OpenStage;
         m_bActive = false;
-    }
-
-    private void OnEnable()
-    {
-        m_stage = OpenStage;
-        m_bActive = true;
-        m_fCurrentTime = 0.0f;
-
-        // Set arm rotation.
-        m_arm.transform.rotation = Quaternion.LookRotation(m_v3PunchDirection, Vector3.up);
-    }
-
-    private void OnDisable()
-    {
-        m_bActive = false;
-        m_arm.SetActive(false);
-        m_fCurrentTime = 0.0f;
     }
 
     /*
@@ -218,15 +224,7 @@ public class Portal : MonoBehaviour
 
         if (m_fCurrentTime >= m_fCloseTime)
         {
-            // Reset stage.
-            m_stage = OpenStage;
-
-            // Deactivate portal and arm.
-            gameObject.SetActive(false);
-            m_arm.SetActive(false);
-            m_bActive = false;
-
-            m_fCurrentTime = 0.0f;
+            Deactivate();
         }
     }
 

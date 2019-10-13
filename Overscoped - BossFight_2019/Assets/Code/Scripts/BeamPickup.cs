@@ -16,6 +16,14 @@ public class BeamPickup : MonoBehaviour
         // Find player and PlayerStats script instance.
         m_player = GameObject.FindGameObjectWithTag("Player");
         m_playerBeamScript = m_player.GetComponent<PlayerBeam>();
+
+        // Create player near detection radius.
+        GameObject newObj = new GameObject("Beam_Pickup_Near_Radius");
+        newObj.tag = "Pickup";
+        newObj.transform.position = transform.position;
+        newObj.AddComponent<SphereCollider>();
+        newObj.GetComponent<SphereCollider>().radius = 30.0f;
+        newObj.GetComponent<SphereCollider>().isTrigger = true;
     }
 
     private void OnTriggerEnter(Collider other)

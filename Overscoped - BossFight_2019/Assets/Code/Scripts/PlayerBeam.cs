@@ -177,6 +177,22 @@ public class PlayerBeam : MonoBehaviour
         }
     }
 
+    private void StopEffects()
+    {
+        // Stop volumetric beam effect.
+        for (int i = 0; i < m_beamParticles.Length; ++i)
+        {
+            m_beamParticleRenderers[i].enabled = false;
+        }
+
+        // Stop audio and particle effects.
+        m_fireAudioLoop.Stop();
+        m_impactAudioLoop.Stop();
+
+        if (m_originParticles)
+            m_originParticles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+    }
+
     void LateUpdate()
     {
         if (PauseMenu.IsPaused())
@@ -188,14 +204,17 @@ public class PlayerBeam : MonoBehaviour
 
             m_bBeamEnabled = Input.GetMouseButton(1) && m_bCanCast && m_fBeamCharge >= 0.0f;
 
-            // Enable/Disable effects.
-            for (int i = 0; i < m_beamParticles.Length; ++i)
-            {
-                m_beamParticleRenderers[i].enabled = m_bBeamEnabled;
-            }
-
             if (m_bBeamEnabled)
             {
+                // Enable volumetric effects.
+                if (!m_beamParticleRenderers[0].enabled)
+                {
+                    for (int i = 0; i < m_beamParticles.Length; ++i)
+                    {
+                        m_beamParticleRenderers[i].enabled = true;
+                    }
+                }
+
                 // Use the player controller's look rotation, to avoid offsets from camera shake.
                 m_beamOrigin.rotation = m_controller.LookRotation();
 
@@ -222,7 +241,7 @@ public class PlayerBeam : MonoBehaviour
                 {
                     // Play impact particle effects.
                     if (m_impactEffect && !m_impactEffect.isPlaying)
-                        m_impactEffect.Stop();
+                        m_impactEffect.Play();
 
                     // Update volumetric beam particle positions.
                     UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_sphereCastHit.distance, m_fMeshLength, true);
@@ -257,12 +276,8 @@ public class PlayerBeam : MonoBehaviour
             }
             else if (m_fireAudioLoop.IsPlaying() || m_impactAudioLoop.IsPlaying() || (m_originParticles && m_originParticles.isPlaying))
             {
-                // Stop audio and particle effects.
-                m_fireAudioLoop.Stop();
-                m_impactAudioLoop.Stop();
-
-                if(m_originParticles)
-                    m_originParticles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+                // Stop all particle and sound FX.
+                StopEffects();
             }
         }
 
@@ -279,7 +294,12 @@ public class PlayerBeam : MonoBehaviour
     {
         m_bBeamUnlocked = bUnlock;
         m_bBeamEnabled = false;
-        enabled = bUnlock;
+
+        // Force disable effects.
+        if(!bUnlock)
+        {
+            StopEffects();
+        }
     }
 
     /*

@@ -67,28 +67,6 @@
               <m_children>
                 <NodeData>
                   <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>Player Not Grounded</m_name>
-                  <m_funcName>CondPlayerNotGrounded</m_funcName>
-                  <m_description />
-                  <m_children />
-                </NodeData>
-                <NodeData>
-                  <m_eType>NODE_ACTION</m_eType>
-                  <m_name>Add Pref Point</m_name>
-                  <m_funcName>ActAddPrefPoint</m_funcName>
-                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
-                  <m_children />
-                </NodeData>
-              </m_children>
-            </NodeData>
-            <NodeData>
-              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
-              <m_name>Pref Point</m_name>
-              <m_funcName>NO_FUNCTION</m_funcName>
-              <m_description>Add a preference point if the below condition/s are met.</m_description>
-              <m_children>
-                <NodeData>
-                  <m_eType>NODE_CONDITION</m_eType>
                   <m_name>Barrier Broken</m_name>
                   <m_funcName>CondBarrierBroken</m_funcName>
                   <m_description />
@@ -215,6 +193,28 @@
                   <m_eType>NODE_CONDITION</m_eType>
                   <m_name>Barrier Broken</m_name>
                   <m_funcName>CondBarrierBroken</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Not Grounded</m_name>
+                  <m_funcName>CondPlayerNotGrounded</m_funcName>
                   <m_description />
                   <m_children />
                 </NodeData>

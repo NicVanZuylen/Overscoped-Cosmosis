@@ -8,9 +8,9 @@ public class HeartPull : PullObject
     [SerializeField]
     private float m_fDissolveTime = 10.0f;
 
-    [Tooltip("Rate in which the armor piece will dissolve.")]
-    [SerializeField]
-    private float m_fDissolveRate = 0.05f;
+    //[Tooltip("Rate in which the armor piece will dissolve.")]
+    //[SerializeField]
+    //private float m_fDissolveRate = 0.05f;
 
     private GameObject m_player;
     private PlayerBeam m_playerBeamScript;
@@ -50,7 +50,7 @@ public class HeartPull : PullObject
         base.Trigger(playerDirection);
 
         // Progress boss stage.
-        m_bossScript.BossDead();
+        m_bossScript.KillBoss();
 
         // Turn of fresnel.
         m_material.SetFloat("_FresnelOnOff", 0.0f);

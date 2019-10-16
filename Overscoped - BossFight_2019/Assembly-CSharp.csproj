@@ -74,6 +74,7 @@
     <Compile Include="Assets\AmplifyShaderEditor\Examples\Official\TemplateExamples\PostProcess\Sobel\PostProcessExample.cs" />
     <Compile Include="Assets\AmplifyShaderEditor\Examples\Official\TemplateExamples\Sprites\SpriteMask\SpriteMaskController.cs" />
     <Compile Include="Assets\Code\AnimBehaviours\ResetToIdle.cs" />
+    <Compile Include="Assets\Code\Classes\AudioLoop.cs" />
     <Compile Include="Assets\Code\Classes\BehaviourNode.cs" />
     <Compile Include="Assets\Code\Classes\Bezier.cs" />
     <Compile Include="Assets\Code\Classes\Deque.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="Assets\Code\Classes\Node.cs" />
     <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
     <Compile Include="Assets\Code\Scripts\ArmorPull.cs" />
-    <Compile Include="Assets\Code\Scripts\Beam.cs" />
+    <Compile Include="Assets\Code\Scripts\BeamPickup.cs" />
     <Compile Include="Assets\Code\Scripts\BobEventHandler.cs" />
     <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
     <Compile Include="Assets\Code\Scripts\CameraEffects.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Assets\Code\Scripts\Menus\ScreenFade.cs" />
     <Compile Include="Assets\Code\Scripts\Meteor.cs" />
     <Compile Include="Assets\Code\Scripts\MeteorAOE.cs" />
+    <Compile Include="Assets\Code\Scripts\MeteorTarget.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerBeam.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerController_old.cs" />
@@ -116,6 +118,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SimpleSubtractOpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\SimpleTerrain\SimpleTerrainAddPass.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_FmodOpNode.shader" />
+    <None Include="Assets\Materials\Shaders\SHD_Boss_Heart_Force_Field.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Translucency\Translucency.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Shaders\ASESShaderSelectorUnlit.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_NegateNode.shader" />
@@ -143,7 +146,6 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_StaticSwitchNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\TemplateExamples\PostProcess\Sobel\Sobel.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ReflectOpNode.shader" />
-    <None Include="Assets\Code\BossBehaviours\BossTree.xml" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ATanOpNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_FunctionOutputNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WorldSpaceCameraPos.shader" />
@@ -195,7 +197,6 @@
     <None Include="Assets\Materials\Shaders\SHD_Boss_Portal_Arm.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\ShaderLibrary\ShaderLibrary.txt" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TFHCIf.shader" />
-    <None Include="Assets\Code\BossBehaviours\TestTree.xml" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\Skybox Cubemap Extended\Shaders\Skybox Cubemap Extended.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Projectors\ProjectorShadow.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_VertexTangentNode.shader" />
@@ -222,6 +223,7 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ClampOpNode.shader" />
     <None Include="Assets\Materials\Shaders\SHD_Well_Fog.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Credits.txt" />
+    <None Include="Assets\Materials\Shaders\SHD_Boss_Heart_Tendrils.shader" />
     <None Include="Assets\Materials\Shaders\SHD_Boss_Projectile_Trail.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\HighlightAnimated\Highlight_Animated.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Community\Melting\Melting.shader" />
@@ -275,7 +277,6 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TexCoordVertexDataNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_ColorSpaceDouble.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\TemplateExamples\UI\SimpleUI\SimpleUI.shader" />
-    <None Include="Assets\Code\BossBehaviours\BossTreePhase3.xml" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\XRay\ProceduralWall.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\SimpleNoise\SimpleNoise.shader" />
     <None Include="Assets\Materials\Shaders\SHD_Boss_Beam.shader" />
@@ -335,6 +336,7 @@
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\ObjectNormalRefraction\ShaderBallInterior.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\HDSRPLit.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\CustomLightingToon\CustomLightingToon.shader" />
+    <None Include="Assets\Materials\Shaders\SHD_Boss_Heart_Thumpy.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\LinearPreviews.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\SimpleTerrain\SimpleWater.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_WeightedBlendNode.shader" />
@@ -364,7 +366,6 @@
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_FresnelNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_HSVToRGBNode.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_SqrtOpNode.shader" />
-    <None Include="Assets\Code\BossBehaviours\NewBehaviourTree.xml" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Dithering\DitheringFadeBlueNoise.shader" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Previews\Preview_TimeNode.shader" />
     <None Include="Assets\Materials\Shaders\SHD_UI_Beam_Charge.shader" />
@@ -381,7 +382,6 @@
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Tessellation\Tessellation.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\Smear\Smear.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\ParallaxMapping\ParallaxMappingIterations.shader" />
-    <None Include="Assets\Code\BossBehaviours\BossTreeExample.xml" />
     <None Include="Assets\AmplifyShaderEditor\Plugins\EditorResources\Templates\Legacy\UnlitLightmap.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\MultiPassDistortion\MultiPassDistortion.shader" />
     <None Include="Assets\AmplifyShaderEditor\Examples\Official\MultiPassDistortion\DoublePassUnlitTemplate.shader" />
@@ -476,17 +476,11 @@
     <Reference Include="Unity.VisualEffectGraph.Runtime">
       <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
       <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
       <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
       <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
@@ -505,12 +499,6 @@
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
       <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -697,15 +685,6 @@
     </Reference>
     <Reference Include="UModelerCommon">
       <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Assets/ThirdParty/3rd Party/tripolygon/UModeler/Scripts/UModelerCommon.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Analytics.Editor">
-      <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.StandardEvents.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>C:/Users/s181301/Documents/Overscoped/Overscoped - BossFight_2019/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.8f1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>

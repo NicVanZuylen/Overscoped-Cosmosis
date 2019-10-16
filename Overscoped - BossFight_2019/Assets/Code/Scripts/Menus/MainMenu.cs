@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/*
+ * Description: Title screen GUI behaviour.
+ * Author: Nic Van Zuylen
+*/
+
 public class MainMenu : MonoBehaviour
 {
     private ScreenFade m_fadeScript;

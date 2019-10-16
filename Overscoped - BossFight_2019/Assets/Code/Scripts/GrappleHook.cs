@@ -2,11 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Handles all input and physics for the grapple and pull core game mechanics.
+ * Author: Nic Van Zuylen
+*/
+
 [RequireComponent(typeof(PlayerController))]
 
 public class GrappleHook : MonoBehaviour
 {
     // Private: 
+
+    // -------------------------------------------------------------------------------------------------
+    [Header("Object References")]
 
     [SerializeField]
     private LineRenderer m_grappleLine = null;
@@ -14,12 +22,17 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private LineRenderer m_pullLine = null;
 
+    [Tooltip("Grapple impact point object.")]
+    [SerializeField]
+    private GameObject m_grapplePoint = null;
+
     [SerializeField]
     private Transform m_grappleNode = null;
 
     [SerializeField]
     private Transform m_pullNode = null;
 
+    // -------------------------------------------------------------------------------------------------
     [Header("Physics")]
 
     [Tooltip("Acceleration due to grapple pull.")]
@@ -70,12 +83,14 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private bool m_bJumpGravOnRelease = false;
 
+    // -------------------------------------------------------------------------------------------------
     [Header("Grapple Mode")]
 
     [Tooltip("Rate in which the pull line will travel towards its destination.")]
     [SerializeField]
     private float m_fGrappleLineSpeed = 30.0f;
 
+    // -------------------------------------------------------------------------------------------------
     [Header("Pull Mode")]
 
     [Tooltip("The distance the pull hook must be extended beyond the initial rope length on impact to decouple the target object.")]
@@ -86,6 +101,7 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private float m_fPullLineSpeed = 30.0f;
 
+    // -------------------------------------------------------------------------------------------------
     [Header("Misc.")]
 
     [Tooltip("Whether or not the player will be restricted a spherical volume with the rope length as the radius when grappling.")]
@@ -96,6 +112,7 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private float m_fHookRadius = 0.5f;
 
+    // -------------------------------------------------------------------------------------------------
     [Header("Effects")]
 
     [Tooltip("Delay between getting a new set of random points for the rope shake effect.")]
@@ -143,6 +160,26 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private ComputeShader m_lineCompute = null;
 
+    // -------------------------------------------------------------------------------------------------
+    [Header("Sound Effects")]
+
+    [SerializeField]
+    private AudioClip m_grappleFireSFX = null;
+
+    [SerializeField]
+    private AudioClip m_grappleExtendSFX = null;
+
+    [SerializeField]
+    private AudioClip m_grappleImpactSFX = null;
+
+    [SerializeField]
+    private AudioClip m_grapplePullLoopSFX = null;
+
+    [SerializeField]
+    private AudioSource m_sfxSource = null;
+
+    // -------------------------------------------------------------------------------------------------
+
     private PlayerController m_controller;
     private PlayerStats m_stats;
     private Animator m_animController;
@@ -153,7 +190,8 @@ public class GrappleHook : MonoBehaviour
     // Grapple function
     private PlayerBeam m_beamScript;
     private RaycastHit m_fireHit;
-    private Vector3 m_v3GrapplePoint;
+    private AudioSource m_impactAudioSource;
+    private AudioLoop m_grappleLoopAudio;
     private Vector3 m_v3GrappleNormal;
     private Vector3 m_v3GrappleBoost;
     private float m_fGrapLineLength; // Distance from casting point to destination, (linear unlike the rope itself).
@@ -184,8 +222,6 @@ public class GrappleHook : MonoBehaviour
 
     void Awake()
     {
-        m_beamScript = GetComponent<PlayerBeam>();
-
         LineEffectParameters lineEffectParams;
         lineEffectParams.m_nWaveCount = m_nWaveCount;
         lineEffectParams.m_fRopeShakeDelay = m_fRopeShakeDelay;
@@ -205,12 +241,21 @@ public class GrappleHook : MonoBehaviour
         m_pullLineEffects = new LineEffects(Instantiate(m_lineCompute), lineEffectParams, m_pullLine.positionCount);
 
         // Grapple end point object.
+        m_impactAudioSource = m_grapplePoint.GetComponent<AudioSource>();
+        m_impactAudioSource.maxDistance = m_fGrappleRange + 5.0f;
+
         m_pullEndPoint = new GameObject("Pull_End_Point");
 
         // Component retreival.
         m_controller = GetComponent<PlayerController>();
+        m_beamScript = GetComponent<PlayerBeam>();
         m_stats = GetComponent<PlayerStats>();
         m_animController = GetComponentInChildren<Animator>();
+
+        if (!m_sfxSource)
+            m_sfxSource = GetComponent<AudioSource>();
+
+        m_grappleLoopAudio = new AudioLoop(m_grapplePullLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
 
         Camera cam = GetComponentInChildren<Camera>();
 
@@ -218,7 +263,6 @@ public class GrappleHook : MonoBehaviour
         m_cameraTransform = cam.transform;
 
         // Misc.
-        m_v3GrapplePoint = Vector3.zero;
         m_fGrappleTime = 0.0f;
         m_bGrappleHookActive = false;
 
@@ -248,12 +292,21 @@ public class GrappleHook : MonoBehaviour
 
         // Spherecast to find impact point.
         const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
-        m_bWithinRange = Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrappleRange, nRaymask, QueryTriggerInteraction.Ignore);
+        m_bWithinRange = Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrappleRange, nRaymask, QueryTriggerInteraction.Ignore) 
+            && !(m_controller.IsGrounded() && m_controller.GroundCollider() == m_fireHit.collider);
 
         // Grapple casting.
         if (bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButton(0) && m_bWithinRange && m_fireHit.collider.tag != "NoGrapple")
         {
-            m_v3GrapplePoint = m_fireHit.point;
+            // Play SFX
+            if(m_grappleFireSFX)
+                m_sfxSource.PlayOneShot(m_grappleFireSFX);
+
+            if(m_grappleExtendSFX)
+                m_sfxSource.PlayOneShot(m_grappleExtendSFX);
+
+            m_grapplePoint.transform.position = m_fireHit.point;
+            m_grapplePoint.transform.parent = m_fireHit.collider.transform;
             m_v3GrappleNormal = m_fireHit.normal;
             m_fGrapLineLength = m_fireHit.distance;
 
@@ -268,6 +321,13 @@ public class GrappleHook : MonoBehaviour
         // Pull casting.
         if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) && m_bWithinRange && m_fireHit.collider.tag == "PullObj")
         {
+            // Play SFX
+            if (m_grappleFireSFX)
+                m_sfxSource.PlayOneShot(m_grappleFireSFX);
+
+            if (m_grappleExtendSFX)
+                m_sfxSource.PlayOneShot(m_grappleExtendSFX);
+
             // Find & enable pull object script.
             m_pullObj = m_fireHit.collider.gameObject.GetComponent<PullObject>();
 
@@ -320,6 +380,11 @@ public class GrappleHook : MonoBehaviour
             {
                 if (m_bGrappleJustImpacted)
                 {
+                    // Play impact SFX.
+                    if(m_grappleImpactSFX)
+                        m_impactAudioSource.PlayOneShot(m_grappleImpactSFX);
+
+                    // Apply camera shake.
                     m_cameraEffects.ApplyShake(0.05f, 1.0f, true);
 
                     // Apply initial force if grounded.
@@ -336,6 +401,10 @@ public class GrappleHook : MonoBehaviour
                     m_cameraEffects.ApplyShake(0.1f, 0.1f);
                     m_v3GrappleBoost = Vector3.zero;
                 }
+
+                // Play loop SFX
+                if (!m_grappleLoopAudio.IsPlaying())
+                    m_grappleLoopAudio.Play();
 
                 // Increment grapple time.
                 m_fGrappleTime += Time.deltaTime;
@@ -355,9 +424,13 @@ public class GrappleHook : MonoBehaviour
                     m_bGrappleHookActive = false;
                     m_fGrappleLineProgress = 0.0f;
 
+                    m_grappleLoopAudio.Stop();
+
                     // Release impulse.
                     if (m_fGrappleTime >= m_fMinReleaseBoostTime)
-                        m_controller.AddImpulse(m_controller.SurfaceForward() * m_fReleaseForce);
+                    {
+                        m_controller.AddImpulse(m_controller.LookForward() * m_fReleaseForce);
+                    }
                 }
             }
         }
@@ -407,16 +480,16 @@ public class GrappleHook : MonoBehaviour
         if (PauseMenu.IsPaused())
             return;
 
-        m_grapLineEffects.ProcessLine(m_grappleLine, m_controller, m_grappleNode, m_v3GrapplePoint, m_fGrappleLineProgress / m_fGrapLineLength, m_bGrappleHookActive);
+        m_grapLineEffects.ProcessLine(m_grappleLine, m_controller, m_grappleNode, m_grapplePoint.transform.position, m_fGrappleLineProgress / m_fGrapLineLength, m_bGrappleHookActive);
         m_pullLineEffects.ProcessLine(m_pullLine, m_controller, m_pullNode, m_pullEndPoint.transform.position, m_fPullLineProgress / m_fPullLineLength, m_bPullHookActive);
     }
 
 
-    Vector3 GrappleFly(PlayerController controller)
+    Vector3 GrappleFly(PlayerController controller, float fDeltaTime)
     {
         Vector3 v3NetForce = m_v3GrappleBoost;
 
-        Vector3 v3GrappleDif = m_v3GrapplePoint - transform.position;
+        Vector3 v3GrappleDif = m_grapplePoint.transform.position - transform.position;
         Vector3 v3GrappleDir = v3GrappleDif.normalized;
         
         // Component of velocity in the direction of the grapple.
@@ -426,7 +499,7 @@ public class GrappleHook : MonoBehaviour
         Vector3 v3NonPullComponent = controller.GetVelocity() - (v3GrappleDir * fPullComponent);
 
         if (fPullComponent < m_fMaxFlySpeed)
-          v3NetForce += v3GrappleDir * m_fPullAcceleration * Time.fixedDeltaTime;
+           v3NetForce += v3GrappleDir * m_fPullAcceleration * fDeltaTime;
 
         Vector3 v3MoveDir = Vector3.zero;
 
@@ -441,22 +514,22 @@ public class GrappleHook : MonoBehaviour
         // Get player movement direction.
         if (Input.GetKey(KeyCode.W))
         {
-            v3MoveDir += m_controller.LookForward();
+            v3MoveDir += v3Forward;
             ++nDirCount;
         }
         if (Input.GetKey(KeyCode.A))
         {
-            v3MoveDir -= m_controller.LookRight();
+            v3MoveDir -= v3Right;
             ++nDirCount;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            v3MoveDir -= m_controller.LookForward();
+            v3MoveDir -= v3Forward;
             ++nDirCount;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            v3MoveDir += m_controller.LookRight();
+            v3MoveDir += v3Right;
             ++nDirCount;
         }
 
@@ -465,13 +538,13 @@ public class GrappleHook : MonoBehaviour
             v3MoveDir.Normalize();
 
         // Controls
-        v3NetForce += v3MoveDir * m_fAirAcceleration * Time.fixedDeltaTime;
+        v3NetForce += v3MoveDir * m_fAirAcceleration * fDeltaTime;
 
         // Lateral drag.
         if (v3NonPullComponent.sqrMagnitude < 1.0f)
-            v3NetForce -= v3NonPullComponent * m_fDriftTolerance * Time.fixedDeltaTime;
+            v3NetForce -= v3NonPullComponent * m_fDriftTolerance * fDeltaTime;
         else
-            v3NetForce -= v3NonPullComponent.normalized * m_fDriftTolerance * Time.fixedDeltaTime;
+            v3NetForce -= v3NonPullComponent.normalized * m_fDriftTolerance * fDeltaTime;
 
         // Stop when within radius of the hook.
         if (v3GrappleDif.sqrMagnitude <= m_fDestinationRadius * m_fDestinationRadius)
@@ -480,20 +553,26 @@ public class GrappleHook : MonoBehaviour
             m_bGrappleHookActive = false;
             m_fGrappleLineProgress = 0.0f;
 
+            // Stop looping SFX.
+            m_grappleLoopAudio.Stop();
+
             m_controller.FreeOverride();
             m_controller.SetGravity(m_controller.JumpGravity());
         }
 
+        // The component of the velocity + net force away from the grapple point.
         float tension = Vector3.Dot(m_controller.GetVelocity() + v3NetForce, v3GrappleDir);
 
-        // Prevent the rope from stretching beyond the rope length when initially grappling.
+        // Prevent the rope from stretching beyond the rope length established when initially grappling.
         if (m_bRestrictToRopeLength && v3GrappleDif.sqrMagnitude > m_fGrapLineLength && tension < 0.0f)
+        {
             v3NetForce -= tension * v3GrappleDir;
+        }
 
         return m_controller.GetVelocity() + v3NetForce;
     }
 
-    Vector3 GrappleLand(PlayerController controller)
+    Vector3 GrappleLand(PlayerController controller, float fDeltaTime)
     {
         Vector3 v3NetForce = Vector3.zero;
 
@@ -503,13 +582,13 @@ public class GrappleHook : MonoBehaviour
 
         // Movement during grapple landing phase.
         if (Input.GetKey(KeyCode.W))
-            v3NetForce += v3ForwardVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
+            v3NetForce += v3ForwardVec * m_fLandMoveAcceleration * fDeltaTime;
         if (Input.GetKey(KeyCode.A))
-            v3NetForce -= v3RightVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
+            v3NetForce -= v3RightVec * m_fLandMoveAcceleration * fDeltaTime;
         if (Input.GetKey(KeyCode.S))
-            v3NetForce -= v3ForwardVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
+            v3NetForce -= v3ForwardVec * m_fLandMoveAcceleration * fDeltaTime;
         if (Input.GetKey(KeyCode.D))
-            v3NetForce += v3RightVec * m_fLandMoveAcceleration * Time.fixedDeltaTime;
+            v3NetForce += v3RightVec * m_fLandMoveAcceleration * fDeltaTime;
 
         // Add gravity.
         v3NetForce += Physics.gravity * Time.fixedDeltaTime;
@@ -519,14 +598,14 @@ public class GrappleHook : MonoBehaviour
         // Drag
         if(v3Velocity.sqrMagnitude < 1.0f)
         {
-            v3Velocity.x -= v3Velocity.x * 5.0f * Time.fixedDeltaTime;
-            v3Velocity.z -= v3Velocity.x * 5.0f * Time.fixedDeltaTime;
+            v3Velocity.x -= v3Velocity.x * 5.0f * fDeltaTime;
+            v3Velocity.z -= v3Velocity.x * 5.0f * fDeltaTime;
         }
         else 
         {
             Vector3 v3VelNor = v3Velocity.normalized;
-            v3Velocity.x -= v3VelNor.x * 5.0f * Time.fixedDeltaTime;
-            v3Velocity.z -= v3VelNor.z * 5.0f * Time.fixedDeltaTime;
+            v3Velocity.x -= v3VelNor.x * 5.0f * fDeltaTime;
+            v3Velocity.z -= v3VelNor.z * 5.0f * fDeltaTime;
         }
 
         // Free override on landing.

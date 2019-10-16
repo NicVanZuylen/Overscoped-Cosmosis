@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Handles all movement and look input and physics for the player character.
+ * Author: Nic Van Zuylen
+*/
+
 [RequireComponent(typeof(CharacterController))]
 
 public class PlayerController : MonoBehaviour
@@ -68,6 +73,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float m_fRespawnHeight = 10.0f;
 
+    [Tooltip("Height in which the player will be respawned above the last platform they stood on.")]
+    [SerializeField]
+    private float m_fKillZoneHeight = -80.0f;
+
     [Tooltip("Whether or not the player is standing on a walkable surface.")]
     [SerializeField]
     private bool m_bOnGround = false;
@@ -82,7 +91,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_v3SurfaceRight;
     private Vector3 m_v3SurfaceUp;
     private Vector3 m_v3SurfaceForward;
-    public Vector3 m_v3Velocity;
+    private Vector3 m_v3Velocity;
     private float m_fSprintDot;
     private float m_fCurrentGroundMaxSpeed;
     private bool m_bShouldSprint;
@@ -95,20 +104,28 @@ public class PlayerController : MonoBehaviour
     private float m_fJumpInitialVelocity; // Initial impulse applied when jumping.
     private float m_fCurrentGravity;
     private int m_nJumpFrame;
+    private bool m_bJumping;
 
     // Looking
     Transform m_cameraTransform;
     private float m_fLookEulerX;
     private float m_fLookEulerY;
-    private float m_fFOVIncrease;
     private bool m_bFocused; // Whether or not the player's cursor is locked and focused on camera movement.
 
-    // Overrides
-    public delegate Vector3 OverrideFunction(PlayerController controller);
+    // Overrides & Callbacks
 
-    OverrideFunction m_overrideFunction;
-    bool m_bOverridden;
-    bool m_bJustResumed;
+    // Runs once per frame on player controller update.
+    public delegate Vector3 OverrideFunction(PlayerController controller, float fDeltaTime);
+
+    // Runs once when a jump is initiated.
+    public delegate void PlayerControllerCallback(PlayerController controller);
+
+    private OverrideFunction m_overrideFunction;
+    private bool m_bOverridden;
+    private bool m_bJustResumed;
+
+    private List<PlayerControllerCallback> m_jumpCallbacks;
+    private List<PlayerControllerCallback> m_landCallbacks;
 
     private void Awake()
     {
@@ -117,6 +134,13 @@ public class PlayerController : MonoBehaviour
         m_animController = GetComponentInChildren<Animator>();
         m_cameraTransform = GetComponentInChildren<Camera>().transform;
         m_v3RespawnPosition = transform.position;
+
+        // Callbacks.
+        if (m_jumpCallbacks != null)
+            m_jumpCallbacks = new List<PlayerControllerCallback>();
+
+        if (m_landCallbacks != null)
+            m_landCallbacks = new List<PlayerControllerCallback>();
 
         // Set intitial camrera look rotation.
         SetLookRotation(m_cameraTransform.rotation);
@@ -264,6 +288,60 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
+    Description: Get the object the player is standing on.
+    Return Type: GameObject
+    */
+    public GameObject GroundObject()
+    {
+        return m_groundHit.collider.gameObject;
+    }
+
+    /*
+    Description: Get the collider the player is standing on.
+    Return Type: Collider
+    */
+    public Collider GroundCollider()
+    {
+        return m_groundHit.collider;
+    }
+
+    /*
+    Description: Get whether or not the player is airborne as the result of a jump.
+    Return Type: bool
+    */
+    public bool IsJumping()
+    {
+        return m_bJumping;
+    }
+
+    /*
+    Description: Get whether or not the player sprinting.
+    Return Type: bool
+    */
+    public bool IsSprinting()
+    {
+        return m_fCurrentGroundMaxSpeed == m_fMaxSprintMoveSpeed;
+    }
+
+    /*
+    Description: Get the maximum non-sprinting ground movement speed.
+    Return Type: float
+    */
+    public float MaxGroundSpeed()
+    {
+        return m_fMaxGroundMoveSpeed;
+    }
+
+    /*
+    Description: Get the maximum grounded sprinting speed.
+    Return Type: float
+    */
+    public float MaxSprintSpeed()
+    {
+        return m_fMaxSprintMoveSpeed;
+    }
+
+    /*
     Description: Get the current velocity from the character controller.
     Return Type: Vector3
     */
@@ -279,6 +357,7 @@ public class PlayerController : MonoBehaviour
     {
         m_overrideFunction = function;
         m_bOverridden = true;
+        m_bJumping = false;
     }
 
     /*
@@ -296,6 +375,32 @@ public class PlayerController : MonoBehaviour
     public bool IsOverridden()
     {
         return m_bOverridden;
+    }
+
+    /*
+    Desciption: Add a function to be called when the player initially jumps.
+    Param:
+        PlayerControllerCallback callback: The callback function.
+    */
+    public void AddJumpCallback(PlayerControllerCallback callback)
+    {
+        if (m_jumpCallbacks == null)
+            m_jumpCallbacks = new List<PlayerControllerCallback>();
+
+        m_jumpCallbacks.Add(callback);   
+    }
+
+    /*
+    Desciption: Add a function to be called when the player initially lands.
+    Param:
+        PlayerControllerCallback callback: The callback function.
+    */
+    public void AddLandCallback(PlayerControllerCallback callback)
+    {
+        if (m_landCallbacks == null)
+            m_landCallbacks = new List<PlayerControllerCallback>();
+
+        m_landCallbacks.Add(callback);
     }
 
     /*
@@ -437,7 +542,7 @@ public class PlayerController : MonoBehaviour
     */
     private void RespawnBelowMinY()
     {
-        if (transform.position.y < -80.0f)
+        if (transform.position.y < m_fKillZoneHeight)
         {
             // Get velocity and remove x and z components.
             Vector3 v3BodyVelocity = m_controller.velocity;
@@ -454,7 +559,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void UpdateMovement(float fDeltaTime)
     {
         if (PauseMenu.IsPaused())
             return;
@@ -467,7 +572,7 @@ public class PlayerController : MonoBehaviour
             m_cameraEffects.SetBobbingEnabled(false);
 
             // Run override behaviour and use it's velocity output.
-            m_v3Velocity = m_overrideFunction(this);
+            m_v3Velocity = m_overrideFunction(this, fDeltaTime);
 
             // Respawn they player if they fall too far.
             RespawnBelowMinY();
@@ -507,7 +612,7 @@ public class PlayerController : MonoBehaviour
                 Vector3 v3NonMoveComponent = m_v3Velocity - (m_v3MoveDirection * fMoveDirComponent);
 
                 // Add force to counter act lateral velocity.
-                v3NetForce -= v3NonMoveComponent * 3.0f * Time.fixedDeltaTime;
+                v3NetForce -= v3NonMoveComponent * 3.0f * fDeltaTime;
 
                 // ------------------------------------------------------------------------------------------------------
                 // Running
@@ -519,10 +624,10 @@ public class PlayerController : MonoBehaviour
 
                 if(m_v3Velocity.sqrMagnitude > m_fCurrentGroundMaxSpeed * m_fCurrentGroundMaxSpeed)
                 {
-                    v3SlideDrag -= m_v3Velocity * m_fSlideDrag * Time.fixedDeltaTime;
+                    v3SlideDrag -= m_v3Velocity * m_fSlideDrag * fDeltaTime;
                 }
 
-                Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fGroundAcceleration * Time.fixedDeltaTime;
+                Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fGroundAcceleration * fDeltaTime;
 
                 v3NetForce += v3Acceleration + v3SlideDrag;
             }
@@ -536,12 +641,12 @@ public class PlayerController : MonoBehaviour
                 if (m_v3Velocity.sqrMagnitude <= m_fMaxGroundMoveSpeed * m_fMaxGroundMoveSpeed)
                 {
                     // Foot drag.
-                    v3NetForce -= m_v3Velocity * m_fGroundDrag * Time.fixedDeltaTime;
+                    v3NetForce -= m_v3Velocity * m_fGroundDrag * fDeltaTime;
                 }
                 else
                 {
                     // Slide drag.
-                    v3NetForce -= m_v3Velocity * m_fMomentumDrag * Time.fixedDeltaTime;
+                    v3NetForce -= m_v3Velocity * m_fMomentumDrag * fDeltaTime;
                 }
 
                 m_animController.SetBool("isRunning", false);
@@ -556,12 +661,6 @@ public class PlayerController : MonoBehaviour
             m_animController.SetBool("isRunning", false);
 
             // ------------------------------------------------------------------------------------------------------
-            // Reset movement vectors for airborn movement.
-
-            // We're giving it the upward vector to represent a flat surface.
-            CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
-
-            // ------------------------------------------------------------------------------------------------------
             // Airborne movement
 
             Vector3 v3VelNor = m_v3Velocity.normalized;
@@ -569,12 +668,12 @@ public class PlayerController : MonoBehaviour
             float fCompInVelocity = Vector3.Dot(v3VelNor, m_v3MoveDirection);
             float fMoveAmount = (1.0f - fCompInVelocity) * m_fMaxAirborneMoveSpeed;
 
-            Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fAirAcceleration * Time.fixedDeltaTime;
+            Vector3 v3Acceleration = m_v3MoveDirection * fMoveAmount * m_fAirAcceleration * fDeltaTime;
             v3Acceleration.y = 0.0f;
 
-            Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag * Time.fixedDeltaTime;
+            Vector3 v3AirDrag = m_v3Velocity * -m_fAirDrag * fDeltaTime;
             v3AirDrag.y = 0.0f;
-            
+
             v3NetForce += v3Acceleration + v3AirDrag;
         }
 
@@ -591,16 +690,17 @@ public class PlayerController : MonoBehaviour
 
             m_bShouldJump = false;
             m_bOnGround = false;
+            m_bJumping = true;
 
             --m_nJumpFrame;
         }
-        
+
 
         // ------------------------------------------------------------------------------------------------------
         // Gravity.
 
-        m_v3Velocity.y += m_fCurrentGravity * Time.fixedDeltaTime;
-            
+        m_v3Velocity.y += m_fCurrentGravity * fDeltaTime;
+
         // ------------------------------------------------------------------------------------------------------
         // Final forces.
 
@@ -617,9 +717,14 @@ public class PlayerController : MonoBehaviour
             return;
 
         // ------------------------------------------------------------------------------------------------------
+        // Movement updates.
+
+        UpdateMovement(Time.deltaTime);
+
+        // ------------------------------------------------------------------------------------------------------
         // Mouse look
 
-        if(m_bFocused)
+        if (m_bFocused)
         {
             m_fLookEulerX -= Input.GetAxis("Mouse Y");
             m_fLookEulerY += Input.GetAxis("Mouse X");
@@ -630,9 +735,11 @@ public class PlayerController : MonoBehaviour
         m_cameraTransform.rotation = Quaternion.Euler(new Vector3(m_fLookEulerX, m_fLookEulerY, 0.0f) + m_cameraEffects.ShakeEuler() + m_cameraEffects.HeadBobbingEuler());
         m_cameraTransform.localPosition = m_cameraEffects.HeadBobbingOffset();
 
+#if UNITY_EDITOR
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceRight * 3.0f), Color.red);
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceUp * 3.0f), Color.green);
         Debug.DrawLine(transform.position, transform.position + (m_v3SurfaceForward * 3.0f), Color.blue);
+#endif
 
         // ------------------------------------------------------------------------------------------------------
         // Move direction
@@ -646,8 +753,13 @@ public class PlayerController : MonoBehaviour
 
         Ray sphereRay = new Ray(transform.position, -Vector3.up);
 
+        // Hit all layers but one.
+        const int nGroundMask = ~(1 << 9); // !Player layer.
+
         // Sphere case down to the nearest surface below. Sphere cast is ignored if not falling.
-        bool bSphereCastHit = Physics.SphereCast(sphereRay, m_controller.radius, out m_groundHit, Mathf.Infinity, int.MaxValue, QueryTriggerInteraction.Ignore);
+        bool bSphereCastHit = Physics.SphereCast(sphereRay, m_controller.radius, out m_groundHit, Mathf.Infinity, nGroundMask, QueryTriggerInteraction.Ignore);
+
+        // The hit must be within the capsule height bounds.
         m_bOnGround = bSphereCastHit && m_groundHit.distance < (m_controller.height * 0.5f) - (m_controller.radius * 0.7f);
 
         // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
@@ -663,12 +775,31 @@ public class PlayerController : MonoBehaviour
                 m_v3RespawnPosition = m_groundHit.collider.bounds.center + new Vector3(0.0f, (m_groundHit.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
         }
 
+#if UNITY_EDITOR
         Debug.DrawLine(sphereRay.origin, m_groundHit.point, Color.magenta);
+#endif
 
         // CharacterController.isGrounded is a very unreliable method to check if the character is grounded. So this is used as a backup method instead.
         m_bOnGround |= m_controller.isGrounded;
 
         m_bOnGround &= !m_bSlopeLimit;
+
+        // Ground detection result should be confirmed here.
+        if (m_bOnGround)
+            m_bJumping = false;
+        else
+        {
+            // Calculate surface vectors for airborne movement.
+            // We're giving it the upward vector to represent a flat surface.
+            CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
+        }
+
+        if (!bPrevGrounded && m_v3Velocity.y < 0.0f && m_bOnGround)
+        {
+            // Landing callbacks.
+            for (int i = 0; i < m_landCallbacks.Count; ++i)
+                m_landCallbacks[i](this);
+        }
 
         // ------------------------------------------------------------------------------------------------------
         // Jumping
@@ -677,8 +808,12 @@ public class PlayerController : MonoBehaviour
 
         m_bShouldJump = m_bOnGround && Input.GetKey(KeyCode.Space);
 
-        if (!bPrevShouldJump && m_bShouldJump)
+        if (!bPrevShouldJump && m_bShouldJump && m_nJumpFrame <= 0)
         {
+            // Jump callbacks...
+            for (int i = 0; i < m_jumpCallbacks.Count; ++i)
+                m_jumpCallbacks[i](this);
+
             m_nJumpFrame = 4; // Give multiple frames to clear the ground.
         }
 
@@ -687,30 +822,12 @@ public class PlayerController : MonoBehaviour
 
         // Reset grounded max speed and FOV offset.
         m_fCurrentGroundMaxSpeed = m_fMaxGroundMoveSpeed;
-        m_fFOVIncrease = 0.0f;
 
         float fMoveDirDot = Vector3.Dot(m_v3MoveDirection, LookForward());
 
         if (m_bOnGround && Input.GetKey(KeyCode.LeftShift) && fMoveDirDot >= m_fSprintDot)
         {
-            m_fFOVIncrease = 10.0f;
             m_fCurrentGroundMaxSpeed = m_fMaxSprintMoveSpeed;
-        }
-
-        // ---------------------------------------------------------------------------------------------------
-        // FOV velocity effect.
-
-        float fFOVOffset = Mathf.Clamp((m_v3Velocity.magnitude - m_fMaxGroundMoveSpeed) + m_fFOVIncrease, 0.0f, 15.0f);
-
-        if (m_bOnGround)
-        {
-            m_cameraEffects.AddFOVOffset(m_fFOVIncrease);
-            m_cameraEffects.SetFOVChangeRate(75.0f);
-        }
-        else
-        {
-            m_cameraEffects.AddFOVOffset(fFOVOffset);
-            m_cameraEffects.SetFOVChangeRate(20.0f);
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -721,7 +838,9 @@ public class PlayerController : MonoBehaviour
 
         // Get modified velocity back from the controller.
         if(!m_bJustResumed)
+        {
             m_v3Velocity = m_controller.velocity;
+        }
         else
             m_bJustResumed = false;
     }

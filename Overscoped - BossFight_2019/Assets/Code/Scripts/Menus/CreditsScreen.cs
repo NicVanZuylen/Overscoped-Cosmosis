@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/*
+ * Description: Scrolls through the credits screen and quits to the title screen.
+ * Author: Nic Van Zuylen
+*/
+
 public class CreditsScreen : MonoBehaviour
 {
     [Tooltip("Transform of the scrolling component of the credits screen.")]

@@ -31,6 +31,11 @@ public class EndPortal : MonoBehaviour
             m_fadeScript.SetCallback(m_pauseScript.ShowCreditsScreen);
             m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
 
+
+            // Freeze game.
+            other.gameObject.GetComponent<PlayerController>().SetPaused(true);
+            Time.timeScale = 0.0f;
+
             m_collider.enabled = false;
         }
     }

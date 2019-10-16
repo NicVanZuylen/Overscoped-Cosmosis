@@ -8,6 +8,10 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
+/*
+ * Description: Editor node class for the Behaviour Tree Editor.
+ * Author: Nic Van Zuylen
+*/
 
 namespace BTreeEditor
 {
@@ -15,6 +19,8 @@ namespace BTreeEditor
     {
         NODE_COMPOSITE_SELECTOR,
         NODE_COMPOSITE_SEQUENCE,
+        NODE_SELECTOR_OFFSHOOT,
+        NODE_SEQUENCE_OFFSHOOT,
         NODE_ACTION,
         NODE_CONDITION
     }
@@ -127,6 +133,20 @@ namespace BTreeEditor
                         parent.AddNode(newSequence);
                         break;
 
+                    case ENodeType.NODE_SELECTOR_OFFSHOOT:
+                        SelectorOffshoot newSelOffshoot = new SelectorOffshoot();
+                        ConstructNode(newSelOffshoot, childData, classInstance); // Create and add children.
+
+                        parent.AddNode(newSelOffshoot);
+                        break;
+
+                    case ENodeType.NODE_SEQUENCE_OFFSHOOT:
+                        SequenceOffshoot newSeqOffshoot = new SequenceOffshoot();
+                        ConstructNode(newSeqOffshoot, childData, classInstance); // Create and add children.
+
+                        parent.AddNode(newSeqOffshoot);
+                        break;
+
                     case ENodeType.NODE_ACTION:
                         BehaviourNode newAction = new BehaviourTree.Action(childData.m_funcName, classInstance);
 
@@ -225,7 +245,11 @@ namespace BTreeEditor
                 // Adding nodes...
                 contextMenu.AddItem(new GUIContent("Add Node/Selector"), false, node.AddSelectorCallback);
                 contextMenu.AddItem(new GUIContent("Add Node/Sequence"), false, node.AddSequenceCallback);
+                contextMenu.AddItem(new GUIContent("Add Node/Offshoot Selector"), false, node.AddOffshootSelCallback);
+                contextMenu.AddItem(new GUIContent("Add Node/Offshoot Sequence"), false, node.AddOffshootSeqCallback);
+
                 contextMenu.AddSeparator("Add Node/");
+
                 contextMenu.AddItem(new GUIContent("Add Node/Action"), false, node.AddActionCallback);
                 contextMenu.AddItem(new GUIContent("Add Node/Condition"), false, node.AddConditionCallback);
 
@@ -234,6 +258,8 @@ namespace BTreeEditor
                 // Change type...
                 contextMenu.AddItem(new GUIContent("Change Type/Selector"), false, node.ChangeTypeToSelectorCallback);
                 contextMenu.AddItem(new GUIContent("Change Type/Sequence"), false, node.ChangeTypeToSequenceCallback);
+                contextMenu.AddItem(new GUIContent("Change Type/Offshoot Selector"), false, node.ChangeTypeToOffSelector);
+                contextMenu.AddItem(new GUIContent("Change Type/Offshoot Sequence"), false, node.ChangeTypeToOffSequence);
             }
 
             // Option to delete the node if it has a parent, if it doesn't have a parent it must be the base node and cannot be deleted.
@@ -261,6 +287,25 @@ namespace BTreeEditor
             contextMenu.ShowAsContext();
         }
 
+        private void AddChangeTypeUndoAction()
+        {
+            switch (m_eType)
+            {
+                case ENodeType.NODE_COMPOSITE_SELECTOR:
+                    BTreeEditor.AddAction(new BTreeEditAction(EActionType.ACTION_NODE_TYPE_CHANGE_TO_SELECTOR, this));
+                    break;
+                case ENodeType.NODE_COMPOSITE_SEQUENCE:
+                    BTreeEditor.AddAction(new BTreeEditAction(EActionType.ACTION_NODE_TYPE_CHANGE_TO_SEQUENCE, this));
+                    break;
+                case ENodeType.NODE_SELECTOR_OFFSHOOT:
+                    BTreeEditor.AddAction(new BTreeEditAction(EActionType.ACTION_NODE_TYPE_CHANGE_TO_OFF_SELECTOR, this));
+                    break;
+                case ENodeType.NODE_SEQUENCE_OFFSHOOT:
+                    BTreeEditor.AddAction(new BTreeEditAction(EActionType.ACTION_NODE_TYPE_CHANGE_TO_OFF_SEQUENCE, this));
+                    break;
+            }
+        }
+
         public void AddSelectorCallback()
         {
             AddChild(new Node(ENodeType.NODE_COMPOSITE_SELECTOR, this, "New Node"));
@@ -269,6 +314,16 @@ namespace BTreeEditor
         public void AddSequenceCallback()
         {
             AddChild(new Node(ENodeType.NODE_COMPOSITE_SEQUENCE, this, "New Node"));
+        }
+
+        public void AddOffshootSelCallback()
+        {
+            AddChild(new Node(ENodeType.NODE_SELECTOR_OFFSHOOT, this, "New Node"));
+        }
+
+        public void AddOffshootSeqCallback()
+        {
+            AddChild(new Node(ENodeType.NODE_SEQUENCE_OFFSHOOT, this, "New Node"));
         }
 
         public void AddActionCallback()
@@ -283,20 +338,30 @@ namespace BTreeEditor
 
         public void ChangeTypeToSelectorCallback()
         {
-            BTreeEditor.AddAction(new BTreeEditAction(EActionType.ACTION_NODE_TYPE_CHANGE_TO_SELECTOR, this));
+            AddChangeTypeUndoAction();
             m_eType = ENodeType.NODE_COMPOSITE_SELECTOR;
         }
 
         public void ChangeTypeToSequenceCallback()
         {
-            BTreeEditor.AddAction(new BTreeEditAction(EActionType.ACTION_NODE_TYPE_CHANGE_TO_SEQUENCE, this));
+            AddChangeTypeUndoAction();
             m_eType = ENodeType.NODE_COMPOSITE_SEQUENCE;
+        }
+
+        public void ChangeTypeToOffSelector()
+        {
+            AddChangeTypeUndoAction();
+            m_eType = ENodeType.NODE_SELECTOR_OFFSHOOT;
+        }
+
+        public void ChangeTypeToOffSequence()
+        {
+            AddChangeTypeUndoAction();
+            m_eType = ENodeType.NODE_SEQUENCE_OFFSHOOT;
         }
 
         public void RenameCallback()
         {
-            //EditorUtility.DisplayPopupMenu();
-
             BTreeEditor.AddAction(new BTreeEditAction(EActionType.ACTION_RENAME_NODE, this));
             EditorWindow.GetWindow<BTreeEditor>().ShowPopup();
         }
@@ -541,6 +606,14 @@ namespace BTreeEditor
 
                 case ENodeType.NODE_COMPOSITE_SEQUENCE:
                     nameTypeExtension = "& Sequence &";
+                    break;
+
+                case ENodeType.NODE_SELECTOR_OFFSHOOT:
+                    nameTypeExtension = "+| Selector +|";
+                    break;
+
+                case ENodeType.NODE_SEQUENCE_OFFSHOOT:
+                    nameTypeExtension = "+& Sequence +&";
                     break;
 
                 case ENodeType.NODE_ACTION:

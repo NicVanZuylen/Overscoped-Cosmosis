@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Controls basic behaviour of objects pullable out of place using the player's pull ability.
+ * Author: Nic Van Zuylen
+*/
+
 [RequireComponent(typeof(Rigidbody))]
 
 public class PullObject : MonoBehaviour

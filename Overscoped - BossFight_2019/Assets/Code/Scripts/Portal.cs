@@ -14,6 +14,10 @@ public class Portal : MonoBehaviour
     [SerializeField]
     private GameObject m_arm = null;
 
+    [Tooltip("Animator component on the boss.")]
+    [SerializeField]
+    private Animator m_bossAnimator = null;
+
     [Tooltip("Arm materials")]
     [SerializeField]
     private Material[] m_armMaterials = null;
@@ -26,10 +30,6 @@ public class Portal : MonoBehaviour
     [Tooltip("Amount of time the portal will be considered to be opening.")]
     [SerializeField]
     private float m_fOpenTime = 1.0f;
-
-    [Tooltip("Amount of time to wait between the portal opening and the arm exiting it.")]
-    [SerializeField]
-    private float m_fWaitTime = 1.0f;
 
     [Tooltip("Amount of time for the arm to enter and leave.")]
     [SerializeField]
@@ -50,9 +50,10 @@ public class Portal : MonoBehaviour
 
     private Rigidbody m_rigidBody;
     private Material m_portalMat;
+    private Collider m_armCollider;
     private Vector3 m_v3PunchDirection;
     private float m_fCurrentTime;
-    public float m_fCollisionFreeTime;
+    private float m_fCurrentExitTime;
 
     /*
     Description: Set the direction the fist will punch in. 
@@ -82,10 +83,72 @@ public class Portal : MonoBehaviour
         return m_bActive;
     }
 
+    /*
+    Description: Force the wait between opening and the arm coming out to end.
+    */
+    public void SetArmEnterStage()
+    {
+        m_stage = ArmEnterStage;
+        m_fCurrentTime = 0.0f;
+    }
+
+    /*
+    Description: Set the current attack stage to arm exit.
+    */
+    public void SetArmExitStage()
+    {
+        m_fCurrentExitTime = 0.0f;
+        m_stage = ArmExitStage;
+    }
+
+    /*
+    Description: Set the current attack stage to the portal close stage.
+    */
+    public void SetPortalCloseStage()
+    {
+        m_fCurrentTime = 0.0f;
+        m_stage = CloseStage;
+    }
+
+    /*
+    Description: Get the amount of time the portal will take to open.
+    Return Type: float
+    */
+    public float OpenTime()
+    {
+        return m_fOpenTime;
+    }
+
+    public void Activate()
+    {
+        m_stage = OpenStage;
+        m_bActive = true;
+        m_fCurrentTime = 0.0f;
+
+        // Set arm rotation.
+        m_arm.transform.rotation = Quaternion.LookRotation(m_v3PunchDirection, Vector3.up);
+    }
+
+    public void Deactivate()
+    {
+        // Reset stage.
+        m_stage = OpenStage;
+
+        // Deactivate portal and arm.
+        gameObject.SetActive(false);
+        m_arm.SetActive(false);
+        m_bActive = false;
+
+        m_fCurrentTime = 0.0f;
+    }
+
     private void Awake()
     {
         Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_playerCollider);
-        Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_arm.GetComponent<CapsuleCollider>());
+
+        m_armCollider = m_arm.GetComponent<Collider>();
+
+        Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_armCollider);
         m_rigidBody = GetComponent<Rigidbody>();
 
         m_portalMat = transform.GetChild(0).GetComponent<MeshRenderer>().material;
@@ -94,20 +157,9 @@ public class Portal : MonoBehaviour
         m_portalMat.SetFloat("_Opacity", 0.0f);
 
         m_stage = OpenStage;
+        m_arm.SetActive(false);
+        gameObject.SetActive(false);
         m_bActive = false;
-    }
-
-    private void OnEnable()
-    {
-        m_stage = OpenStage;
-        m_bActive = true;
-        m_fCurrentTime = m_fOpenTime;
-    }
-
-    private void OnDisable()
-    {
-        m_bActive = false;
-        m_fCurrentTime = 0.0f;
     }
 
     /*
@@ -115,45 +167,23 @@ public class Portal : MonoBehaviour
     */
     private void OpenStage()
     {
-        // Don't allow progression when collisions are still being resolved.
-        if(m_fCollisionFreeTime >= 0.5f)
-            m_fCurrentTime -= Time.deltaTime;
+        m_fCurrentTime += Time.deltaTime;
 
-        float fScaleProgress = (1.0f - (m_fCurrentTime / m_fCloseTime));
+        float fOpenProgress = Mathf.Min(m_fCurrentTime / m_fOpenTime, 1.0f);
 
-        m_portalMat.SetFloat("_Opacity", fScaleProgress);
+        // Set arm rotation.
+        m_arm.transform.rotation = Quaternion.LookRotation(m_v3PunchDirection, Vector3.up);
 
-        if (m_fCurrentTime <= 0.0f)
-        {
-            m_arm.SetActive(true);
-            m_arm.transform.rotation = (Quaternion.LookRotation(m_v3PunchDirection, Vector3.up) * Quaternion.Euler(-90.0f, 0.0f, 0.0f));
+        m_portalMat.SetFloat("_Opacity", fOpenProgress);
 
-            // Set arm material properties.
-            m_armMaterials[0].SetVector("_PlaneOrigin", transform.position);
-            m_armMaterials[1].SetVector("_PlaneOrigin", transform.position);
+        m_bossAnimator.SetBool("PortalPunchComplete", false);
 
-            m_armMaterials[0].SetVector("_PlaneNormal", -m_v3PunchDirection);
-            m_armMaterials[1].SetVector("_PlaneNormal", -m_v3PunchDirection);
+        // Set arm material properties.
+        m_armMaterials[0].SetVector("_PlaneOrigin", transform.position);
+        m_armMaterials[1].SetVector("_PlaneOrigin", transform.position);
 
-            // Next stage.
-            m_stage = WaitTimeStage;
-            m_fCurrentTime = m_fWaitTime;
-        }
-    }
-
-    /*
-    Description: Wait stage between OpenStage and ArmEnterStage 
-    */
-    private void WaitTimeStage()
-    {
-        m_fCurrentTime -= Time.deltaTime;
-
-        if(m_fCurrentTime <= 0.0f)
-        {
-            // Next stage.
-            m_stage = ArmEnterStage;
-            m_fCurrentTime = m_fArmEnterTime;
-        }
+        m_armMaterials[0].SetVector("_PlaneNormal", -m_v3PunchDirection);
+        m_armMaterials[1].SetVector("_PlaneNormal", -m_v3PunchDirection);
     }
 
     /*
@@ -161,18 +191,20 @@ public class Portal : MonoBehaviour
     */
     private void ArmEnterStage()
     {
-        m_fCurrentTime -= Time.deltaTime;
+        // Activate arm if disabled.
+        if(!m_arm.activeInHierarchy)
+        {
+            m_arm.SetActive(true);
+            m_armCollider.enabled = true;
+        }
 
-        float fArmOut = (1.0f - (m_fCurrentTime / m_fArmEnterTime)) * m_fArmLength;
+        m_fCurrentTime += Time.deltaTime;
+        m_fCurrentTime = Mathf.Min(m_fCurrentTime, m_fArmEnterTime);
+
+        float fArmOut = (m_fCurrentTime / m_fArmEnterTime) * m_fArmLength;
+        fArmOut -= m_fArmLength;
 
         m_arm.transform.position = transform.position + (m_v3PunchDirection * fArmOut);
-
-        if(m_fCurrentTime <= 0.0f)
-        {
-            // Next stage.
-            m_stage = ArmExitStage;
-            m_fCurrentTime = m_fArmExitTime;
-        }
     }
 
     /*
@@ -180,20 +212,17 @@ public class Portal : MonoBehaviour
     */
     private void ArmExitStage()
     {
-        m_fCurrentTime -= Time.deltaTime;
+        // Deactivate arm collider.
+        if (m_armCollider.enabled)
+            m_armCollider.enabled = false;
 
-        float fArmOut = (m_fCurrentTime / m_fArmExitTime) * m_fArmLength;
+        m_fCurrentExitTime += Time.deltaTime;
+        m_fCurrentExitTime = Mathf.Min(m_fCurrentExitTime, m_fArmExitTime);
+
+        float fArmOut = (1.0f - (m_fCurrentExitTime / m_fArmExitTime)) * m_fArmLength;
+        fArmOut -= m_fArmLength;
 
         m_arm.transform.position = transform.position + (m_v3PunchDirection * fArmOut);
-
-        if (m_fCurrentTime <= 0.0f)
-        {
-            m_arm.SetActive(false);
-
-            // Next stage.
-            m_stage = CloseStage;
-            m_fCurrentTime = m_fCloseTime;
-        }
     }
 
     /*
@@ -201,40 +230,26 @@ public class Portal : MonoBehaviour
     */
     private void CloseStage()
     {
-        m_fCurrentTime -= Time.deltaTime;
+        // Continue arm exit stage.
+        ArmExitStage();
 
-        float fScaleProgress = (m_fCurrentTime / m_fCloseTime);
+        m_fCurrentTime += Time.deltaTime;
 
-        m_portalMat.SetFloat("_Opacity", fScaleProgress);
+        float fCloseProgress = Mathf.Min(m_fCurrentTime / m_fCloseTime, 1.0f);
 
-        if (m_fCurrentTime <= 0.0f)
+        m_portalMat.SetFloat("_Opacity", 1.0f - fCloseProgress);
+
+        if (m_fCurrentTime >= m_fCloseTime)
         {
-            // Reset.
-            m_stage = OpenStage;
-            m_bActive = false;
-
-            gameObject.SetActive(false);
-
-            m_fCurrentTime = 0.0f;
+            Deactivate();
         }
     }
 
     private void Update()
     {
-        // Increase time between collisions.
-        m_fCollisionFreeTime += Time.deltaTime;
-
         // Ensure the portal does not move.
         m_rigidBody.velocity = Vector3.zero;
 
         m_stage();
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        // Reset open time, scale and collision time.
-        m_fCurrentTime = m_fOpenTime;
-        m_portalMat.SetFloat("_Opacity", 0.0f);
-        m_fCollisionFreeTime = 0.0f;
     }
 }

@@ -21,6 +21,8 @@ namespace BTreeEditor
         ACTION_MOVE_NODE_RIGHT,
         ACTION_NODE_TYPE_CHANGE_TO_SELECTOR,
         ACTION_NODE_TYPE_CHANGE_TO_SEQUENCE,
+        ACTION_NODE_TYPE_CHANGE_TO_OFF_SELECTOR,
+        ACTION_NODE_TYPE_CHANGE_TO_OFF_SEQUENCE,
         ACTION_RENAME_NODE,
         ACTION_PASTE_NODE
     }
@@ -104,6 +106,20 @@ namespace BTreeEditor
                         ConstructNode(newSequence, childData, classInstance); // Create and add children.
 
                         parent.AddNode(newSequence);
+                        break;
+
+                    case ENodeType.NODE_SELECTOR_OFFSHOOT:
+                        SelectorOffshoot newSelOffshoot = new SelectorOffshoot();
+                        ConstructNode(newSelOffshoot, childData, classInstance); // Create and add children.
+
+                        parent.AddNode(newSelOffshoot);
+                        break;
+
+                    case ENodeType.NODE_SEQUENCE_OFFSHOOT:
+                        SequenceOffshoot newSeqOffshoot = new SequenceOffshoot();
+                        ConstructNode(newSeqOffshoot, childData, classInstance); // Create and add children.
+
+                        parent.AddNode(newSeqOffshoot);
                         break;
 
                     case ENodeType.NODE_ACTION:
@@ -293,6 +309,14 @@ namespace BTreeEditor
 
                 case EActionType.ACTION_NODE_TYPE_CHANGE_TO_SEQUENCE:
                     action.m_node.ChangeTypeToSelectorCallback();
+                    break;
+
+                case EActionType.ACTION_NODE_TYPE_CHANGE_TO_OFF_SELECTOR:
+                    action.m_node.ChangeTypeToOffSelector();
+                    break;
+
+                case EActionType.ACTION_NODE_TYPE_CHANGE_TO_OFF_SEQUENCE:
+                    action.m_node.ChangeTypeToOffSequence();
                     break;
 
                 case EActionType.ACTION_PASTE_NODE:

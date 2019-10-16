@@ -28,6 +28,11 @@ public class PauseMenu : MonoBehaviour
         m_pauseMenu.SetActive(false);
     }
 
+    private void OnDestroy()
+    {
+        Time.timeScale = 1.0f;
+    }
+
     private void Update()
     {
         // Pause or unpause on escape.

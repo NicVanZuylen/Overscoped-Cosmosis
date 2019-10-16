@@ -43,10 +43,6 @@ public class BossBehaviour : MonoBehaviour
     // -------------------------------------------------------------------------------------------------
     [Header("Attacks")]
 
-    [Tooltip("Distance in which the boss will attempt a slam attack.")]
-    [SerializeField]
-    private float m_fSlamDistance = 10.0f;
-
     [Header("Meteor")]
     [Tooltip("Amount of time before meteor attack can be used again.")]
     [SerializeField]
@@ -111,6 +107,8 @@ public class BossBehaviour : MonoBehaviour
     private Animator m_animator;
     private GameObject end_Portal;
     private float m_fTimeSinceGlobalAttack = 0.0f;
+    private float m_fTimeSinceHit; // Time since the boss was hit by the beam.
+    private bool m_bUnderAttack;
 
     // Stages
     private BehaviourNode[] m_bossTreeStages;
@@ -195,7 +193,6 @@ public class BossBehaviour : MonoBehaviour
         // Portal punch
         m_portalScript = m_portal.GetComponent<Portal>();
         m_portal.tag = "NoGrapple";
-        m_portal.SetActive(false);
 
         // Attack functions...
         m_attacks = new AttackFunc[3];
@@ -237,7 +234,19 @@ public class BossBehaviour : MonoBehaviour
             m_attackRatings[i].m_bAvailable = false;
         }
 
-        m_bossTreeStages[m_nStageIndex].Run();  
+        if (!m_bUnderAttack) // Don't run AI when being hit.
+            m_bossTreeStages[m_nStageIndex].Run();
+        else
+        {
+            // Hit recovery...
+
+            m_fTimeSinceHit += Time.deltaTime;
+
+            if (m_fTimeSinceHit >= 0.5f)
+                RecoverFromHit();
+        }
+
+        ActBeamTrack();
 
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
 
@@ -246,13 +255,57 @@ public class BossBehaviour : MonoBehaviour
         m_fBeamAttackCDTimer -= Time.deltaTime;
     }
 
+    /*
+    Description: Progress the boss AI stage.
+    */
     public void ProgressStage()
     {
         // Progress stage.
         ++m_nStageIndex;
+
+        // Recover from beam attack.
+        RecoverFromHit();
     }
 
-    public void BossDead()
+    /*
+    Description: Cancel attacks and play the hit animation.
+    */
+    public void TakeHit()
+    {
+        m_fTimeSinceHit = 0.0f;
+        m_bUnderAttack = true;
+
+        m_animator.SetInteger("AttackID", 0);
+        m_animator.SetBool("UnderAttack", true);
+        m_animator.SetBool("PortalPunchComplete", true);
+
+        DeactivateBeam();
+        m_portalScript.SetPortalCloseStage();
+    }
+
+    /*
+    Description: Stop hit animation and return normal AI.
+    */
+    public void RecoverFromHit()
+    {
+        m_bUnderAttack = false;
+
+        m_animator.SetBool("UnderAttack", false);
+    }
+
+    /*
+    Description: Get whether or not the boss is currently being struck by an attack.
+    Return Type: bool
+    */
+    public bool IsUnderAttack()
+    {
+        return m_bUnderAttack;
+    }
+
+    /*
+    Description: Boss death event function.
+    */
+    public void KillBoss()
     {
         //enable end portal
         Debug.Log("Boss Dead");
@@ -541,6 +594,9 @@ public class BossBehaviour : MonoBehaviour
             for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
                 m_beamParticleRenderers[i].enabled = true;
 
+            // Set initial end position.
+            //m_v3BeamEnd = PointOnSphere(m_player.transform.position + new Vector3(10, 0, 0), m_beamOrigin.position, (m_player.transform.position - m_beamOrigin.position).magnitude);
+
             // Set timers and flag the beam as active.
             m_fBeamAttackCDTimer = m_fBeamAttackCD;
             m_fBeamTime = m_fBeamDuration;
@@ -595,6 +651,21 @@ public class BossBehaviour : MonoBehaviour
         return ENodeResult.NODE_SUCCESS;
     }
 
+    /*
+    Description: Deactivate the beam attack.
+    */
+    public void DeactivateBeam()
+    {
+        for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
+            m_beamParticleRenderers[i].enabled = false;
+
+        // Set end point to start.
+        m_v3BeamEnd = m_beamOrigin.position;
+
+        ResetAnimToIdle();
+        m_bBeamActive = false;
+    }
+
     // Track the beam's aim. Even if the beam is not in use.
     public ENodeResult ActBeamTrack()
     {
@@ -602,7 +673,7 @@ public class BossBehaviour : MonoBehaviour
 
         Vector3 v3EndOnRadius = PointOnSphere(m_v3BeamEnd, m_beamOrigin.position, fSphereMag);
 
-        if (m_beamParticleRenderers[0].enabled)
+        if (true)
         {
             float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
 
@@ -622,10 +693,8 @@ public class BossBehaviour : MonoBehaviour
             }
 
         }
-        else
-        {
-            m_v3BeamEnd = PointOnSphere(m_player.transform.position + new Vector3(10,0,0), m_beamOrigin.position, fSphereMag);
-        }
+        //else
+          //  m_v3BeamEnd = PointOnSphere(m_player.transform.position, m_beamOrigin.position, (m_player.transform.position - m_beamOrigin.position).magnitude);
 
         // Run beam attack effects when beam is enabled.
         if (m_bBeamActive)
@@ -637,11 +706,7 @@ public class BossBehaviour : MonoBehaviour
 
             if (m_fBeamTime <= 0.0f)
             {
-                for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
-                    m_beamParticleRenderers[i].enabled = false;
-
-                ResetAnimToIdle();
-                m_bBeamActive = false;
+                DeactivateBeam();
             }
         }
 
@@ -694,20 +759,17 @@ public class BossBehaviour : MonoBehaviour
             
         // Create random unit vector.
         Vector3 v3PortalOffset = v3PlayerForward;
-
-        float fHorizontalOff = Random.Range(-1.0f, 1.0f);
-        v3PortalOffset.x += v3PlayerRight.x * fHorizontalOff;
-        v3PortalOffset.y += v3PlayerRight.y * fHorizontalOff;
-        v3PortalOffset.z += v3PlayerRight.z * fHorizontalOff;
-
-        v3PortalOffset += Vector3.up * Random.Range(0.5f, 1.0f);
+    
+        v3PortalOffset += Vector3.up * Random.Range(0.3f, 0.5f);
         v3PortalOffset += v3PlayerRight * Random.Range(-1.0f, 1.0f);
 
         v3PortalOffset.Normalize();
 
-        m_portal.transform.position = m_player.transform.position + m_playerController.GetVelocity() + (v3PortalOffset * 50.0f);
+        // Position the portal at the potential player position with a random offset.
+        Vector3 v3PlayerTrackPos = m_player.transform.position + (m_playerController.GetVelocity() * m_portalScript.OpenTime());
+        m_portal.transform.position = v3PlayerTrackPos + (v3PortalOffset * 50.0f);
 
-        Vector3 v3PlayerDir = (m_player.transform.position - m_portal.transform.position).normalized;
+        // Look at predicted player location.
         m_portal.transform.rotation = Quaternion.LookRotation(-v3PortalOffset, Vector3.up);
 
         m_portal.SetActive(true);

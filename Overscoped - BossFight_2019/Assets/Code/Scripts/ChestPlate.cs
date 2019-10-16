@@ -57,6 +57,7 @@ public class ChestPlate : MonoBehaviour
     public void DealBeamDamage()
     {
         m_fHealth -= Time.deltaTime;
+        m_bossScript.TakeHit();
 
         if(m_fHealth <= 0.0f)
         {

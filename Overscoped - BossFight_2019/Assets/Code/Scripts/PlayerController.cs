@@ -288,6 +288,24 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
+    Description: Get the object the player is standing on.
+    Return Type: GameObject
+    */
+    public GameObject GroundObject()
+    {
+        return m_groundHit.collider.gameObject;
+    }
+
+    /*
+    Description: Get the collider the player is standing on.
+    Return Type: Collider
+    */
+    public Collider GroundCollider()
+    {
+        return m_groundHit.collider;
+    }
+
+    /*
     Description: Get whether or not the player is airborne as the result of a jump.
     Return Type: bool
     */

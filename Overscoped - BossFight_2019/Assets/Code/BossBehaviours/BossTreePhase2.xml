@@ -7,13 +7,6 @@
   <m_children>
     <NodeData>
       <m_eType>NODE_ACTION</m_eType>
-      <m_name>Track Beam</m_name>
-      <m_funcName>ActBeamTrack</m_funcName>
-      <m_description>Continue tracking of the beam attack at all times.</m_description>
-      <m_children />
-    </NodeData>
-    <NodeData>
-      <m_eType>NODE_ACTION</m_eType>
       <m_name>Face Player</m_name>
       <m_funcName>ActTrackPlayer</m_funcName>
       <m_description />
@@ -24,13 +17,6 @@
       <m_name>Is Idle</m_name>
       <m_funcName>CondIsIdleAnimation</m_funcName>
       <m_description>Don't continue until the boss is idle</m_description>
-      <m_children />
-    </NodeData>
-    <NodeData>
-      <m_eType>NODE_CONDITION</m_eType>
-      <m_name>Global Attack CD</m_name>
-      <m_funcName>CondGlobalAttackCD</m_funcName>
-      <m_description>Wait for global attack cooldown.</m_description>
       <m_children />
     </NodeData>
     <NodeData>
@@ -70,6 +56,28 @@
                   <m_name>Barrier Broken</m_name>
                   <m_funcName>CondBarrierBroken</m_funcName>
                   <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Not Grounded</m_name>
+                  <m_funcName>CondPlayerNotGrounded</m_funcName>
+                  <m_description>Blanket the ground with meteors while flying to leave the player with a little surprise when they land.</m_description>
                   <m_children />
                 </NodeData>
                 <NodeData>
@@ -316,6 +324,13 @@
       <m_name>ChooseAttack</m_name>
       <m_funcName>ActChooseAttack</m_funcName>
       <m_description>Choose the best attack to perform from a list of available attacks.</m_description>
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_ACTION</m_eType>
+      <m_name>Track Beam</m_name>
+      <m_funcName>ActBeamTrack</m_funcName>
+      <m_description>Continue tracking of the beam attack at all times.</m_description>
       <m_children />
     </NodeData>
   </m_children>

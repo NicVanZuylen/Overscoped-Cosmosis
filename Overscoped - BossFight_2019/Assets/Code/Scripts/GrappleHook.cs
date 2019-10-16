@@ -292,7 +292,8 @@ public class GrappleHook : MonoBehaviour
 
         // Spherecast to find impact point.
         const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
-        m_bWithinRange = Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrappleRange, nRaymask, QueryTriggerInteraction.Ignore);
+        m_bWithinRange = Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrappleRange, nRaymask, QueryTriggerInteraction.Ignore) 
+            && !(m_controller.IsGrounded() && m_controller.GroundCollider() == m_fireHit.collider);
 
         // Grapple casting.
         if (bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButton(0) && m_bWithinRange && m_fireHit.collider.tag != "NoGrapple")

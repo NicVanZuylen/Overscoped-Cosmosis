@@ -50,7 +50,7 @@ public class HeartPull : PullObject
         base.Trigger(playerDirection);
 
         // Progress boss stage.
-        m_bossScript.BossDead();
+        m_bossScript.KillBoss();
 
         // Turn of fresnel.
         m_material.SetFloat("_FresnelOnOff", 0.0f);

@@ -92,16 +92,31 @@ public class Portal : MonoBehaviour
         m_fCurrentTime = 0.0f;
     }
 
+    /*
+    Description: Set the current attack stage to arm exit.
+    */
     public void SetArmExitStage()
     {
         m_fCurrentExitTime = 0.0f;
         m_stage = ArmExitStage;
     }
 
+    /*
+    Description: Set the current attack stage to the portal close stage.
+    */
     public void SetPortalCloseStage()
     {
         m_fCurrentTime = 0.0f;
         m_stage = CloseStage;
+    }
+
+    /*
+    Description: Get the amount of time the portal will take to open.
+    Return Type: float
+    */
+    public float OpenTime()
+    {
+        return m_fOpenTime;
     }
 
     public void Activate()
@@ -142,6 +157,8 @@ public class Portal : MonoBehaviour
         m_portalMat.SetFloat("_Opacity", 0.0f);
 
         m_stage = OpenStage;
+        m_arm.SetActive(false);
+        gameObject.SetActive(false);
         m_bActive = false;
     }
 

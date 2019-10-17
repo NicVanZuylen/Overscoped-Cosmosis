@@ -92,17 +92,28 @@ public class BossBehaviour : MonoBehaviour
     private ParticleSystem m_meteorSummonEffect = null;
 
     // -------------------------------------------------------------------------------------------------
-    [Header("Sound Effects")]
-
+    [Header("Hit SFX")]
     [SerializeField]
     private AudioClip m_bossHitSFX = null;
 
+
+    [Header("Attack Noises SFX")]
     [SerializeField]
     private AudioClip[] m_bossAttackSFX = null;
 
-    [SerializeField]
-    private AudioClip m_bossBeamLoopSFX = null;
 
+    [Header("Meteor SFX")]
+    [SerializeField]
+    private AudioClip m_meteorSummonSFX = null;
+
+    [SerializeField]
+    private AudioClip m_meteorIncomingSFX = null;
+
+    [SerializeField]
+    private AudioClip m_meteorImpactSFX = null;
+
+
+    [Header("Punch SFX")]
     [SerializeField]
     private AudioClip m_portalStartSFX = null;
 
@@ -113,11 +124,34 @@ public class BossBehaviour : MonoBehaviour
     private AudioClip m_portalPunchSFX = null;
 
     [SerializeField]
+    private AudioClip m_portalAmbientsSFX = null;
+
+    [Header("Beam SFX")]
+    [SerializeField]
+    private AudioClip m_beamChargeLoopingSFX = null;
+                                             
+    [SerializeField]                         
+    private AudioClip m_beamFireLoopingSFX = null;  
+                                             
+    [SerializeField]                         
+    private AudioClip m_beamImpactLoopingSFX = null;
+                                            
+    [SerializeField]                        
+    private AudioClip m_beamEndLoopingSFX = null;   
+
+    private AudioLoop m_beamChargeAudioLoop;
+
+    private AudioLoop m_beamFireAudioLoop;
+
+    private AudioLoop m_beamImpactAudioLoop;
+
+    [Header("SFX Source")]
+    [SerializeField]
     private AudioSource m_SFXSource = null;
 
     private AudioSource m_PortalSFXSource = null;
 
-    private AudioLoop m_bossBeamAudioLoop;
+    
 
     // -------------------------------------------------------------------------------------------------
     [Header("Misc")]
@@ -244,7 +278,7 @@ public class BossBehaviour : MonoBehaviour
 
         m_PortalSFXSource = m_portal.GetComponent<AudioSource>();
 
-        m_bossBeamAudioLoop = new AudioLoop(m_bossBeamLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
+        m_beamFireAudioLoop = new AudioLoop(m_beamFireLoopingSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
     }
 
     void Update()
@@ -640,8 +674,8 @@ public class BossBehaviour : MonoBehaviour
         // Rotate beam effects...
         m_beamOrigin.rotation = Quaternion.LookRotation(m_v3BeamDirection, Vector3.up);
 
-        if (!m_bossBeamAudioLoop.IsPlaying())
-            m_bossBeamAudioLoop.Play();
+        if (!m_beamFireAudioLoop.IsPlaying())
+            m_beamFireAudioLoop.Play();
 
         // Raycast to get hit information.
         if (Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
@@ -674,8 +708,8 @@ public class BossBehaviour : MonoBehaviour
         // Set end point to start.
         m_v3BeamEnd = m_beamOrigin.position;
 
-        if (m_bossBeamAudioLoop.IsPlaying())
-            m_bossBeamAudioLoop.Stop();
+        if (m_beamFireAudioLoop.IsPlaying())
+            m_beamFireAudioLoop.Stop();
 
         ResetAnimToIdle();
         m_bBeamActive = false;

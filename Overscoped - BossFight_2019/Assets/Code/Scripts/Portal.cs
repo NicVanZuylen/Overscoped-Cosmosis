@@ -125,6 +125,9 @@ public class Portal : MonoBehaviour
         m_bActive = true;
         m_fCurrentTime = 0.0f;
 
+        m_bossAnimator.SetBool("PortalPunchComplete", false);
+
+
         // Set arm rotation.
         m_arm.transform.rotation = Quaternion.LookRotation(m_v3PunchDirection, Vector3.up);
     }
@@ -176,8 +179,7 @@ public class Portal : MonoBehaviour
 
         m_portalMat.SetFloat("_Opacity", fOpenProgress);
 
-        m_bossAnimator.SetBool("PortalPunchComplete", false);
-
+        
         // Set arm material properties.
         m_armMaterials[0].SetVector("_PlaneOrigin", transform.position);
         m_armMaterials[1].SetVector("_PlaneOrigin", transform.position);

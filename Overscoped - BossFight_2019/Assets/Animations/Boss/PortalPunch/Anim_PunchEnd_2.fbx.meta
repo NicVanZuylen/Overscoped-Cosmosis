@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 014db4067aa233645a9fe2b8fce08b90
+guid: 38c38b98949b93b4486107848f0b082b
 ModelImporter:
   serializedVersion: 25
   internalIDToNameTable:
@@ -38,8 +38,8 @@ ModelImporter:
       name: Take 001
       takeName: Take 001
       internalID: 1827226128182048838
-      firstFrame: 1
-      lastFrame: 78
+      firstFrame: 26
+      lastFrame: 73
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -59,22 +59,29 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0
-        functionName: EvSummonPortal
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.41666666
+      - time: 0.13766603
         functionName: EvSetArmEnterStage
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.8324206
-        functionName: EvAdvancePunchAnim
+      - time: 0.5694497
+        functionName: EvSetArmExitStage
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.88017076
+        functionName: EvSetPortalCloseStage
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.13440856
+        functionName: EvAttackSFX
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

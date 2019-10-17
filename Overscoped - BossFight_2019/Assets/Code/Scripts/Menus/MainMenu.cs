@@ -12,10 +12,15 @@ using UnityEngine.UI;
 public class MainMenu : MonoBehaviour
 {
     private ScreenFade m_fadeScript;
+    private MusicManager m_musicManager;
 
     private void Awake()
     {
-        m_fadeScript = GetComponentInChildren<ScreenFade>();   
+        m_fadeScript = GetComponentInChildren<ScreenFade>();
+
+        m_musicManager = GetComponent<MusicManager>();
+
+        m_musicManager.PlayTrackIndex(0);
     }
 
     private void Update()

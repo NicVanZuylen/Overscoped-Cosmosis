@@ -79,6 +79,7 @@ public class PlayerBeam : MonoBehaviour
     private float m_fBeamCharge; // Actual current charge value.
     private float m_fCurrentMeterLevel; // Current charge as displayed on the HUD.
     private int m_nDissolveBracerIndex;
+    private const int m_nRayMask = ~(1 << 2); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple.
     private bool m_bCanCast;
     private bool m_bBeamUnlocked;
     private bool m_bBeamEnabled;
@@ -113,7 +114,7 @@ public class PlayerBeam : MonoBehaviour
 
         m_particles = new ParticleSystem.Particle[m_nBeamLength / 2];
 
-        m_fMeshLength = 2.0f;
+        m_fMeshLength = 10.0f;
 
         m_endObj = new GameObject("Player_Beam_End_Point");
 
@@ -155,13 +156,15 @@ public class PlayerBeam : MonoBehaviour
 
             // Set new offset.
             particles[i].position = new Vector3(0.0f, 0.0f, fOffset);
-            particles[i].startSize = 1.0f;
+            particles[i].startSize3D = Vector3.one;
             particles[i].startColor = Color.white;
             ++nParticleAmount;
 
             // Stop once length is exceeded.
-            if (bHit && fOffset + fSegmentLength >= fMaxLength)
+            if (fOffset + fSegmentLength >= fMaxLength)
             {
+                particles[i].startSize3D = new Vector3(1.0f, 1.0f, (fMaxLength - fOffset) / fSegmentLength);
+
                 break;
             }
         }
@@ -232,9 +235,8 @@ public class PlayerBeam : MonoBehaviour
                 if (!m_impactAudioLoop.IsPlaying())
                     m_impactAudioLoop.Play();
 
-                const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
                 Ray sphereRay = new Ray(m_beamOrigin.position, m_beamOrigin.forward);
-                bool bRayHit = Physics.Raycast(sphereRay, out m_sphereCastHit, (float)m_nBeamLength, nRaymask, QueryTriggerInteraction.Ignore);
+                bool bRayHit = Physics.Raycast(sphereRay, out m_sphereCastHit, (float)m_nBeamLength, m_nRayMask, QueryTriggerInteraction.Ignore);
 
                 // Find end point of the line.
                 if (bRayHit)

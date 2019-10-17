@@ -152,7 +152,7 @@ public class GrappleHook : MonoBehaviour
     private float m_fImpactShakeMult = 5.0f;
 
     [SerializeField]
-    private GameObject m_grappleHandEffect = null;
+    private ParticleSystem m_grappleHandEffect = null;
 
     [SerializeField]
     private GameObject m_impactEffect = null;
@@ -185,6 +185,7 @@ public class GrappleHook : MonoBehaviour
     private Animator m_animController;
     private CameraEffects m_cameraEffects;
     private Transform m_cameraTransform;
+    private const int m_nRayMask = ~(1 << 2 | 1 << 11); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple.
     private bool m_bPullHookActive;
 
     // Grapple function
@@ -291,12 +292,11 @@ public class GrappleHook : MonoBehaviour
         bool bPlayerHasEnoughMana = m_stats.EnoughMana();
 
         // Spherecast to find impact point.
-        const int nRaymask = ~(1 << 2); // Layer bitmask includes every layer but the ignore raycast layer.
-        m_bWithinRange = Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrappleRange, nRaymask, QueryTriggerInteraction.Ignore) 
+        m_bWithinRange = Physics.SphereCast(grapRay, m_fHookRadius, out m_fireHit, m_fGrappleRange, m_nRayMask, QueryTriggerInteraction.Ignore) 
             && !(m_controller.IsGrounded() && m_controller.GroundCollider() == m_fireHit.collider);
 
         // Grapple casting.
-        if (bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButton(0) && m_bWithinRange && m_fireHit.collider.tag != "NoGrapple")
+        if (bPlayerHasEnoughMana && !m_bGrappleHookActive && !m_beamScript.BeamEnabled() && Input.GetMouseButton(0) && m_bWithinRange)
         {
             // Play SFX
             if(m_grappleFireSFX)
@@ -304,6 +304,13 @@ public class GrappleHook : MonoBehaviour
 
             if(m_grappleExtendSFX)
                 m_sfxSource.PlayOneShot(m_grappleExtendSFX);
+
+            // Play particle effect.
+            if (m_grappleHandEffect != null)
+            {
+                m_grappleHandEffect.Stop();
+                m_grappleHandEffect.Play();
+            }
 
             m_grapplePoint.transform.position = m_fireHit.point;
             m_grapplePoint.transform.parent = m_fireHit.collider.transform;
@@ -319,7 +326,7 @@ public class GrappleHook : MonoBehaviour
         }
 
         // Pull casting.
-        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) && m_bWithinRange && m_fireHit.collider.tag == "PullObj")
+        if (bPlayerHasEnoughMana && !m_bPullHookActive && !m_beamScript.BeamUnlocked() && Input.GetMouseButton(1) && m_bWithinRange)
         {
             // Play SFX
             if (m_grappleFireSFX)
@@ -350,9 +357,6 @@ public class GrappleHook : MonoBehaviour
             m_impactEffect.transform.position = m_fireHit.point;
             m_impactEffect.transform.rotation = Quaternion.LookRotation(m_fireHit.normal, Vector3.up);
         }
-
-        // Line will disable when the pop effect finishes.
-        m_grappleHandEffect.SetActive(m_bGrappleHookActive);
 
         bool bImpacted = m_bGrappleLocked && m_bGrappleHookActive;
 

@@ -636,7 +636,7 @@ public class BossBehaviour : MonoBehaviour
         {
             Debug.DrawLine(m_beamOrigin.position, m_v3BeamEnd, Color.white);
 
-            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, beamHit.distance, 2.0f, true);
+            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, beamHit.distance, 10.0f, true);
 
             if (beamHit.collider.gameObject == m_player)
             {
@@ -645,7 +645,7 @@ public class BossBehaviour : MonoBehaviour
         }
         else
         {
-            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, m_nMaxBeamParticles, 2.0f, false);
+            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, m_nMaxBeamParticles, 10.0f, false);
         }
 
         return ENodeResult.NODE_SUCCESS;

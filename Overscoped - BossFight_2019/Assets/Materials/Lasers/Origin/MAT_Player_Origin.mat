@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MAT_Player_Origin
+  m_Shader: {fileID: 4800000, guid: 054efd4c990225e458f2345bf6b0a1cc, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3010
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _NoiseTexture:
+        m_Texture: {fileID: 2800000, guid: e28dc97a9541e3642a48c0e3886688c5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample0:
+        m_Texture: {fileID: 2800000, guid: e28dc97a9541e3642a48c0e3886688c5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample3:
+        m_Texture: {fileID: 2800000, guid: f2e0c334ffe42f740b78bcb2d549b12c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _FresnelPower: 0.3
+    - _FresnelScale: 0.3
+    - _NoiseStrength: 5
+    m_Colors:
+    - _Colour: {r: 110.13088, g: 3.4596088, b: 0, a: 0}
+    - _FresnelColour: {r: 2.7764707, g: 0, b: 2.9960785, a: 0}
+    - _NoiseOffset: {r: -0.2, g: 0.5, b: 0, a: 0}
+    - _NoiseTiling: {r: 10, g: 2, b: 0, a: 0}
+    - _Offset: {r: 0.2, g: 0.125, b: 0, a: 0}
+    - _Tiling: {r: 2, g: 1, b: 0, a: 0}

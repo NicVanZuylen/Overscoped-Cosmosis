@@ -67,7 +67,7 @@ public class ChestPlate : MonoBehaviour
     public void DealBeamDamage()
     {
         m_fHealth -= Time.deltaTime;
-        m_bossScript.TakeHit();
+        m_bossScript.TakeHit(); 
 
         float fHealthPercentage = 1.0f - (m_fHealth / m_fMaxHealth);
 

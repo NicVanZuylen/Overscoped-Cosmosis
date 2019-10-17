@@ -92,7 +92,32 @@ public class BossBehaviour : MonoBehaviour
     private ParticleSystem m_meteorSummonEffect = null;
 
     // -------------------------------------------------------------------------------------------------
-    [Header("Audio")]
+    [Header("Sound Effects")]
+
+    [SerializeField]
+    private AudioClip m_bossHitSFX = null;
+
+    [SerializeField]
+    private AudioClip[] m_bossAttackSFX = null;
+
+    [SerializeField]
+    private AudioClip m_bossBeamLoopSFX = null;
+
+    [SerializeField]
+    private AudioClip m_portalStartSFX = null;
+
+    [SerializeField]
+    private AudioClip m_portalEndSFX = null;
+
+    [SerializeField]
+    private AudioClip m_portalPunchSFX = null;
+
+    [SerializeField]
+    private AudioSource m_SFXSource = null;
+
+    private AudioSource m_PortalSFXSource = null;
+
+    private AudioLoop m_bossBeamAudioLoop;
 
     // -------------------------------------------------------------------------------------------------
     [Header("Misc")]
@@ -216,6 +241,10 @@ public class BossBehaviour : MonoBehaviour
 
         m_attackRatings = new AttackRating[3];
         m_nAttackIndex = 0;
+
+        m_PortalSFXSource = m_portal.GetComponent<AudioSource>();
+
+        m_bossBeamAudioLoop = new AudioLoop(m_bossBeamLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
     }
 
     void Update()
@@ -278,6 +307,9 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetInteger("AttackID", 0);
         m_animator.SetBool("UnderAttack", true);
         m_animator.SetBool("PortalPunchComplete", true);
+
+        if (m_bossHitSFX)
+            m_SFXSource.PlayOneShot(m_bossHitSFX);
 
         DeactivateBeam();
         m_portalScript.SetPortalCloseStage();
@@ -541,30 +573,7 @@ public class BossBehaviour : MonoBehaviour
     {
         Debug.Log("Meteor Attack!");
 
-        // Set cooldown timers
-        m_fMeteorCDTimer = m_fMeteorCD;
-        m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
-
-        // Sets the animator to the meteor animation
         m_animator.SetInteger("AttackID", 2);
-
-        // Play summon VFX
-        if(m_meteorSummonEffect)
-            m_meteorSummonEffect.Play();
-
-        // Gets a random amount of meteors to spawn
-        int nMeteorAmount = Random.Range(1, m_meteors.Length + 1);
-
-        // Summon meteors.
-        for(int i = 0; i < nMeteorAmount; ++i)
-        {
-            if (m_availableTargets.Count == 0)
-                break;
-
-            MeteorTarget newTarget = m_availableTargets.Dequeue();
-
-            newTarget.SummonMeteor(m_meteors[i], transform.position + new Vector3(0.0f, 100.0f, 0.0f));
-        }
         
         return ENodeResult.NODE_SUCCESS;
     }
@@ -631,12 +640,15 @@ public class BossBehaviour : MonoBehaviour
         // Rotate beam effects...
         m_beamOrigin.rotation = Quaternion.LookRotation(m_v3BeamDirection, Vector3.up);
 
+        if (!m_bossBeamAudioLoop.IsPlaying())
+            m_bossBeamAudioLoop.Play();
+
         // Raycast to get hit information.
         if (Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
         {
             Debug.DrawLine(m_beamOrigin.position, m_v3BeamEnd, Color.white);
 
-            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, beamHit.distance, 2.0f, true);
+            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, beamHit.distance, 10.0f, true);
 
             if (beamHit.collider.gameObject == m_player)
             {
@@ -645,7 +657,7 @@ public class BossBehaviour : MonoBehaviour
         }
         else
         {
-            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, m_nMaxBeamParticles, 2.0f, false);
+            PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, m_nMaxBeamParticles, 10.0f, false);
         }
 
         return ENodeResult.NODE_SUCCESS;
@@ -661,6 +673,9 @@ public class BossBehaviour : MonoBehaviour
 
         // Set end point to start.
         m_v3BeamEnd = m_beamOrigin.position;
+
+        if (m_bossBeamAudioLoop.IsPlaying())
+            m_bossBeamAudioLoop.Stop();
 
         ResetAnimToIdle();
         m_bBeamActive = false;
@@ -748,7 +763,12 @@ public class BossBehaviour : MonoBehaviour
         ResetAnimToIdle();
 
         if (m_portalScript.IsActive())
+        {
             m_portalScript.SetPortalCloseStage();
+
+            if (m_portalEndSFX)
+                m_PortalSFXSource.PlayOneShot(m_portalEndSFX); 
+        }
     }
 
     public void EvSummonPortal()
@@ -776,7 +796,46 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.SetPunchDirection(-v3PortalOffset);
         m_portalScript.Activate();
 
+        if (m_portalStartSFX)
+            m_PortalSFXSource.PlayOneShot(m_portalStartSFX);
+
         return;
+    }
+
+    public void EvSummonMeteors()
+    {
+        // Set cooldown timers
+        m_fMeteorCDTimer = m_fMeteorCD;
+        m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+
+        // Play summon VFX
+        if (m_meteorSummonEffect)
+            m_meteorSummonEffect.Play();
+
+        // Gets a random amount of meteors to spawn
+        int nMeteorAmount = Random.Range(1, m_meteors.Length + 1);
+
+        // Summon meteors.
+        for (int i = 0; i < nMeteorAmount; ++i)
+        {
+            if (m_availableTargets.Count == 0)
+                break;
+
+            MeteorTarget newTarget = m_availableTargets.Dequeue();
+
+            newTarget.SummonMeteor(m_meteors[i], transform.position + new Vector3(0.0f, 100.0f, 0.0f));
+        }
+    }
+
+    public void EvAttackSFX()
+    {
+        int nRandomAttackSFX = Random.Range(0, m_bossAttackSFX.Length);
+
+        if (m_bossAttackSFX[nRandomAttackSFX])
+        {
+            m_SFXSource.PlayOneShot(m_bossAttackSFX[nRandomAttackSFX]);
+            Debug.Log("boss atttack noise");
+        }
     }
 
     private void OnDrawGizmosSelected()

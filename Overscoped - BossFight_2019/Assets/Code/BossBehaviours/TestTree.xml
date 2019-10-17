@@ -1,0 +1,322 @@
+<?xml version="1.0"?>
+<NodeData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <m_eType>NODE_COMPOSITE_SEQUENCE</m_eType>
+  <m_name>Base</m_name>
+  <m_funcName>NO_FUNCTION</m_funcName>
+  <m_description />
+  <m_children>
+    <NodeData>
+      <m_eType>NODE_ACTION</m_eType>
+      <m_name>Track Beam</m_name>
+      <m_funcName>ActBeamTrack</m_funcName>
+      <m_description>Continue tracking of the beam attack at all times.</m_description>
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_ACTION</m_eType>
+      <m_name>Face Player</m_name>
+      <m_funcName>ActTrackPlayer</m_funcName>
+      <m_description />
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_CONDITION</m_eType>
+      <m_name>Is Idle</m_name>
+      <m_funcName>CondIsIdleAnimation</m_funcName>
+      <m_description>Don't continue until the boss is idle</m_description>
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_CONDITION</m_eType>
+      <m_name>Global Attack CD</m_name>
+      <m_funcName>CondGlobalAttackCD</m_funcName>
+      <m_description>Wait for global attack cooldown.</m_description>
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_CONDITION</m_eType>
+      <m_name>Portal Not Active</m_name>
+      <m_funcName>CondPortalNotActive</m_funcName>
+      <m_description>Make sure the portal is not still in use before using it again.</m_description>
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+      <m_name>Attack Analyzer</m_name>
+      <m_funcName>NO_FUNCTION</m_funcName>
+      <m_description>Adds available attacks to a list to be picked from and rates them based off of optional conditions.</m_description>
+      <m_children>
+        <NodeData>
+          <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+          <m_name>Meteor</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Meteor attack analysis</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>Cooldown</m_name>
+              <m_funcName>CondMeteorCD</m_funcName>
+              <m_description>Check cooldown.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Not Grounded</m_name>
+                  <m_funcName>CondPlayerNotGrounded</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Barrier Broken</m_name>
+                  <m_funcName>CondBarrierBroken</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>Add As Available</m_name>
+              <m_funcName>ActAddAvailable</m_funcName>
+              <m_description>Add this attack as available.</m_description>
+              <m_children />
+            </NodeData>
+          </m_children>
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Progress Attack Index</m_name>
+          <m_funcName>ActProgressAtckIndex</m_funcName>
+          <m_description>Increment the attack index for preference points.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+          <m_name>Portal Punch</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Portal Punch Analysis</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>Cooldown</m_name>
+              <m_funcName>CondSlamCD</m_funcName>
+              <m_description>Check cooldown.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>Portal Not Active</m_name>
+              <m_funcName>CondPortalNotActive</m_funcName>
+              <m_description>Make sure the portal is not still in use before using it again.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Near Crystal</m_name>
+                  <m_funcName>CondPlayerNearCrystal</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Grappling</m_name>
+                  <m_funcName>CondPlayerGrappling</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Sprinting</m_name>
+                  <m_funcName>CondPlayerSprinting</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Barrier Broken</m_name>
+                  <m_funcName>CondBarrierBroken</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>Add As Available</m_name>
+              <m_funcName>ActAddAvailable</m_funcName>
+              <m_description>Add this attack as available.</m_description>
+              <m_children />
+            </NodeData>
+          </m_children>
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_ACTION</m_eType>
+          <m_name>Progress Attack Index</m_name>
+          <m_funcName>ActProgressAtckIndex</m_funcName>
+          <m_description>Increment the attack index for preference points.</m_description>
+          <m_children />
+        </NodeData>
+        <NodeData>
+          <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+          <m_name>Beam</m_name>
+          <m_funcName>NO_FUNCTION</m_funcName>
+          <m_description>Beam Analysis</m_description>
+          <m_children>
+            <NodeData>
+              <m_eType>NODE_CONDITION</m_eType>
+              <m_name>Cooldown</m_name>
+              <m_funcName>CondBeamCD</m_funcName>
+              <m_description>Check cooldown.</m_description>
+              <m_children />
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Not Grounded</m_name>
+                  <m_funcName>CondPlayerNotGrounded</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_SEQUENCE_OFFSHOOT</m_eType>
+              <m_name>Pref Point</m_name>
+              <m_funcName>NO_FUNCTION</m_funcName>
+              <m_description>Add a preference point if the below condition/s are met.</m_description>
+              <m_children>
+                <NodeData>
+                  <m_eType>NODE_CONDITION</m_eType>
+                  <m_name>Player Grappling</m_name>
+                  <m_funcName>CondPlayerGrappling</m_funcName>
+                  <m_description />
+                  <m_children />
+                </NodeData>
+                <NodeData>
+                  <m_eType>NODE_ACTION</m_eType>
+                  <m_name>Add Pref Point</m_name>
+                  <m_funcName>ActAddPrefPoint</m_funcName>
+                  <m_description>Add a preference point for the attack associated with the current attack index.</m_description>
+                  <m_children />
+                </NodeData>
+              </m_children>
+            </NodeData>
+            <NodeData>
+              <m_eType>NODE_ACTION</m_eType>
+              <m_name>Add As Available</m_name>
+              <m_funcName>ActAddAvailable</m_funcName>
+              <m_description>Add this attack as available.</m_description>
+              <m_children />
+            </NodeData>
+          </m_children>
+        </NodeData>
+      </m_children>
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_ACTION</m_eType>
+      <m_name>ChooseAttack</m_name>
+      <m_funcName>ActChooseAttack</m_funcName>
+      <m_description>Choose the best attack to perform from a list of available attacks.</m_description>
+      <m_children />
+    </NodeData>
+  </m_children>
+</NodeData>

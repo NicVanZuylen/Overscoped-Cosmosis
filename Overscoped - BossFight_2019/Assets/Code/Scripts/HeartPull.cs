@@ -8,10 +8,6 @@ public class HeartPull : PullObject
     [SerializeField]
     private float m_fDissolveTime = 10.0f;
 
-    //[Tooltip("Rate in which the armor piece will dissolve.")]
-    //[SerializeField]
-    //private float m_fDissolveRate = 0.05f;
-
     private GameObject m_player;
     private PlayerBeam m_playerBeamScript;
     private BossBehaviour m_bossScript;

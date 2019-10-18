@@ -4,10 +4,10 @@ Shader "Cosmosis/Player/Player"
 {
     Properties
     {
-		_Albedo("Albedo", 2D) = "white" {}
-		[HDR]_EmissionColour("Emission Colour", Color) = (0,2.003402,3.523293,0)
-		_Mask("Mask", 2D) = "white" {}
-		_Mana("Mana", Range( 0 , 1)) = 0.5
+		_TextureSample0("Texture Sample 0", 2D) = "white" {}
+		_Metal("Metal", Float) = 0
+		_Smooth("Smooth", Float) = 0
+		_Emission("Emission", Range( 0 , 1)) = 0
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
     }
 
@@ -183,12 +183,11 @@ Shader "Cosmosis/Player/Player"
 					#endif
 				};
 
-				sampler2D _Albedo;
-				float4 _Albedo_ST;
-				sampler2D _Mask;
-				float4 _Mask_ST;
-				float4 _EmissionColour;
-				float _Mana;
+				sampler2D _TextureSample0;
+				float4 _TextureSample0_ST;
+				float _Metal;
+				float _Emission;
+				float _Smooth;
 
 				    
 				void BuildSurfaceData(FragInputs fragInputs, inout GlobalSurfaceDescription surfaceDescription, float3 V, out SurfaceData surfaceData, out float3 bentNormalWS)
@@ -408,29 +407,21 @@ Shader "Cosmosis/Player/Player"
 				BuiltinData builtinData;
 
 				GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
-				float2 uv_Albedo = packedInput.ase_texcoord5.xy * _Albedo_ST.xy + _Albedo_ST.zw;
-				float2 uv_Mask = packedInput.ase_texcoord5.xy * _Mask_ST.xy + _Mask_ST.zw;
-				float4 tex2DNode11 = tex2D( _Mask, uv_Mask );
-				float4 temp_cast_0 = (0.0).xxxx;
-				float4 temp_cast_1 = (1.0).xxxx;
-				float4 clampResult34 = clamp( ( 0.5 + ( 1.0 - tex2DNode11 ) ) , temp_cast_0 , temp_cast_1 );
+				float2 uv_TextureSample0 = packedInput.ase_texcoord5.xy * _TextureSample0_ST.xy + _TextureSample0_ST.zw;
+				float4 tex2DNode9 = tex2D( _TextureSample0, uv_TextureSample0 );
 				
-				float temp_output_39_0 = (-0.1 + (_Mana - 0.0) * (1.2 - -0.1) / (1.0 - 0.0));
-				float2 uv026 = packedInput.ase_texcoord5.xy * float2( 1,1 ) + float2( 0,0 );
-				float smoothstepResult18 = smoothstep( ( temp_output_39_0 - 0.05 ) , ( temp_output_39_0 + 0.05 ) , uv026.y);
-				
-                surfaceDescription.Albedo = ( tex2D( _Albedo, uv_Albedo ) * clampResult34 ).rgb;
+                surfaceDescription.Albedo = tex2DNode9.rgb;
                 surfaceDescription.Normal = float3( 0, 0, 1 );
                 surfaceDescription.BentNormal = float3( 0, 0, 1 );
                 surfaceDescription.CoatMask = 0;
-                surfaceDescription.Metallic = 0.0;
+                surfaceDescription.Metallic = _Metal;
 				
 				#ifdef _MATERIAL_FEATURE_SPECULAR_COLOR
 				surfaceDescription.Specular = 0;
 				#endif
                 
-				surfaceDescription.Emission = ( _EmissionColour * tex2DNode11 * smoothstepResult18 ).rgb;
-                surfaceDescription.Smoothness = 0.5;
+				surfaceDescription.Emission = ( tex2DNode9 * _Emission ).rgb;
+                surfaceDescription.Smoothness = _Smooth;
                 surfaceDescription.Occlusion = 1;
 				surfaceDescription.Alpha = 1;
 				
@@ -562,12 +553,11 @@ Shader "Cosmosis/Player/Player"
 					#endif
 				};
 
-				sampler2D _Albedo;
-				float4 _Albedo_ST;
-				sampler2D _Mask;
-				float4 _Mask_ST;
-				float4 _EmissionColour;
-				float _Mana;
+				sampler2D _TextureSample0;
+				float4 _TextureSample0_ST;
+				float _Metal;
+				float _Emission;
+				float _Smooth;
 				
 				                
 				void BuildSurfaceData(FragInputs fragInputs, inout GlobalSurfaceDescription surfaceDescription, float3 V, out SurfaceData surfaceData, out float3 bentNormalWS)
@@ -776,29 +766,21 @@ Shader "Cosmosis/Player/Player"
 					SurfaceData surfaceData;
 					BuiltinData builtinData;
 					GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
-					float2 uv_Albedo = packedInput.ase_texcoord.xy * _Albedo_ST.xy + _Albedo_ST.zw;
-					float2 uv_Mask = packedInput.ase_texcoord.xy * _Mask_ST.xy + _Mask_ST.zw;
-					float4 tex2DNode11 = tex2D( _Mask, uv_Mask );
-					float4 temp_cast_0 = (0.0).xxxx;
-					float4 temp_cast_1 = (1.0).xxxx;
-					float4 clampResult34 = clamp( ( 0.5 + ( 1.0 - tex2DNode11 ) ) , temp_cast_0 , temp_cast_1 );
+					float2 uv_TextureSample0 = packedInput.ase_texcoord.xy * _TextureSample0_ST.xy + _TextureSample0_ST.zw;
+					float4 tex2DNode9 = tex2D( _TextureSample0, uv_TextureSample0 );
 					
-					float temp_output_39_0 = (-0.1 + (_Mana - 0.0) * (1.2 - -0.1) / (1.0 - 0.0));
-					float2 uv026 = packedInput.ase_texcoord.xy * float2( 1,1 ) + float2( 0,0 );
-					float smoothstepResult18 = smoothstep( ( temp_output_39_0 - 0.05 ) , ( temp_output_39_0 + 0.05 ) , uv026.y);
-					
-					surfaceDescription.Albedo = ( tex2D( _Albedo, uv_Albedo ) * clampResult34 ).rgb;
+					surfaceDescription.Albedo = tex2DNode9.rgb;
 					surfaceDescription.Normal = float3( 0, 0, 1 );
 					surfaceDescription.BentNormal = float3( 0, 0, 1 );
 					surfaceDescription.CoatMask = 0;
-					surfaceDescription.Metallic = 0.0;
+					surfaceDescription.Metallic = _Metal;
 					
 					#ifdef _MATERIAL_FEATURE_SPECULAR_COLOR
 					surfaceDescription.Specular = 0;
 					#endif
 					
-					surfaceDescription.Emission = ( _EmissionColour * tex2DNode11 * smoothstepResult18 ).rgb;
-					surfaceDescription.Smoothness = 0.5;
+					surfaceDescription.Emission = ( tex2DNode9 * _Emission ).rgb;
+					surfaceDescription.Smoothness = _Smooth;
 					surfaceDescription.Occlusion = 1;
 					surfaceDescription.Alpha = 1;
 					
@@ -1458,7 +1440,8 @@ Shader "Cosmosis/Player/Player"
 					#endif
 				};
       
-				
+				float _Smooth;
+
 				                    
 				void BuildSurfaceData(FragInputs fragInputs, inout SmoothSurfaceDescription surfaceDescription, float3 V, out SurfaceData surfaceData, out float3 bentNormalWS)
 				{
@@ -1633,7 +1616,7 @@ Shader "Cosmosis/Player/Player"
 				BuiltinData builtinData;
 				SmoothSurfaceDescription surfaceDescription = (SmoothSurfaceDescription)0;
 				
-				surfaceDescription.Smoothness = 0.5;
+				surfaceDescription.Smoothness = _Smooth;
 				surfaceDescription.Alpha = 1;
 
 				#ifdef _ALPHATEST_ON
@@ -1763,7 +1746,8 @@ Shader "Cosmosis/Player/Player"
 					#endif 
 				};
 
-				
+				float _Smooth;
+
 				        
 				void BuildSurfaceData(FragInputs fragInputs, inout SmoothSurfaceDescription surfaceDescription, float3 V, out SurfaceData surfaceData, out float3 bentNormalWS)
 				{
@@ -1991,7 +1975,7 @@ Shader "Cosmosis/Player/Player"
 					
 					SmoothSurfaceDescription surfaceDescription = (SmoothSurfaceDescription)0;
                     
-					surfaceDescription.Smoothness = 0.5;
+					surfaceDescription.Smoothness = _Smooth;
 					surfaceDescription.Alpha = 1;
 					
 					#ifdef _ALPHATEST_ON
@@ -2152,12 +2136,11 @@ Shader "Cosmosis/Player/Player"
 					#endif 
 				};
 
-				sampler2D _Albedo;
-				float4 _Albedo_ST;
-				sampler2D _Mask;
-				float4 _Mask_ST;
-				float4 _EmissionColour;
-				float _Mana;
+				sampler2D _TextureSample0;
+				float4 _TextureSample0_ST;
+				float _Metal;
+				float _Emission;
+				float _Smooth;
 
 				                  
 				void BuildSurfaceData(FragInputs fragInputs, inout GlobalSurfaceDescription surfaceDescription, float3 V, out SurfaceData surfaceData, out float3 bentNormalWS)
@@ -2385,29 +2368,21 @@ Shader "Cosmosis/Player/Player"
 					SurfaceData surfaceData;
 					BuiltinData builtinData;
 					GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
-					float2 uv_Albedo = packedInput.ase_texcoord5.xy * _Albedo_ST.xy + _Albedo_ST.zw;
-					float2 uv_Mask = packedInput.ase_texcoord5.xy * _Mask_ST.xy + _Mask_ST.zw;
-					float4 tex2DNode11 = tex2D( _Mask, uv_Mask );
-					float4 temp_cast_0 = (0.0).xxxx;
-					float4 temp_cast_1 = (1.0).xxxx;
-					float4 clampResult34 = clamp( ( 0.5 + ( 1.0 - tex2DNode11 ) ) , temp_cast_0 , temp_cast_1 );
+					float2 uv_TextureSample0 = packedInput.ase_texcoord5.xy * _TextureSample0_ST.xy + _TextureSample0_ST.zw;
+					float4 tex2DNode9 = tex2D( _TextureSample0, uv_TextureSample0 );
 					
-					float temp_output_39_0 = (-0.1 + (_Mana - 0.0) * (1.2 - -0.1) / (1.0 - 0.0));
-					float2 uv026 = packedInput.ase_texcoord5.xy * float2( 1,1 ) + float2( 0,0 );
-					float smoothstepResult18 = smoothstep( ( temp_output_39_0 - 0.05 ) , ( temp_output_39_0 + 0.05 ) , uv026.y);
-					
-					surfaceDescription.Albedo = ( tex2D( _Albedo, uv_Albedo ) * clampResult34 ).rgb;
+					surfaceDescription.Albedo = tex2DNode9.rgb;
 					surfaceDescription.Normal = float3( 0, 0, 1 );
 					surfaceDescription.BentNormal = float3( 0, 0, 1 );
 					surfaceDescription.CoatMask = 0;
-					surfaceDescription.Metallic = 0.0;
+					surfaceDescription.Metallic = _Metal;
 					
 					#ifdef _MATERIAL_FEATURE_SPECULAR_COLOR
 					surfaceDescription.Specular = 0;
 					#endif
 					
-					surfaceDescription.Emission = ( _EmissionColour * tex2DNode11 * smoothstepResult18 ).rgb;
-					surfaceDescription.Smoothness = 0.5;
+					surfaceDescription.Emission = ( tex2DNode9 * _Emission ).rgb;
+					surfaceDescription.Smoothness = _Smooth;
 					surfaceDescription.Occlusion = 1;
 					surfaceDescription.Alpha = 1;
 					
@@ -2506,29 +2481,12 @@ Shader "Cosmosis/Player/Player"
 }
 /*ASEBEGIN
 Version=16900
-2263;103;1083;828;1388.099;227.8751;1;True;False
-Node;AmplifyShaderEditor.TexturePropertyNode;12;-1245.81,3.864811;Float;True;Property;_Mask;Mask;2;0;Create;True;0;0;False;0;15a5f9ac93ec54241a05f416e77e5870;4855cd84f5ba0c344b80c8009ce51491;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
-Node;AmplifyShaderEditor.RangedFloatNode;19;-1577.438,322.9559;Float;False;Property;_Mana;Mana;3;0;Create;True;0;0;False;0;0.5;1;0;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SamplerNode;11;-936.8106,81.86481;Float;True;Property;_TextureSample1;Texture Sample 1;0;0;Create;True;0;0;False;0;None;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.RangedFloatNode;29;-588.4216,-90.3549;Float;False;Constant;_Float0;Float 0;4;0;Create;True;0;0;False;0;0.5;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.OneMinusNode;32;-588.6632,-16.20129;Float;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.TFHCRemapNode;39;-1302.599,333.6249;Float;False;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;-0.1;False;4;FLOAT;1.2;False;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;20;-1285.438,494.9561;Float;False;Constant;_Float1;Float 1;3;0;Create;True;0;0;False;0;0.05;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.TexturePropertyNode;10;-547.2016,-281.9413;Float;True;Property;_Albedo;Albedo;0;0;Create;True;0;0;False;0;ca1a5e504324857499d1fdeb25489439;ca1a5e504324857499d1fdeb25489439;False;white;Auto;Texture2D;0;1;SAMPLER2D;0
-Node;AmplifyShaderEditor.TextureCoordinatesNode;26;-1179.914,206.838;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.SimpleAddOpNode;33;-427.6632,-86.20129;Float;False;2;2;0;FLOAT;0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.SimpleAddOpNode;21;-1070.438,425.9561;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;35;-398.6632,5.798706;Float;False;Constant;_Float2;Float 2;4;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleSubtractOpNode;22;-1090.438,333.9561;Float;False;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;36;-397.6632,77.79871;Float;False;Constant;_Float3;Float 3;4;0;Create;True;0;0;False;0;1;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SmoothstepOpNode;18;-932.7127,285.4034;Float;True;3;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;1;FLOAT;0
-Node;AmplifyShaderEditor.ClampOpNode;34;-233.6632,-31.20129;Float;False;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;COLOR;1,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.SamplerNode;9;-303.9075,-222.1849;Float;True;Property;_TextureSample0;Texture Sample 0;0;0;Create;True;0;0;False;0;None;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.ColorNode;16;-835.7208,-85.7733;Float;False;Property;_EmissionColour;Emission Colour;1;1;[HDR];Create;True;0;0;False;0;0,2.003402,3.523293,0;1,1,1,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.RangedFloatNode;14;-14.47089,173.3111;Float;False;Constant;_Smooth;Smooth;1;0;Create;True;0;0;False;0;0.5;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;13;-5.470901,77.93272;Float;False;Constant;_Metal;Metal;1;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;15;-567.9814,111.0083;Float;False;3;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT;0;False;1;COLOR;0
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;38;6.336792,-96.20129;Float;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+1920;1;1906;1011;897.3943;416.2937;1;True;False
+Node;AmplifyShaderEditor.RangedFloatNode;16;-329.3943,42.7063;Float;False;Property;_Emission;Emission;3;0;Create;True;0;0;False;0;0;0.25;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SamplerNode;9;-346.9075,-166.1849;Float;True;Property;_TextureSample0;Texture Sample 0;0;0;Create;True;0;0;False;0;None;fbb8634642cc9e74687a0fd224ad4d55;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;13;-55.4709,144.9327;Float;False;Property;_Metal;Metal;1;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;14;-49.47089,223.3111;Float;False;Property;_Smooth;Smooth;2;0;Create;True;0;0;False;0;0;0.35;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;15;-24.39429,5.706299;Float;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;1;COLOR;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;7;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;2;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;TransparentBackface;0;7;TransparentBackface;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;True;1;False;-1;False;False;False;False;False;True;1;LightMode=TransparentBackface;False;0;;0;0;Standard;0;13;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;4;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;2;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;DepthOnly;0;4;DepthOnly;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;False;False;False;False;True;1;LightMode=DepthOnly;False;0;;0;0;Standard;0;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;6;-2,142;Float;False;False;2;Float;ASEMaterialInspector;0;2;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;Distortion;0;6;Distortion;2;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;True;4;1;False;-1;1;False;-1;4;1;False;-1;1;False;-1;True;1;False;-1;5;False;-1;False;False;False;False;False;True;3;False;-1;False;True;1;LightMode=DistortionVectors;False;0;;0;0;Standard;0;6;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT2;0,0;False;3;FLOAT;0;False;4;FLOAT3;0,0,0;False;5;FLOAT3;0,0,0;False;0
@@ -2538,30 +2496,11 @@ Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;5;0,0;Float;False;False;2;F
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;2;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;META;0;1;META;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;True;2;False;-1;False;False;False;False;False;True;1;LightMode=Meta;False;0;;0;0;Standard;0;26;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT;0;False;14;FLOAT;0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;FLOAT;0;False;18;FLOAT3;0,0,0;False;19;FLOAT;0;False;20;FLOAT;0;False;21;FLOAT;0;False;22;FLOAT;0;False;23;FLOAT3;0,0,0;False;24;FLOAT;0;False;25;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;8;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;2;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;Forward;0;8;Forward;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;True;True;2;False;-1;255;False;-1;7;False;-1;7;False;-1;3;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;3;False;-1;False;True;1;LightMode=Forward;False;0;;0;0;Standard;0;26;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT;0;False;14;FLOAT;0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;FLOAT;0;False;18;FLOAT3;0,0,0;False;19;FLOAT;0;False;20;FLOAT;0;False;21;FLOAT;0;False;22;FLOAT;0;False;23;FLOAT3;0,0,0;False;24;FLOAT;0;False;25;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;182.1676,-7.26049;Float;False;True;2;Float;ASEMaterialInspector;0;2;Cosmosis/Player/Player;091c43ba8bd92c9459798d59b089ce4e;True;GBuffer;0;0;GBuffer;26;True;0;5;False;-1;10;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;True;True;2;False;-1;255;False;-1;7;False;-1;7;False;-1;3;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;3;False;-1;False;True;1;LightMode=GBuffer;False;0;;0;0;Standard;18;Material Type,InvertActionOnDeselection;0;Energy Conserving Specular,InvertActionOnDeselection;0;Transmission,InvertActionOnDeselection;0;Surface Type;0;Receive Decals;1;Alpha Cutoff;0;Receives SSR;1;Specular AA;0;Specular Occlusion Mode;0;Distortion;0;Distortion Mode;0;Distortion Depth Test;0;Back Then Front Rendering;0;Blend Preserves Specular;1;Fog;1;Draw Before Refraction;0;Refraction Model;0;Vertex Position,InvertActionOnDeselection;1;0;9;True;True;True;True;True;True;False;False;True;False;26;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT;0;False;14;FLOAT;0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;FLOAT;0;False;18;FLOAT3;0,0,0;False;19;FLOAT;0;False;20;FLOAT;0;False;21;FLOAT;0;False;22;FLOAT;0;False;23;FLOAT3;0,0,0;False;24;FLOAT;0;False;25;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
-WireConnection;11;0;12;0
-WireConnection;32;0;11;0
-WireConnection;39;0;19;0
-WireConnection;33;0;29;0
-WireConnection;33;1;32;0
-WireConnection;21;0;39;0
-WireConnection;21;1;20;0
-WireConnection;22;0;39;0
-WireConnection;22;1;20;0
-WireConnection;18;0;26;2
-WireConnection;18;1;22;0
-WireConnection;18;2;21;0
-WireConnection;34;0;33;0
-WireConnection;34;1;35;0
-WireConnection;34;2;36;0
-WireConnection;9;0;10;0
-WireConnection;15;0;16;0
-WireConnection;15;1;11;0
-WireConnection;15;2;18;0
-WireConnection;38;0;9;0
-WireConnection;38;1;34;0
-WireConnection;0;0;38;0
+WireConnection;15;0;9;0
+WireConnection;15;1;16;0
+WireConnection;0;0;9;0
 WireConnection;0;4;13;0
 WireConnection;0;6;15;0
 WireConnection;0;7;14;0
 ASEEND*/
-//CHKSM=93F1F2DF6762ACFE5A621CC7B737370EC4478E1A
+//CHKSM=167B6F28628FEBC18F85CFA77919AE480E49EF1B

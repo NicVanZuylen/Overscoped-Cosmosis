@@ -83,7 +83,6 @@
     <Compile Include="Assets\Code\EditorScripts\BTreeEditor.cs" />
     <Compile Include="Assets\Code\Scripts\ArmorPull.cs" />
     <Compile Include="Assets\Code\Scripts\BeamPickup.cs" />
-    <Compile Include="Assets\Code\Scripts\BobEventHandler.cs" />
     <Compile Include="Assets\Code\Scripts\BossBehaviour.cs" />
     <Compile Include="Assets\Code\Scripts\CameraEffects.cs" />
     <Compile Include="Assets\Code\Scripts\ChestPlate.cs" />
@@ -101,6 +100,7 @@
     <Compile Include="Assets\Code\Scripts\MusicManager.cs" />
     <Compile Include="Assets\Code\Scripts\ParticleStopper.cs" />
     <Compile Include="Assets\Code\Scripts\PickupRespawner.cs" />
+    <Compile Include="Assets\Code\Scripts\PlayerAnimEventHandler.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerBeam.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Code\Scripts\PlayerStats.cs" />
@@ -497,20 +497,8 @@
     <Reference Include="Unity.CollabProxy.Editor">
       <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
-      <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
-      <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.VisualEffectGraph.Editor">
       <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.VisualEffectGraph.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.ShaderGraph.Editor">
-      <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.HighDefinition.Editor">
-      <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
       <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
@@ -520,6 +508,18 @@
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
       <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
+      <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
+      <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ShaderGraph.Editor">
+      <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.ShaderGraph.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.HighDefinition.Editor">
+      <HintPath>C:/Users/s181206/Documents/Overscoped/Overscoped - BossFight_2019/Library/ScriptAssemblies/Unity.RenderPipelines.HighDefinition.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

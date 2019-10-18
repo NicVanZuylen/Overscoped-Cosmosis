@@ -283,7 +283,7 @@ public class PlayerStats : MonoBehaviour
         // Apply velocity-based FX.
         ApplyVelocityFX();
 
-        if (m_hookScript.IsActive())
+        if (m_hookScript.GrappleActive())
         {
             // Reset mana regen delay.
             m_fCurrentRegenDelay = m_fManaRegenDelay;

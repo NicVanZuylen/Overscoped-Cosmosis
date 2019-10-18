@@ -110,7 +110,7 @@ public class BossBehaviour : MonoBehaviour
     private AudioClip m_meteorIncomingSFX = null;
 
     [SerializeField]
-    private AudioClip m_meteorImpactSFX = null;
+    private AudioClip m_meteorImpactSFX = null;     //needs setting up
 
 
     [Header("Punch SFX")]
@@ -121,37 +121,35 @@ public class BossBehaviour : MonoBehaviour
     private AudioClip m_portalEndSFX = null;
 
     [SerializeField]
-    private AudioClip m_portalPunchSFX = null;
+    private AudioClip m_portalPunchSFX = null;      //needs setting up
 
     [SerializeField]
     private AudioClip m_portalAmbientsSFX = null;
 
+    private AudioLoop m_portalAmbientsAudioLoop;
+
     [Header("Beam SFX")]
     [SerializeField]
-    private AudioClip m_beamChargeLoopingSFX = null;
-                                             
+    private AudioClip m_beamChargeLoopingSFX = null;    //needs setting up
+
     [SerializeField]                         
     private AudioClip m_beamFireLoopingSFX = null;  
                                              
     [SerializeField]                         
-    private AudioClip m_beamImpactLoopingSFX = null;
-                                            
-    [SerializeField]                        
-    private AudioClip m_beamEndLoopingSFX = null;   
+    private AudioClip m_beamImpactLoopingSFX = null;    //needs setting up
 
-    private AudioLoop m_beamChargeAudioLoop;
+    [SerializeField]                        
+    private AudioClip m_beamEndLoopingSFX = null;       //needs setting up
+
+    private AudioLoop m_beamChargeAudioLoop;   
 
     private AudioLoop m_beamFireAudioLoop;
 
-    private AudioLoop m_beamImpactAudioLoop;
+    private AudioLoop m_beamImpactAudioLoop;   
 
     [Header("SFX Source")]
     [SerializeField]
-    private AudioSource m_SFXSource = null;
-
-    private AudioSource m_PortalSFXSource = null;
-
-    
+    private AudioSource m_SFXSource = null; 
 
     // -------------------------------------------------------------------------------------------------
     [Header("Misc")]
@@ -276,9 +274,12 @@ public class BossBehaviour : MonoBehaviour
         m_attackRatings = new AttackRating[3];
         m_nAttackIndex = 0;
 
-        m_PortalSFXSource = m_portal.GetComponent<AudioSource>();
-
         m_beamFireAudioLoop = new AudioLoop(m_beamFireLoopingSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
+
+        m_beamChargeAudioLoop = new AudioLoop(m_beamChargeLoopingSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
+
+        m_portalAmbientsAudioLoop = new AudioLoop(m_portalAmbientsSFX, m_portal, ESpacialMode.AUDIO_SPACE_NONE);
+
     }
 
     void Update()
@@ -801,7 +802,10 @@ public class BossBehaviour : MonoBehaviour
             m_portalScript.SetPortalCloseStage();
 
             if (m_portalEndSFX)
-                m_PortalSFXSource.PlayOneShot(m_portalEndSFX); 
+                AudioSource.PlayClipAtPoint(m_portalEndSFX, m_portal.transform.position);
+
+            if (m_portalAmbientsAudioLoop.IsPlaying())
+                m_portalAmbientsAudioLoop.Stop();
         }
     }
 
@@ -831,7 +835,15 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.Activate();
 
         if (m_portalStartSFX)
-            m_PortalSFXSource.PlayOneShot(m_portalStartSFX);
+            AudioSource.PlayClipAtPoint(m_portalStartSFX, m_portal.transform.position);
+
+
+        m_portalAmbientsAudioLoop.GetSource().spatialBlend = 1;
+        m_portalAmbientsAudioLoop.GetSource().minDistance = 10;
+
+        if (!m_portalAmbientsAudioLoop.IsPlaying())
+            m_portalAmbientsAudioLoop.Play();
+            
 
         return;
     }
@@ -857,7 +869,14 @@ public class BossBehaviour : MonoBehaviour
 
             MeteorTarget newTarget = m_availableTargets.Dequeue();
 
-            newTarget.SummonMeteor(m_meteors[i], transform.position + new Vector3(0.0f, 100.0f, 0.0f));
+            if(m_meteorSummonSFX)
+                AudioSource.PlayClipAtPoint(m_meteorSummonSFX, newTarget.transform.GetChild(0).position);
+
+            newTarget.SummonMeteor(m_meteors[i], newTarget.transform.GetChild(0).position);
+
+            AudioSource audioSource = m_meteors[i].GetComponent<AudioSource>();
+
+            audioSource.PlayOneShot(m_meteorIncomingSFX);
         }
     }
 

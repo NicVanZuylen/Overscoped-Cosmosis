@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.1458271, g: 0.04640487, b: 0.22022216, a: 1}
+  m_IndirectSpecularColor: {r: 0.061417833, g: 0.07427355, b: 0.11543029, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3613,16 +3613,6 @@ PrefabInstance:
       propertyPath: m_UseGravity
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2468785554186299697, guid: a7ad2c228eefcee48b0e44692d13a8b6,
-        type: 3}
-      propertyPath: m_IsKinematic
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2468785554186299697, guid: a7ad2c228eefcee48b0e44692d13a8b6,
-        type: 3}
-      propertyPath: m_UseGravity
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1204034148302797209, guid: a7ad2c228eefcee48b0e44692d13a8b6,
         type: 3}
       propertyPath: m_UseGravity
@@ -3632,6 +3622,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsKinematic
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2468785554186299697, guid: a7ad2c228eefcee48b0e44692d13a8b6,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2468785554186299697, guid: a7ad2c228eefcee48b0e44692d13a8b6,
+        type: 3}
+      propertyPath: m_UseGravity
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a7ad2c228eefcee48b0e44692d13a8b6, type: 3}
@@ -33433,6 +33433,11 @@ PrefabInstance:
       propertyPath: m_reticleOuterTransform
       value: 
       objectReference: {fileID: 180945713}
+    - target: {fileID: 6804065804147842942, guid: 08267407a60da1046ac8f6f1de23b161,
+        type: 3}
+      propertyPath: m_fTimeSlowDuration
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8876800597683058462, guid: 08267407a60da1046ac8f6f1de23b161,
         type: 3}
       propertyPath: m_postProcessing
@@ -96686,7 +96691,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1918641180}
   m_LocalRotation: {x: -0.7147564, y: -0, z: -0, w: 0.6993735}
-  m_LocalPosition: {x: -0.6, y: -17.9, z: 12.6}
+  m_LocalPosition: {x: -0.3, y: -17.9, z: 12.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

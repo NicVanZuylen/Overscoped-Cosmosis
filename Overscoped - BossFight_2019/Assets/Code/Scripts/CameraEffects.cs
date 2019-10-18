@@ -17,8 +17,9 @@ public struct CameraSplineState
 
 public class CameraEffects : MonoBehaviour
 {
+    [Tooltip("HDRP post processing volume.")]
     [SerializeField]
-    private Volume m_postProcessing;
+    private Volume m_postProcessing = null;
 
     [Tooltip("Lerp rate of FOV changes.")]
     [SerializeField]
@@ -93,7 +94,7 @@ public class CameraEffects : MonoBehaviour
     private CameraSplineState m_currentSplineState;
     private CameraSplineState m_nextSplineState;
     private const int m_nSplineSampleCount = 3;
-    private const int m_nMaxSplinePoints = 256;
+    private const int m_nMaxSplinePoints = 512;
     private int m_nSplineIndex;
 
     void Awake()
@@ -324,7 +325,7 @@ public class CameraEffects : MonoBehaviour
     {
         if(m_fChromAbbShakeDuration <= 0.0f)
         {
-            m_chromAbb.value = Mathf.MoveTowards(m_chromAbb.value, 0.0f, 5.0f * Time.deltaTime);
+            m_chromAbb.value = Mathf.MoveTowards(m_chromAbb.value, 0.0f, 5.0f * Time.unscaledDeltaTime);
             return;
         }
 
@@ -334,11 +335,11 @@ public class CameraEffects : MonoBehaviour
             m_fCurrentCAShakeDelay = m_fChromAbbShakeDelay;
         }
 
-        m_fCurrentCAShakeDelay -= Time.deltaTime;
-        m_fChromAbbShakeDuration -= Time.deltaTime;
+        m_fCurrentCAShakeDelay -= Time.unscaledDeltaTime;
+        m_fChromAbbShakeDuration -= Time.unscaledDeltaTime;
 
         // Move towards target value.
-        m_chromAbb.value = Mathf.MoveTowards(m_chromAbb.value, m_fChromAbbTarget, 10.0f * Time.deltaTime);
+        m_chromAbb.value = Mathf.MoveTowards(m_chromAbb.value, m_fChromAbbTarget, 10.0f * Time.unscaledDeltaTime);
     }
 
     /*

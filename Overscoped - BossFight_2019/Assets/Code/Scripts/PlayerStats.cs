@@ -57,7 +57,9 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fPortalPunchForce = 100.0f;
 
+    // -------------------------------------------------------------------------------------------------
     [Header("Death")]
+
     [Tooltip("Amount of time's worth of movement captured by the camera spline.")]
     [SerializeField]
     private float m_fDeathRecordTime = 20.0f;
@@ -73,6 +75,10 @@ public class PlayerStats : MonoBehaviour
     [Tooltip("Regen mode for mana regen.")]
     [SerializeField]
     private ERegenMode m_manaRegenMode = ERegenMode.REGEN_LINEAR;
+
+    [Tooltip("Amount if time time will take to halt before the death spline is ridden.")]
+    [SerializeField]
+    private float m_fTimeSlowDuration = 2.0f;
 
     // -------------------------------------------------------------------------------------------------
     [Space(10)]
@@ -361,14 +367,48 @@ public class PlayerStats : MonoBehaviour
 
     private void RestartScene()
     {
+        Time.timeScale = 1.0f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+
+
     private void DeathUpdate()
     {
+        m_camEffects.ApplyChromAbbShake(0.1f, m_fSplineProgress * 1.5f, m_fSplineProgress * 2.0f);
+
+        if (Time.timeScale > 0.0f && m_camPivot.parent != null)
+        {
+            m_fCurrentSplineTime -= Time.deltaTime;
+
+            if(m_fCurrentSplineTime <= 0.0f)
+            {
+                // Record current camera state.
+                m_camEffects.RecordCameraState();
+            }
+
+            Time.timeScale = Mathf.Max(Time.timeScale - ((1.0f / m_fTimeSlowDuration) * Time.unscaledDeltaTime), 0.0f);
+
+            if(Time.timeScale == 0.0f)
+            {
+                // Begin camera spline.
+                m_camEffects.StartCamSpline();
+
+                // Detach camera from player.
+                m_camPivot.parent = null;
+
+                // Disable control scripts.
+                m_controller.enabled = false;
+                m_hookScript.enabled = false;
+                m_beamScript.enabled = false;
+            }
+
+            return;
+        }
+
         CameraSplineState splineState = m_camEffects.EvaluateCamSpline(Mathf.Clamp(m_fSplineProgress, 0.0f, 1.0f));
 
-        m_fSplineProgress += m_rewindCurve.Evaluate(m_fSplineProgress) * Time.deltaTime;
+        m_fSplineProgress += m_rewindCurve.Evaluate(m_fSplineProgress) * Time.unscaledDeltaTime;
 
         m_fadeScript.SetFade(m_fSplineProgress);
 
@@ -481,21 +521,10 @@ public class PlayerStats : MonoBehaviour
         // Set health bar value to zero.
         m_armHealthMat.SetFloat("_Mana", 0.0f);
 
-        // Detach camera from player.
-        m_camPivot.parent = null;
-
-        // Begin spline.
-        m_camEffects.StartCamSpline();
-
         // Begin fade effect.
         m_fadeScript.SetFadeRate(0.0f);
         m_fadeScript.SetCallback(RestartScene);
         m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
-
-        // Disable control scripts.
-        m_controller.enabled = false;
-        m_hookScript.enabled = false;
-        m_beamScript.enabled = false;
 
         // Assume checkpoint is reached.
         m_bCheckpointReached = true;

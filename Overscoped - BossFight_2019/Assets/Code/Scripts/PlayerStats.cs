@@ -131,6 +131,9 @@ public class PlayerStats : MonoBehaviour
     private AudioClip[] m_jumpGruntSFX = null;
 
     [SerializeField]
+    private AudioClip[] m_landSFX = null;
+
+    [SerializeField]
     private AudioSource m_sfxSource;
 
     // -------------------------------------------------------------------------------------------------
@@ -144,6 +147,7 @@ public class PlayerStats : MonoBehaviour
     private Transform m_camPivot;
     private ScreenFade m_fadeScript;
     private AudioLoop m_windAudioLoop;
+    private static float m_fPlayerVolume = 1.0f;
     private static bool m_bCheckpointReached = false;
     private bool m_bNearPickup = false;
 
@@ -168,6 +172,7 @@ public class PlayerStats : MonoBehaviour
         m_fadeScript = FindObjectOfType<ScreenFade>();
 
         m_controller.AddJumpCallback(OnJump);
+        m_controller.AddLandCallback(OnLand);
 
         if (!m_sfxSource)
             m_sfxSource = GetComponent<AudioSource>();
@@ -240,7 +245,7 @@ public class PlayerStats : MonoBehaviour
             windSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed, 0.0f);
 
             if (!m_windAudioLoop.IsPlaying())
-                m_windAudioLoop.Play();
+                m_windAudioLoop.Play(m_fPlayerVolume);
         }
         else if(m_windAudioLoop.IsPlaying())
         {
@@ -265,7 +270,22 @@ public class PlayerStats : MonoBehaviour
 
         // Perform null check and play audio.
         if (m_jumpGruntSFX.Length > 0 && m_jumpGruntSFX[nRandomSFXIndex])
-            m_sfxSource.PlayOneShot(m_jumpGruntSFX[nRandomSFXIndex]);
+            m_sfxSource.PlayOneShot(m_jumpGruntSFX[nRandomSFXIndex], m_fPlayerVolume);
+    }
+
+    /*
+    Description: Run once when landing.
+    Param:
+        PlayerController controller: For callback compatibility.
+    */
+    void OnLand(PlayerController controller)
+    {
+        // Get random SFX index.
+        int nRandomSFXIndex = Random.Range(0, m_landSFX.Length);
+
+        // Perform null check and play audio.
+        if (m_landSFX.Length > 0 && m_landSFX[nRandomSFXIndex])
+            m_sfxSource.PlayOneShot(m_landSFX[nRandomSFXIndex], m_fPlayerVolume);
     }
 
     // Update is called once per frame
@@ -502,7 +522,7 @@ public class PlayerStats : MonoBehaviour
         int nRandomSFXIndex = Random.Range(0, m_hurtSFX.Length);
 
         if (m_hurtSFX.Length > 0 && m_hurtSFX[nRandomSFXIndex])
-            m_sfxSource.PlayOneShot(m_hurtSFX[nRandomSFXIndex]);
+            m_sfxSource.PlayOneShot(m_hurtSFX[nRandomSFXIndex], m_fPlayerVolume);
 
         if(m_fHealth <= 0.0f)
         {

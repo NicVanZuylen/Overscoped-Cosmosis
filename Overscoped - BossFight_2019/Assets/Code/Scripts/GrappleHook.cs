@@ -141,11 +141,17 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private float m_fImpactShakeMult = 5.0f;
 
+    [Tooltip("Particle VFX playing from the player's hands when the grapple is in use.")]
     [SerializeField]
-    private ParticleSystem m_grappleHandEffect = null;
+    private ParticleObject m_grappleHandVFX = new ParticleObject();
 
+    [Tooltip("VFX played at the point of impact of the grapple.")]
     [SerializeField]
-    private GameObject m_impactEffect = null;
+    private ParticleObject m_grappleImpactVFX = new ParticleObject();
+
+    [Tooltip("VFX played at the target point of the grapple when not in use.")]
+    [SerializeField]
+    private ParticleObject m_targetVFX = new ParticleObject();
 
     [SerializeField]
     private ComputeShader m_lineCompute = null;
@@ -187,6 +193,7 @@ public class GrappleHook : MonoBehaviour
     private float m_fGrapLineLength; // Distance from casting point to destination, (linear unlike the rope itself).
     private float m_fGrappleLineProgress; // Distance along the linear rope distance currently covered by the rope while casting.
     private float m_fGrappleTime; // Elapsed time from the point of grappling.
+    private static float m_fGrappleVolume = 1.0f;
     private bool m_bGrappleHookActive;
     private bool m_bArmExtending; // Whether or not the player's arm is extended. Must be false before the grapple is cast.
     private bool m_bPullMode; // True if the target is a pull object, the player will pull that object instead.
@@ -231,10 +238,14 @@ public class GrappleHook : MonoBehaviour
         m_stats = GetComponent<PlayerStats>();
         m_animController = GetComponentInChildren<Animator>();
 
+        // SFX
+
         if (!m_sfxSource)
             m_sfxSource = GetComponent<AudioSource>();
 
         m_grappleLoopAudio = new AudioLoop(m_grapplePullLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
+
+        // Camera
 
         Camera cam = GetComponentInChildren<Camera>();
 
@@ -285,6 +296,12 @@ public class GrappleHook : MonoBehaviour
 
             m_animController.SetBool("isCasting", true);
             m_bArmExtending = true;
+
+            if (m_grappleFireSFX)
+                m_sfxSource.PlayOneShot(m_grappleFireSFX, m_fGrappleVolume);
+
+            // Stop targeting VFX.
+            m_targetVFX.Stop();
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------
@@ -293,15 +310,15 @@ public class GrappleHook : MonoBehaviour
         // Show particle effect at the hit point while aiming.
         if (!m_bGrappleHookActive && m_bWithinRange)
         {
-            m_impactEffect.transform.position = m_fireHit.point;
-            m_impactEffect.transform.rotation = Quaternion.LookRotation(m_fireHit.normal, Vector3.up);
+            m_targetVFX.SetPosition(m_fireHit.point);
+
+            if (!m_targetVFX.IsPlaying())
+                m_targetVFX.Play();
         }
 
         bool bImpacted = m_bGrappleLocked && m_bGrappleHookActive;
 
         m_animController.SetBool("isGrounded", m_controller.IsGrounded());
-
-        m_impactEffect.SetActive(m_bWithinRange);
 
         // ------------------------------------------------------------------------------------------------------------------------------
         // Active behaviour
@@ -322,10 +339,13 @@ public class GrappleHook : MonoBehaviour
                 {
                     // Play impact SFX.
                     if (m_grappleImpactSFX)
-                        m_impactAudioSource.PlayOneShot(m_grappleImpactSFX);
+                        m_impactAudioSource.PlayOneShot(m_grappleImpactSFX, m_fGrappleVolume);
+
+                    // Play VFX.
+                    m_grappleImpactVFX.Play();
 
                     // Apply camera shake.
-                    m_cameraEffects.ApplyShake(0.05f, 1.0f, true);
+                    m_cameraEffects.ApplyShake(0.5f, 1.0f, true);
 
                     // Apply initial force if grounded.
                     if (m_controller.IsGrounded())
@@ -351,7 +371,7 @@ public class GrappleHook : MonoBehaviour
 
                 // Play loop SFX
                 if (!m_grappleLoopAudio.IsPlaying())
-                    m_grappleLoopAudio.Play();
+                    m_grappleLoopAudio.Play(m_fGrappleVolume);
 
                 // Increment grapple time.
                 m_fGrappleTime += Time.deltaTime;
@@ -572,18 +592,14 @@ public class GrappleHook : MonoBehaviour
     public void BeginGrapple()
     {
         // Play SFX
-        if (m_grappleFireSFX)
-            m_sfxSource.PlayOneShot(m_grappleFireSFX);
+        //if (m_grappleFireSFX)
+        //    m_sfxSource.PlayOneShot(m_grappleFireSFX, m_fGrappleVolume);
 
         if (m_grappleExtendSFX)
-            m_sfxSource.PlayOneShot(m_grappleExtendSFX);
+            m_sfxSource.PlayOneShot(m_grappleExtendSFX, m_fGrappleVolume);
 
         // Play particle effect.
-        if (m_grappleHandEffect != null)
-        {
-            m_grappleHandEffect.Stop();
-            m_grappleHandEffect.Play();
-        }
+        m_grappleHandVFX.Play();
 
         // Fly time.
         m_fGrappleTime = 0.0f;
@@ -616,6 +632,10 @@ public class GrappleHook : MonoBehaviour
 
         // Stop looping audio.
         m_grappleLoopAudio.Stop();
+
+        // Stop VFX.
+        m_grappleHandVFX.Stop();
+        m_grappleImpactVFX.Stop();
     }
 
     /*

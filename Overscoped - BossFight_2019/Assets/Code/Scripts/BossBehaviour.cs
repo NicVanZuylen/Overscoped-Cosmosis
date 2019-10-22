@@ -91,37 +91,26 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private ParticleSystem m_meteorSummonEffect = null;
 
+    [Tooltip("VFX object played at the beam origin point.")]
+    [SerializeField]
+    private ParticleObject m_beamOriginVFX = new ParticleObject();
+
+    [Tooltip("VFX object played at the beam origin point.")]
+    [SerializeField]
+    private ParticleObject m_beamDestinationVFX = new ParticleObject();
+
     // -------------------------------------------------------------------------------------------------
     [Header("Hit SFX")]
     [SerializeField]
     private AudioClip m_bossHitSFX = null;
 
-
     [Header("Attack Noises SFX")]
     [SerializeField]
     private AudioClip[] m_bossAttackSFX = null;
 
-
     [Header("Meteor SFX")]
     [SerializeField]
     private AudioClip m_meteorSummonSFX = null;
-
-    [SerializeField]
-    private AudioClip m_meteorIncomingSFX = null;
-
-    [SerializeField]
-    private AudioClip m_meteorImpactSFX = null;     //needs setting up
-
-
-    [Header("Punch SFX")]
-    [SerializeField]
-    private AudioClip m_portalStartSFX = null;
-
-    [SerializeField]
-    private AudioClip m_portalEndSFX = null;
-
-    [SerializeField]
-    private AudioClip m_portalPunchSFX = null;      //needs setting up
 
     [SerializeField]
     private AudioClip m_portalAmbientsSFX = null;
@@ -137,9 +126,6 @@ public class BossBehaviour : MonoBehaviour
                                              
     [SerializeField]                         
     private AudioClip m_beamImpactLoopingSFX = null;    //needs setting up
-
-    [SerializeField]                        
-    private AudioClip m_beamEndLoopingSFX = null;       //needs setting up
 
     private AudioLoop m_beamChargeAudioLoop;   
 
@@ -158,11 +144,12 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private float m_fTimeBetweenAttacks = 5.0f;
 
+    // Global
     private PlayerController m_playerController;
     private PlayerStats m_playerStats;
     private GrappleHook m_grappleScript;
     private Animator m_animator;
-    private GameObject end_Portal;
+    private GameObject m_endPortal;
     private float m_fTimeSinceGlobalAttack = 0.0f;
     private float m_fTimeSinceHit; // Time since the boss was hit by the beam.
     private bool m_bUnderAttack;
@@ -199,6 +186,9 @@ public class BossBehaviour : MonoBehaviour
 
     private AttackFunc[] m_attacks;
 
+    // Audio
+    private static float m_fBossVolume = 1.0f;
+
     void Awake()
     {
         m_playerController = m_player.GetComponent<PlayerController>();
@@ -207,8 +197,8 @@ public class BossBehaviour : MonoBehaviour
         m_animator = GetComponent<Animator>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
 
-        end_Portal = GameObject.FindGameObjectWithTag("EndPortal");
-        end_Portal.SetActive(false);
+        m_endPortal = GameObject.FindGameObjectWithTag("EndPortal");
+        m_endPortal.SetActive(false);
 
         // Initial attack cooldowns.
         m_fPortalPunchCDTimer = m_fPortalPunchCD;
@@ -218,6 +208,8 @@ public class BossBehaviour : MonoBehaviour
         // Beam
         m_fBeamTime = m_fBeamDuration;
         m_v3BeamEnd = m_player.transform.position;
+
+        // VFX
 
         // Initialize beam effect buffers.
         m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticles.Length];
@@ -280,6 +272,7 @@ public class BossBehaviour : MonoBehaviour
 
         m_portalAmbientsAudioLoop = new AudioLoop(m_portalAmbientsSFX, m_portal, ESpacialMode.AUDIO_SPACE_NONE);
 
+        m_beamImpactAudioLoop = new AudioLoop(m_beamImpactLoopingSFX, m_beamDestinationVFX.m_particleSystems[0].gameObject, ESpacialMode.AUDIO_SPACE_WORLD);
     }
 
     void Update()
@@ -344,7 +337,7 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetBool("PortalPunchComplete", true);
 
         if (m_bossHitSFX)
-            m_SFXSource.PlayOneShot(m_bossHitSFX);
+            m_SFXSource.PlayOneShot(m_bossHitSFX, m_fBossVolume);
 
         DeactivateBeam();
         m_portalScript.SetPortalCloseStage();
@@ -377,7 +370,11 @@ public class BossBehaviour : MonoBehaviour
         //enable end portal
         Debug.Log("Boss Dead");
         gameObject.SetActive(false);
-        end_Portal.SetActive(true);
+        m_endPortal.SetActive(true);
+
+        // Cancel attacks.
+        DeactivateBeam();
+        m_portalScript.SetPortalCloseStage();
     }
 
     // ----------------------------------------------------------------------------------------------
@@ -632,19 +629,22 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult ActInitializeBeam()
     {
+        Debug.Log("Beam!");
+
         // Enable beam renderers.
         if (!m_bBeamActive)
         {
             for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
                 m_beamParticleRenderers[i].enabled = true;
 
-            // Set initial end position.
-            //m_v3BeamEnd = PointOnSphere(m_player.transform.position + new Vector3(10, 0, 0), m_beamOrigin.position, (m_player.transform.position - m_beamOrigin.position).magnitude);
-
             // Set timers and flag the beam as active.
             m_fBeamAttackCDTimer = m_fBeamAttackCD;
             m_fBeamTime = m_fBeamDuration;
             m_bBeamActive = true;
+
+            // Play VFX...
+            m_beamOriginVFX.Play();
+            m_beamDestinationVFX.Play();
         }
 
         return ENodeResult.NODE_SUCCESS;
@@ -667,8 +667,6 @@ public class BossBehaviour : MonoBehaviour
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
         m_fBeamAttackCDTimer = m_fBeamAttackCD;
 
-        Debug.Log("Beam!");
-
         Ray beamRay = new Ray(m_beamOrigin.position, m_v3BeamDirection);
         RaycastHit beamHit;
 
@@ -676,13 +674,14 @@ public class BossBehaviour : MonoBehaviour
         m_beamOrigin.rotation = Quaternion.LookRotation(m_v3BeamDirection, Vector3.up);
 
         if (!m_beamFireAudioLoop.IsPlaying())
-            m_beamFireAudioLoop.Play();
+            m_beamFireAudioLoop.Play(m_fBossVolume);
+
+        if (!m_beamImpactAudioLoop.IsPlaying())
+            m_beamImpactAudioLoop.Play();
 
         // Raycast to get hit information.
         if (Physics.SphereCast(beamRay, 0.2f, out beamHit, m_fBeamMaxRange, int.MaxValue, QueryTriggerInteraction.Ignore))
         {
-            Debug.DrawLine(m_beamOrigin.position, m_v3BeamEnd, Color.white);
-
             PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, beamHit.distance, 10.0f, true);
 
             if (beamHit.collider.gameObject == m_player)
@@ -712,6 +711,13 @@ public class BossBehaviour : MonoBehaviour
         if (m_beamFireAudioLoop.IsPlaying())
             m_beamFireAudioLoop.Stop();
 
+        if (m_beamImpactAudioLoop.IsPlaying())
+            m_beamImpactAudioLoop.Stop();
+
+        // Stop VFX.
+        m_beamOriginVFX.Stop();
+        m_beamDestinationVFX.Stop();
+
         ResetAnimToIdle();
         m_bBeamActive = false;
     }
@@ -723,28 +729,24 @@ public class BossBehaviour : MonoBehaviour
 
         Vector3 v3EndOnRadius = PointOnSphere(m_v3BeamEnd, m_beamOrigin.position, fSphereMag);
 
-        if (true)
+        float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
+
+        float fTrackSpeed = m_fMinBeamTrackSpeed + (fBeamProgress * (m_fMaxBeamTrackSpeed - m_fMinBeamTrackSpeed));
+
+        Vector3 v3PlayerDir = (m_player.transform.position - m_beamOrigin.transform.position).normalized;
+        m_v3BeamDirection = (m_v3BeamEnd - m_beamOrigin.transform.position).normalized;
+
+        // Keep beam within a tight cone of the player's position.
+        if (Vector3.Dot(m_v3BeamDirection, v3PlayerDir) >= 0.95f)
         {
-            float fBeamProgress = 1.0f - (m_fBeamTime / m_fBeamDuration);
-
-            float fTrackSpeed = m_fMinBeamTrackSpeed + (fBeamProgress * (m_fMaxBeamTrackSpeed - m_fMinBeamTrackSpeed));
-
-            Vector3 v3PlayerDir = (m_player.transform.position - m_beamOrigin.transform.position).normalized;
-            m_v3BeamDirection = (m_v3BeamEnd - m_beamOrigin.transform.position).normalized;
-
-            // Keep beam within a tight cone of the player's position.
-            if (Vector3.Dot(m_v3BeamDirection, v3PlayerDir) >= 0.95f)
-            {
-                m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, fTrackSpeed * Time.deltaTime);
-            }
-            else
-            {
-                m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, 500.0f * Time.deltaTime);
-            }
-
+            m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, fTrackSpeed * Time.deltaTime);
         }
-        //else
-          //  m_v3BeamEnd = PointOnSphere(m_player.transform.position, m_beamOrigin.position, (m_player.transform.position - m_beamOrigin.position).magnitude);
+        else
+        {
+            m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, 500.0f * Time.deltaTime);
+        }
+
+        m_beamDestinationVFX.SetPosition(m_v3BeamEnd);
 
         // Run beam attack effects when beam is enabled.
         if (m_bBeamActive)
@@ -801,9 +803,6 @@ public class BossBehaviour : MonoBehaviour
         {
             m_portalScript.SetPortalCloseStage();
 
-            if (m_portalEndSFX)
-                AudioSource.PlayClipAtPoint(m_portalEndSFX, m_portal.transform.position);
-
             if (m_portalAmbientsAudioLoop.IsPlaying())
                 m_portalAmbientsAudioLoop.Stop();
         }
@@ -834,15 +833,11 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.SetPunchDirection(-v3PortalOffset);
         m_portalScript.Activate();
 
-        if (m_portalStartSFX)
-            AudioSource.PlayClipAtPoint(m_portalStartSFX, m_portal.transform.position);
-
-
         m_portalAmbientsAudioLoop.GetSource().spatialBlend = 1;
         m_portalAmbientsAudioLoop.GetSource().minDistance = 10;
 
         if (!m_portalAmbientsAudioLoop.IsPlaying())
-            m_portalAmbientsAudioLoop.Play();
+            m_portalAmbientsAudioLoop.Play(m_fBossVolume);
             
 
         return;
@@ -873,10 +868,6 @@ public class BossBehaviour : MonoBehaviour
                 AudioSource.PlayClipAtPoint(m_meteorSummonSFX, newTarget.transform.GetChild(0).position);
 
             newTarget.SummonMeteor(m_meteors[i], newTarget.transform.GetChild(0).position);
-
-            AudioSource audioSource = m_meteors[i].GetComponent<AudioSource>();
-
-            audioSource.PlayOneShot(m_meteorIncomingSFX);
         }
     }
 
@@ -886,7 +877,7 @@ public class BossBehaviour : MonoBehaviour
 
         if (m_bossAttackSFX[nRandomAttackSFX])
         {
-            m_SFXSource.PlayOneShot(m_bossAttackSFX[nRandomAttackSFX]);
+            m_SFXSource.PlayOneShot(m_bossAttackSFX[nRandomAttackSFX], m_fBossVolume);
             Debug.Log("boss atttack noise");
         }
     }

@@ -119,15 +119,13 @@ public class BossBehaviour : MonoBehaviour
 
     [Header("Beam SFX")]
     [SerializeField]
-    private AudioClip m_beamChargeLoopingSFX = null;    //needs setting up
+    private AudioClip m_beamChargeSFX = null;
 
     [SerializeField]                         
     private AudioClip m_beamFireLoopingSFX = null;  
                                              
     [SerializeField]                         
-    private AudioClip m_beamImpactLoopingSFX = null;    //needs setting up
-
-    private AudioLoop m_beamChargeAudioLoop;   
+    private AudioClip m_beamImpactLoopingSFX = null;
 
     private AudioLoop m_beamFireAudioLoop;
 
@@ -187,7 +185,7 @@ public class BossBehaviour : MonoBehaviour
     private AttackFunc[] m_attacks;
 
     // Audio
-    private static float m_fBossVolume = 1.0f;
+    private static float m_fBossVolume = 10.0f;
 
     void Awake()
     {
@@ -267,8 +265,6 @@ public class BossBehaviour : MonoBehaviour
         m_nAttackIndex = 0;
 
         m_beamFireAudioLoop = new AudioLoop(m_beamFireLoopingSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
-
-        m_beamChargeAudioLoop = new AudioLoop(m_beamChargeLoopingSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
 
         m_portalAmbientsAudioLoop = new AudioLoop(m_portalAmbientsSFX, m_portal, ESpacialMode.AUDIO_SPACE_NONE);
 
@@ -624,6 +620,9 @@ public class BossBehaviour : MonoBehaviour
     {
         m_animator.SetInteger("AttackID", 3);
 
+        if (m_beamChargeSFX)
+            m_SFXSource.PlayOneShot(m_beamChargeSFX, m_fBossVolume);
+
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -834,7 +833,7 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.Activate();
 
         m_portalAmbientsAudioLoop.GetSource().spatialBlend = 1;
-        m_portalAmbientsAudioLoop.GetSource().minDistance = 10;
+        m_portalAmbientsAudioLoop.GetSource().minDistance = 50;
 
         if (!m_portalAmbientsAudioLoop.IsPlaying())
             m_portalAmbientsAudioLoop.Play(m_fBossVolume);

@@ -84,6 +84,9 @@ public class Meteor : MonoBehaviour
         m_v3TravelDirection = (m_v3Target - transform.position).normalized;
     }
 
+
+
+
     void OnTriggerEnter(Collider collider)
     {
         if(collider.tag == "MeteorSpawn")
@@ -91,7 +94,7 @@ public class Meteor : MonoBehaviour
             gameObject.SetActive(false);
 
             // Play impact effect.
-            if(m_impactEffectParticles)
+            if (m_impactEffectParticles)
             {
                 m_impactEffect.transform.position = transform.position;
                 m_impactEffect.SetActive(true);

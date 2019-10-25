@@ -198,12 +198,16 @@ public class PlayerBeam : MonoBehaviour
         // Stop volumetric beam effect.
         for (int i = 0; i < m_beamParticles.Length; ++i)
         {
-            m_beamParticleRenderers[i].enabled = false;
+            if(m_beamParticleRenderers[i].enabled)
+                m_beamParticleRenderers[i].enabled = false;
         }
 
         // Stop audio and particle effects.
-        m_fireAudioLoop.Stop();
-        m_impactAudioLoop.Stop();
+        if(m_fireAudioLoop.IsPlaying())
+            m_fireAudioLoop.Stop();
+
+        if(m_impactAudioLoop.IsPlaying())
+            m_impactAudioLoop.Stop();
 
         // Stop animations.
         m_animator.SetBool("isBeamCasting", false);
@@ -308,7 +312,7 @@ public class PlayerBeam : MonoBehaviour
                 // Reduce beam charge.
                 m_fBeamCharge -= m_fChargeLossRate * Time.deltaTime;
             }
-            else if (m_fireAudioLoop.IsPlaying() || m_impactAudioLoop.IsPlaying() || (m_originParticles && m_originParticles.isPlaying))
+            else if(m_beamParticleRenderers[0].enabled)
             {
                 // Stop all particle and sound FX.
                 StopEffects();

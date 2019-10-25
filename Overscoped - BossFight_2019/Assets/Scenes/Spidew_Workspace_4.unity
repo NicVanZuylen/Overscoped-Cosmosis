@@ -122,12 +122,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1661966 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2725955821773418405, guid: ed16ca3417fe22f478cf87da9d692428,
-    type: 3}
-  m_PrefabInstance: {fileID: 1896455136}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &9022318 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4996631372940962070, guid: 2a422931cf7eb4344aa06a758107f71d,
@@ -11604,7 +11598,7 @@ PrefabInstance:
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
       propertyPath: m_RootOrder
-      value: 13
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
@@ -18186,12 +18180,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &247055413 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7597191833072728470, guid: 08267407a60da1046ac8f6f1de23b161,
-    type: 3}
-  m_PrefabInstance: {fileID: 629796985}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &249250996
 Mesh:
   m_ObjectHideFlags: 0
@@ -20856,9 +20844,7 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/Player/Player.prefab
   - _gameObject: {fileID: 990203801}
     _prefab: Assets/Meshes/Player/SK_Player.fbx
-  - _gameObject: {fileID: 1453764986}
-    _prefab: Assets/Prefabs/Player/Player.prefab
-  - _gameObject: {fileID: 469514461}
+  - _gameObject: {fileID: 1709630225}
     _prefab: Assets/Prefabs/VFX/PS_Player_Laser_Beam.prefab
   - _gameObject: {fileID: 1482151282}
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_and_Pull_Origin.prefab
@@ -20868,9 +20854,7 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/Player/Player.prefab
   - _gameObject: {fileID: 1045355395}
     _prefab: Assets/Meshes/Player/SK_Player.fbx
-  - _gameObject: {fileID: 1432772320}
-    _prefab: Assets/Prefabs/Player/Player.prefab
-  - _gameObject: {fileID: 984744958}
+  - _gameObject: {fileID: 491730252}
     _prefab: Assets/Prefabs/VFX/PS_Player_Laser_Beam.prefab
   - _gameObject: {fileID: 1803104016}
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_and_Pull_Origin.prefab
@@ -20888,9 +20872,7 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/Player/Player.prefab
   - _gameObject: {fileID: 847897477}
     _prefab: Assets/Meshes/Player/SK_Player.fbx
-  - _gameObject: {fileID: 385450628}
-    _prefab: Assets/Prefabs/Player/Player.prefab
-  - _gameObject: {fileID: 1661966}
+  - _gameObject: {fileID: 1695637866}
     _prefab: Assets/Prefabs/VFX/PS_Player_Laser_Beam.prefab
   - _gameObject: {fileID: 44991052}
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_and_Pull_Origin.prefab
@@ -21008,13 +20990,15 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/Boss/Portal.prefab
   - _gameObject: {fileID: 784252356}
     _prefab: Assets/Meshes/Boss/SM_Arm.fbx
+  - _gameObject: {fileID: 644164149}
+    _prefab: Assets/VFX/VFX Graphs/VFX_G_Boss_Spawn.prefab
+  - _gameObject: {fileID: 1987841943}
+    _prefab: Assets/Prefabs/GameManager.prefab
   - _gameObject: {fileID: 686038719}
     _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
   - _gameObject: {fileID: 1434641567}
     _prefab: Assets/Meshes/Player/SK_Player.fbx
-  - _gameObject: {fileID: 686038719}
-    _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
-  - _gameObject: {fileID: 247055413}
+  - _gameObject: {fileID: 1281093793}
     _prefab: Assets/Prefabs/VFX/PS_Player_Laser_Beam.prefab
   - _gameObject: {fileID: 186012771}
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_and_Pull_Origin.prefab
@@ -21024,10 +21008,14 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/GUI/GameMenuCanvas.prefab
   - _gameObject: {fileID: 1823388946}
     _prefab: Assets/Prefabs/GUI/HUDCanvas.prefab
-  - _gameObject: {fileID: 1987841943}
-    _prefab: Assets/Prefabs/GameManager.prefab
   - _gameObject: {fileID: 1751965203}
     _prefab: Assets/Prefabs/End Portal.prefab
+  - _gameObject: {fileID: 136037253}
+    _prefab: Assets/Prefabs/PS_Crystal.prefab
+  - _gameObject: {fileID: 136037254}
+    _prefab: Assets/Meshes/Crystal.fbx
+  - _gameObject: {fileID: 136037253}
+    _prefab: Assets/Prefabs/PS_Crystal.prefab
   - _gameObject: {fileID: 1939285247}
     _prefab: Assets/Prefabs/MeteorTargetVolume.prefab
   - _gameObject: {fileID: 791509674}
@@ -21060,12 +21048,6 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/MeteorTargetVolume.prefab
   - _gameObject: {fileID: 1349629591}
     _prefab: Assets/Prefabs/MeteorTargetVolume.prefab
-  - _gameObject: {fileID: 136037253}
-    _prefab: Assets/Prefabs/PS_Crystal.prefab
-  - _gameObject: {fileID: 136037254}
-    _prefab: Assets/Meshes/Crystal.fbx
-  - _gameObject: {fileID: 136037253}
-    _prefab: Assets/Prefabs/PS_Crystal.prefab
   - _gameObject: {fileID: 971783381}
     _prefab: Assets/Prefabs/PS_Crystal.prefab
   - _gameObject: {fileID: 971783382}
@@ -21774,7 +21756,7 @@ Transform:
   - {fileID: 686038720}
   - {fileID: 1603796747}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &343181899
 PrefabInstance:
@@ -26411,12 +26393,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &469514461 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2725955821773418405, guid: ed16ca3417fe22f478cf87da9d692428,
-    type: 3}
-  m_PrefabInstance: {fileID: 1714043715}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &472137368
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26652,6 +26628,12 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &491730252 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8150041405091459928, guid: ed16ca3417fe22f478cf87da9d692428,
+    type: 3}
+  m_PrefabInstance: {fileID: 1082369034}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &509062251
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33937,6 +33919,12 @@ Transform:
   m_Father: {fileID: 354920082}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &644164149 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3729592265509758174, guid: 15224bf2b194e9c47af1aa65c1964291,
+    type: 3}
+  m_PrefabInstance: {fileID: 1590795150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &645798108
 GameObject:
   m_ObjectHideFlags: 0
@@ -34738,7 +34726,7 @@ Transform:
   m_LocalScale: {x: 10.06538, y: 10.06538, z: 10.06538}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &705792494
 Mesh:
@@ -42853,7 +42841,7 @@ PrefabInstance:
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
       propertyPath: m_RootOrder
-      value: 15
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
@@ -43386,12 +43374,6 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 1805533336080166010, guid: 02ebce200fe8e3d4ba487fdf75f0ac42, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 02ebce200fe8e3d4ba487fdf75f0ac42, type: 3}
---- !u!1 &984744958 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2725955821773418405, guid: ed16ca3417fe22f478cf87da9d692428,
-    type: 3}
-  m_PrefabInstance: {fileID: 1082369034}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &987388887
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -59587,7 +59569,7 @@ Transform:
   - {fileID: 976276624}
   - {fileID: 688912380}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1254939441 stripped
 GameObject:
@@ -60469,6 +60451,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 9158341367325311, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
     type: 3}
   m_PrefabInstance: {fileID: 461555996}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1281093793 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4440809416837145963, guid: 08267407a60da1046ac8f6f1de23b161,
+    type: 3}
+  m_PrefabInstance: {fileID: 629796985}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1282802932
 PrefabInstance:
@@ -67463,7 +67451,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1413523232
 PrefabInstance:
@@ -79990,7 +79978,7 @@ PrefabInstance:
     - target: {fileID: 6784897559113473245, guid: abcedfbe29c62424bba0494e4f2c3b14,
         type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 6784897559113473245, guid: abcedfbe29c62424bba0494e4f2c3b14,
         type: 3}
@@ -81305,7 +81293,7 @@ PrefabInstance:
     - target: {fileID: 1052553494790951508, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1052553494790951508, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
@@ -81352,6 +81340,11 @@ PrefabInstance:
       propertyPath: m_healthBar
       value: 
       objectReference: {fileID: 1535014373}
+    - target: {fileID: 3729592265509758163, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15224bf2b194e9c47af1aa65c1964291, type: 3}
 --- !u!1 &1599085540
@@ -85941,6 +85934,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1164992406}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1695637866 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8150041405091459928, guid: ed16ca3417fe22f478cf87da9d692428,
+    type: 3}
+  m_PrefabInstance: {fileID: 1896455136}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1695741813 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4908880173491303050, guid: 82d932799874cc940881879ee30bf66f,
@@ -86118,6 +86117,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2271950620025345484, guid: a7ad2c228eefcee48b0e44692d13a8b6,
     type: 3}
   m_PrefabInstance: {fileID: 1160223537}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1709630225 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8150041405091459928, guid: ed16ca3417fe22f478cf87da9d692428,
+    type: 3}
+  m_PrefabInstance: {fileID: 1714043715}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1709932894
 GameObject:

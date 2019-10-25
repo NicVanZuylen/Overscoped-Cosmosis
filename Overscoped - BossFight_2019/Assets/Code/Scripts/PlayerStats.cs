@@ -125,13 +125,13 @@ public class PlayerStats : MonoBehaviour
     private AudioClip m_windLoopSFX = null;
 
     [SerializeField]
-    private AudioClip[] m_hurtSFX = null;
+    private AudioSelection m_hurtSFX = new AudioSelection();
 
     [SerializeField]
-    private AudioClip[] m_jumpGruntSFX = null;
+    private AudioSelection m_jumpGruntSFX = new AudioSelection();
 
     [SerializeField]
-    private AudioClip[] m_landSFX = null;
+    private AudioSelection m_landSFX = new AudioSelection();
 
     [SerializeField]
     private AudioSource m_sfxSource;
@@ -265,12 +265,8 @@ public class PlayerStats : MonoBehaviour
     */
     void OnJump(PlayerController controller)
     {
-        // Get random SFX index.
-        int nRandomSFXIndex = Random.Range(0, m_jumpGruntSFX.Length);
-
-        // Perform null check and play audio.
-        if (m_jumpGruntSFX.Length > 0 && m_jumpGruntSFX[nRandomSFXIndex])
-            m_sfxSource.PlayOneShot(m_jumpGruntSFX[nRandomSFXIndex], m_fPlayerVolume);
+        // Play SFX.
+        m_jumpGruntSFX.PlayRandom();
     }
 
     /*
@@ -280,12 +276,7 @@ public class PlayerStats : MonoBehaviour
     */
     void OnLand(PlayerController controller)
     {
-        // Get random SFX index.
-        int nRandomSFXIndex = Random.Range(0, m_landSFX.Length);
-
-        // Perform null check and play audio.
-        if (m_landSFX.Length > 0 && m_landSFX[nRandomSFXIndex])
-            m_sfxSource.PlayOneShot(m_landSFX[nRandomSFXIndex], m_fPlayerVolume);
+        m_landSFX.PlayRandom();
     }
 
     // Update is called once per frame
@@ -308,6 +299,9 @@ public class PlayerStats : MonoBehaviour
     {
         // Apply velocity-based FX.
         ApplyVelocityFX();
+
+        // Reduce hurt cooldown.
+        m_hurtSFX.CountCooldown();
 
         if (m_hookScript.GrappleActive())
         {
@@ -519,10 +513,7 @@ public class PlayerStats : MonoBehaviour
         m_fHealth -= fDamage;
 
         // Hurt SFX
-        int nRandomSFXIndex = Random.Range(0, m_hurtSFX.Length);
-
-        if (m_hurtSFX.Length > 0 && m_hurtSFX[nRandomSFXIndex])
-            m_sfxSource.PlayOneShot(m_hurtSFX[nRandomSFXIndex], m_fPlayerVolume);
+        m_hurtSFX.PlayRandom();
 
         if(m_fHealth <= 0.0f)
         {
@@ -560,7 +551,7 @@ public class PlayerStats : MonoBehaviour
             Debug.Log("Portal Punch Hit!");
 
             // Add force in the punch direction.
-            m_controller.AddImpulse(-other.transform.up * m_fPortalPunchForce);
+            m_controller.AddImpulse(other.transform.forward * m_fPortalPunchForce);
 
             // Shake camera.
             m_camEffects.ApplyShake(0.5f, 2.0f, true);

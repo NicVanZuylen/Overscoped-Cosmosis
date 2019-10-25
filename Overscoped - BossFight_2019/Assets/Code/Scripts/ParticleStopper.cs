@@ -6,6 +6,12 @@ using UnityEngine;
 
 public class ParticleStopper : MonoBehaviour
 {
+    [SerializeField]
+    private bool m_bDisableOnStop = true;
+
+    [SerializeField]
+    private ParticleSystemStopBehavior m_stopBehaviour = ParticleSystemStopBehavior.StopEmitting;
+
     private ParticleSystem m_system;
     private float m_fDuration;
     private float m_fTimer;
@@ -20,18 +26,21 @@ public class ParticleStopper : MonoBehaviour
 
     void Update()
     {
-        m_fTimer -= Time.deltaTime;
+        if(m_system.isPlaying)
+            m_fTimer -= Time.deltaTime;
 
         // Disable when timer runs out.
         if(m_fTimer <= 0.0f)
         {
             if(m_system.isPlaying)
-                m_system.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+                m_system.Stop(true, m_stopBehaviour);
 
             if (m_system.particleCount == 0)
             {
                 m_fTimer = m_fDuration;
-                gameObject.SetActive(false);
+
+                if(m_bDisableOnStop)
+                    gameObject.SetActive(false);
             }
         }
     }

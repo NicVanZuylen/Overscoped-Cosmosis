@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8005071254889865535}
   - component: {fileID: 8005071254889865528}
   - component: {fileID: 8005071254889865529}
-  m_Layer: 11
+  m_Layer: 1
   m_Name: Portal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 8005071254889865531}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.47421, y: 0.47421, z: 0.47421}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
   - {fileID: 986369622682317904}
   m_Father: {fileID: 0}
@@ -55,8 +55,8 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
+  m_RenderingLayerMask: 256
+  m_RendererPriority: 1
   m_Materials:
   - {fileID: 2100000, guid: df66cf309a5269b4aa7937533e83ec3f, type: 2}
   m_StaticBatchInfo:
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 986369622682317904}
   - component: {fileID: 7537687993622049023}
   - component: {fileID: 4062686834439534286}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: PS_Portal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -246,7 +246,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 2
+      scalar: 1
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -738,10 +738,10 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 30
+    angle: 75.11
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
-    radiusThickness: 1
+    radiusThickness: 0
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
@@ -824,7 +824,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 5.25
+      value: 6
       mode: 0
       spread: 0
       speed:
@@ -1068,8 +1068,8 @@ ParticleSystem:
           inWeight: 0.33333334
           outWeight: 0.33333334
         - serializedVersion: 3
-          time: 0.8118182
-          value: 0.23148547
+          time: 0.53239924
+          value: 0.20768176
           inSlope: -0.0011616217
           outSlope: -0.0011616217
           tangentMode: 0
@@ -1077,13 +1077,13 @@ ParticleSystem:
           inWeight: 1
           outWeight: 0.33333334
         - serializedVersion: 3
-          time: 0.92139304
-          value: 1
-          inSlope: 11.14761
-          outSlope: 11.14761
+          time: 1
+          value: 0.6130952
+          inSlope: 1.0303028
+          outSlope: 1.0303028
           tangentMode: 0
           weightedMode: 0
-          inWeight: 0.118002795
+          inWeight: 0.34594628
           outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -1448,7 +1448,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
   UVModule:
     serializedVersion: 2
-    enabled: 0
+    enabled: 1
     mode: 0
     timeMode: 0
     fps: 30
@@ -1464,20 +1464,20 @@ ParticleSystem:
           time: 0
           value: 0
           inSlope: 0
-          outSlope: 1
-          tangentMode: 0
+          outSlope: 0
+          tangentMode: 34
           weightedMode: 0
-          inWeight: 0.33333334
+          inWeight: 0
           outWeight: 0.33333334
         - serializedVersion: 3
           time: 1
-          value: 1
-          inSlope: 1
+          value: 0
+          inSlope: 0
           outSlope: 0
-          tangentMode: 0
+          tangentMode: 34
           weightedMode: 0
           inWeight: 0.33333334
-          outWeight: 0.33333334
+          outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -1507,8 +1507,8 @@ ParticleSystem:
         m_RotationOrder: 4
     startFrame:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0
+      minMaxState: 3
+      scalar: 0.8888889
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -1559,8 +1559,8 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     speedRange: {x: 0, y: 1}
-    tilesX: 1
-    tilesY: 1
+    tilesX: 3
+    tilesY: 3
     animationType: 0
     rowIndex: 0
     cycles: 1
@@ -4795,7 +4795,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c5ecc1745cf1468439d148f1f075cd4d, type: 2}
+  - {fileID: 2100000, guid: cb5ad91a98bad1f4c8f71a29e2084b2d, type: 2}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0

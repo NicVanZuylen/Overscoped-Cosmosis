@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _VertexTexture:
-        m_Texture: {fileID: 2800000, guid: f7389f5ab6a087a4ba093dd442286f11, type: 3}
+        m_Texture: {fileID: 2800000, guid: 8372be772f2b6da4596e8a7b8d2f5eec, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _texcoord:
@@ -48,7 +48,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BeamTaper: 35
+    - _BeamTaper: 1
+    - _BeamTaperBack: 20
+    - _BeamTaperFront: 2
     - _ColourVertexStrength: 1
     - _Float0: 3
     - _FreqMult: 1
@@ -67,7 +69,7 @@ Material:
     m_Colors:
     - _Color0: {r: 0, g: 0.003921569, b: 0.2, a: 0}
     - _Color1: {r: 0.27115044, g: 0, b: 1.4980392, a: 0}
-    - _ColourOffset: {r: -0.2, g: 1, b: 0, a: 0}
+    - _ColourOffset: {r: 0.1, g: 1, b: 0, a: 0}
     - _ColourTiling: {r: 1, g: 3, b: 0, a: 0}
     - _LineOrigin: {r: -165, g: -12, b: 14, a: 0}
     - _Offset: {r: 0.2, g: 0.5, b: 0, a: 0}

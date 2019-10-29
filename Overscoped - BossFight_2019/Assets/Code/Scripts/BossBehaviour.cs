@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.VFX;
 
 /*
  * Description: Contains AI behaviour for the boss.
@@ -99,15 +100,33 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private ParticleObject m_beamDestinationVFX = new ParticleObject();
 
+    [Tooltip("Spawn GPU particlesystem.")]
+    [SerializeField]
+    private VisualEffect m_spawnVFX = null;
+
+    [Tooltip("Spawn/Death dissolve material")]
+    [SerializeField]
+    private Material m_dissolveMat = null;
+
     // -------------------------------------------------------------------------------------------------
     [Header("Hit SFX")]
-    [SerializeField]
-    private AudioClip m_bossHitSFX = null;
 
+    [SerializeField]
+    private AudioSelection m_bossHitSFX = new AudioSelection();
+
+    // -------------------------------------------------------------------------------------------------
     [Header("Attack Noises SFX")]
-    [SerializeField]
-    private AudioClip[] m_bossAttackSFX = null;
 
+    [SerializeField]
+    private AudioSelection m_meteorVoiceSelection = new AudioSelection();
+
+    [SerializeField]
+    private AudioSelection m_beamVoiceSelection = new AudioSelection();
+
+    [SerializeField]
+    private AudioSelection m_punchVoiceSelection = new AudioSelection();
+
+    // -------------------------------------------------------------------------------------------------
     [Header("Meteor SFX")]
     [SerializeField]
     private AudioClip m_meteorSummonSFX = null;
@@ -129,11 +148,10 @@ public class BossBehaviour : MonoBehaviour
 
     private AudioLoop m_beamFireAudioLoop;
 
-    private AudioLoop m_beamImpactAudioLoop;   
+    private AudioLoop m_beamImpactAudioLoop;
 
-    [Header("SFX Source")]
-    [SerializeField]
-    private AudioSource m_SFXSource = null; 
+
+    private AudioSource m_SFXSource = null;
 
     // -------------------------------------------------------------------------------------------------
     [Header("Misc")]
@@ -145,11 +163,14 @@ public class BossBehaviour : MonoBehaviour
     // Global
     private PlayerController m_playerController;
     private PlayerStats m_playerStats;
+    private Transform m_cameraTransform;
     private GrappleHook m_grappleScript;
     private Animator m_animator;
     private GameObject m_endPortal;
     private float m_fTimeSinceGlobalAttack = 0.0f;
     private float m_fTimeSinceHit; // Time since the boss was hit by the beam.
+    private float m_fSpawnTime;
+    private float m_fCurrentSpawnTime;
     private bool m_bUnderAttack;
 
     // Stages
@@ -183,6 +204,10 @@ public class BossBehaviour : MonoBehaviour
     delegate ENodeResult AttackFunc();
 
     private AttackFunc[] m_attacks;
+    private AudioSelection[] m_attackVoices;
+    private float[] m_fAttackDelays;
+    private float m_fCurrentAttackDelay;
+    private bool m_bAttackPending;
 
     // Audio
     private static float m_fBossVolume = 10.0f;
@@ -191,6 +216,7 @@ public class BossBehaviour : MonoBehaviour
     {
         m_playerController = m_player.GetComponent<PlayerController>();
         m_playerStats = m_player.GetComponent<PlayerStats>();
+        m_cameraTransform = m_player.GetComponentInChildren<Camera>().transform;
         m_grappleScript = m_player.GetComponent<GrappleHook>();
         m_animator = GetComponent<Animator>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
@@ -208,6 +234,14 @@ public class BossBehaviour : MonoBehaviour
         m_v3BeamEnd = m_player.transform.position;
 
         // VFX
+
+        // Spawn
+        m_animator.enabled = false;
+
+        m_dissolveMat.SetFloat("_Dissolve", 0.0f);
+
+        m_fSpawnTime = m_spawnVFX.GetFloat("Lifetime Max");
+        m_fCurrentSpawnTime = m_fSpawnTime;
 
         // Initialize beam effect buffers.
         m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticles.Length];
@@ -246,6 +280,18 @@ public class BossBehaviour : MonoBehaviour
         m_attacks[0] = ActPlayMeteorAnim;
         m_attacks[1] = ActPlayPortalPunchAnim;
         m_attacks[2] = ActChargeBeam;
+
+        m_attackVoices = new AudioSelection[3];
+        m_attackVoices[0] = m_meteorVoiceSelection;
+        m_attackVoices[1] = m_punchVoiceSelection;
+        m_attackVoices[2] = m_beamVoiceSelection;
+
+        m_fAttackDelays = new float[3];
+        m_fAttackDelays[0] = 1.0f;
+        m_fAttackDelays[1] = 2.0f;
+        m_fAttackDelays[2] = 1.0f;
+        m_fCurrentAttackDelay = 0.0f;
+        m_bAttackPending = false;
 
 #if (UNITY_EDITOR)
         string treePath = Application.dataPath + "/Code/BossBehaviours/";
@@ -299,9 +345,30 @@ public class BossBehaviour : MonoBehaviour
                 RecoverFromHit();
         }
 
+        // Perform attack after delay.
+        if(m_bAttackPending && m_fCurrentAttackDelay <= 0.0f)
+        {
+            m_attacks[m_nChosenAttackIndex]();
+
+            m_bAttackPending = false;
+        }
+
         ActBeamTrack();
 
+        // Count down audio cooldowns.
+        m_bossHitSFX.CountCooldown();
+
+        // Count down attack cooldowns...
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
+        m_fCurrentAttackDelay -= Time.deltaTime;
+
+        if (m_fCurrentSpawnTime > 0.0f)
+        {
+            m_fCurrentSpawnTime = Mathf.Max(m_fCurrentSpawnTime - Time.deltaTime, 0.0f);
+            float fDissolveLevel = Mathf.Min((1.0f - (m_fCurrentSpawnTime / m_fSpawnTime) * 2.0f), 1.0f);
+
+            m_dissolveMat.SetFloat("_Dissolve", fDissolveLevel);
+        }
 
         m_fPortalPunchCDTimer -= Time.deltaTime;
         m_fMeteorCDTimer -= Time.deltaTime;
@@ -332,8 +399,7 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetBool("UnderAttack", true);
         m_animator.SetBool("PortalPunchComplete", true);
 
-        if (m_bossHitSFX)
-            m_SFXSource.PlayOneShot(m_bossHitSFX, m_fBossVolume);
+        m_bossHitSFX.PlayRandom();
 
         DeactivateBeam();
         m_portalScript.SetPortalCloseStage();
@@ -404,7 +470,7 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondNotGlobalAttackCD()
     {
-        if (m_fTimeSinceGlobalAttack > 0.0f)
+        if (m_fTimeSinceGlobalAttack > 0.0f && m_bAttackPending)
         {
             return ENodeResult.NODE_SUCCESS;
         }
@@ -514,6 +580,14 @@ public class BossBehaviour : MonoBehaviour
         return ENodeResult.NODE_FAILURE;
     }
 
+    public ENodeResult CondAttackNotPending()
+    {
+        if (!m_bAttackPending)
+            return ENodeResult.NODE_SUCCESS;
+
+        return ENodeResult.NODE_FAILURE;
+    }
+
     // ----------------------------------------------------------------------------------------------
     // Actions
 
@@ -542,7 +616,7 @@ public class BossBehaviour : MonoBehaviour
     {
         int nHighestScore = -1;
         int nAvailableCount = 0;
-        int m_nChosenAttackIndex = -1;
+        m_nChosenAttackIndex = -1;
 
         for(int i = 0; i < m_attackRatings.Length; ++i)
         {
@@ -575,8 +649,15 @@ public class BossBehaviour : MonoBehaviour
         {
             Debug.Log("Attack Index: " + m_nChosenAttackIndex + ", " + nAvailableCount + " Attacks available.");
 
-            // Perform attack.
-            m_attacks[m_nChosenAttackIndex]();
+            if(!m_bAttackPending)
+            {
+                // Set delay and flag as pending attack.
+                m_fCurrentAttackDelay = m_fAttackDelays[m_nChosenAttackIndex];
+                m_bAttackPending = true;
+
+                // Play voice line.
+                m_attackVoices[m_nChosenAttackIndex].PlayRandom();
+            }
         }
         else
             Debug.Log("No attacks available!");
@@ -602,7 +683,7 @@ public class BossBehaviour : MonoBehaviour
         Debug.Log("Meteor Attack!");
 
         m_animator.SetInteger("AttackID", 2);
-        
+
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -643,7 +724,6 @@ public class BossBehaviour : MonoBehaviour
 
             // Play VFX...
             m_beamOriginVFX.Play();
-            m_beamDestinationVFX.Play();
         }
 
         return ENodeResult.NODE_SUCCESS;
@@ -687,9 +767,19 @@ public class BossBehaviour : MonoBehaviour
             {
                 m_playerStats.DealDamage(m_fBeamDPS * Time.deltaTime);
             }
+
+            // Ensure impact VFX are playing and set position.
+            if (!m_beamDestinationVFX.IsPlaying())
+                m_beamDestinationVFX.Play();
+
+            m_beamDestinationVFX.SetPosition(beamHit.point);
         }
         else
         {
+            // Stop VFX if the beam no longer is impacting anything.
+            if (m_beamDestinationVFX.IsPlaying())
+                m_beamDestinationVFX.Stop();
+
             PlayerBeam.UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_beamSegmentParticles, m_beamOrigin.position, m_nMaxBeamParticles, 10.0f, false);
         }
 
@@ -715,13 +805,17 @@ public class BossBehaviour : MonoBehaviour
 
         // Stop VFX.
         m_beamOriginVFX.Stop();
-        m_beamDestinationVFX.Stop();
+
+        if(m_beamDestinationVFX.IsPlaying())
+            m_beamDestinationVFX.Stop();
 
         ResetAnimToIdle();
         m_bBeamActive = false;
     }
 
-    // Track the beam's aim. Even if the beam is not in use.
+    /*
+    Description: Track the beam's aim. Even if the beam is not in use.
+    */
     public ENodeResult ActBeamTrack()
     {
         float fSphereMag = (m_player.transform.position - m_beamOrigin.position).magnitude;
@@ -744,8 +838,6 @@ public class BossBehaviour : MonoBehaviour
         {
             m_v3BeamEnd = Vector3.MoveTowards(v3EndOnRadius, m_player.transform.position, 500.0f * Time.deltaTime);
         }
-
-        m_beamDestinationVFX.SetPosition(m_v3BeamEnd);
 
         // Run beam attack effects when beam is enabled.
         if (m_bBeamActive)
@@ -810,14 +902,13 @@ public class BossBehaviour : MonoBehaviour
     public void EvSummonPortal()
     {
         // Get the player's flat forward vector.
-        Vector3 v3PlayerForward = m_playerController.LookForward();
-        Vector3 v3PlayerRight = m_playerController.LookRight();
+        Vector3 v3PlayerForward = m_cameraTransform.forward;
+        Vector3 v3PlayerRight = m_cameraTransform.right;
             
         // Create random unit vector.
         Vector3 v3PortalOffset = v3PlayerForward;
     
-        v3PortalOffset += Vector3.up * Random.Range(0.3f, 0.5f);
-        v3PortalOffset += v3PlayerRight * Random.Range(-1.0f, 1.0f);
+        v3PortalOffset += v3PlayerRight * Random.Range(-0.2f, 0.2f);
 
         v3PortalOffset.Normalize();
 
@@ -838,7 +929,6 @@ public class BossBehaviour : MonoBehaviour
         if (!m_portalAmbientsAudioLoop.IsPlaying())
             m_portalAmbientsAudioLoop.Play(m_fBossVolume);
             
-
         return;
     }
 
@@ -870,15 +960,19 @@ public class BossBehaviour : MonoBehaviour
         }
     }
 
-    public void EvAttackSFX()
+    public void EvMeteorVoice()
     {
-        int nRandomAttackSFX = Random.Range(0, m_bossAttackSFX.Length);
+        //m_meteorVoiceSelection.PlayRandom();
+    }
 
-        if (m_bossAttackSFX[nRandomAttackSFX])
-        {
-            m_SFXSource.PlayOneShot(m_bossAttackSFX[nRandomAttackSFX], m_fBossVolume);
-            Debug.Log("boss atttack noise");
-        }
+    public void EvBeamVoice()
+    {
+        //m_beamVoiceSelection.PlayRandom();
+    }
+
+    public void EvPunchVoice()
+    {
+        //m_punchVoiceSelection.PlayRandom();
     }
 
     private void OnDrawGizmosSelected()

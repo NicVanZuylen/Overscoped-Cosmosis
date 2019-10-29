@@ -26,6 +26,10 @@ public class ChestPlate : MonoBehaviour
     [SerializeField]
     private Gradient m_healthGradient = null;
 
+    [Tooltip("Collider for the boss's heart.")]
+    [SerializeField]
+    private GameObject m_heart = null;
+
     private PlayerBeam m_playerBeamScript;
     private CameraEffects m_camEffects;
     private BossBehaviour m_bossScript;
@@ -37,13 +41,15 @@ public class ChestPlate : MonoBehaviour
         m_playerBeamScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBeam>();
         m_bossScript = GetComponentInParent<BossBehaviour>();
 
-        m_material = GetComponent<MeshRenderer>().material;
+        m_heart.layer = LayerMask.NameToLayer("NoGrapple");
+
+        m_material = GetComponent<MeshRenderer>().sharedMaterial;
 
         m_material.SetFloat("_Pop", 0.0f);
 
         m_fHealth = m_fMaxHealth;
 
-        m_material.SetFloat("_Lerp", 0.0f);
+        m_material.SetFloat("_IsHit", 0.0f);
 
         // Disable script to prevent premature popping.
         enabled = false;
@@ -61,6 +67,11 @@ public class ChestPlate : MonoBehaviour
             gameObject.SetActive(false);
     }
 
+    private void OnDestroy()
+    {
+        m_material.SetFloat("_IsHit", 0.0f);
+    }
+
     /*
     Description: Deal damage from the beam to the chestplate, and destroy it if the health reaches zero. 
     */
@@ -72,7 +83,7 @@ public class ChestPlate : MonoBehaviour
         float fHealthPercentage = 1.0f - (m_fHealth / m_fMaxHealth);
 
         // Set barrier colour lerp.
-        m_material.SetFloat("_Lerp", fHealthPercentage);
+        m_material.SetFloat("_IsHit", fHealthPercentage);
 
         // Set health bar fill & colour.
         m_healthBar.fillAmount = 1.0f - fHealthPercentage;
@@ -83,6 +94,9 @@ public class ChestPlate : MonoBehaviour
             // Remove chestplate & progress stage.
             m_bossScript.ProgressStage();
             enabled = true;
+
+            // Reset heart layer to default.
+            m_heart.layer = 0;
 
             // Disable player beam.
             m_playerBeamScript.UnlockBeam(false);

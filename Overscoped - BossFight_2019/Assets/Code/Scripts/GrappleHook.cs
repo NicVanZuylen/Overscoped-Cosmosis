@@ -181,7 +181,7 @@ public class GrappleHook : MonoBehaviour
     private Animator m_animController;
     private CameraEffects m_cameraEffects;
     private Transform m_cameraTransform;
-    private const int m_nRayMask = ~(1 << 2 | 1 << 11); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple.
+    private const int m_nRayMask = ~(1 << 2 | 1 << 9 | 1 << 11); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple and Player.
 
     // Grapple function
     private PlayerBeam m_beamScript;

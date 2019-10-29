@@ -20,10 +20,7 @@ public class PlayerAnimEventHandler : MonoBehaviour
     [Header("Footstep sound FX")]
 
     [SerializeField]
-    private AudioSource m_sfxSource = null;
-
-    [SerializeField]
-    private AudioClip[] m_footStepSFX = null;
+    private AudioSelection m_footStepSFX = new AudioSelection();
 
     private void Awake()
     {
@@ -40,11 +37,8 @@ public class PlayerAnimEventHandler : MonoBehaviour
         if (!m_controller.IsGrounded() || m_animator.GetAnimatorTransitionInfo(0).IsName("Run -> Idle"))
             return;
 
-        // Play random footstep sound effect.
-        int nRandSFXIndex = Random.Range(0, m_footStepSFX.Length);
-
-        if (m_footStepSFX.Length > 0 && m_footStepSFX[nRandSFXIndex])
-            m_sfxSource.PlayOneShot(m_footStepSFX[nRandSFXIndex]);
+        // Play random footstep noise.
+        m_footStepSFX.PlayRandom();
 
         m_camEffects.Step();
     }

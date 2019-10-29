@@ -14,10 +14,6 @@ public class BeamPickup : MonoBehaviour
 
     [Header("Effects")]
 
-    [Tooltip("Particle object to spawn upon pickup.")]
-    [SerializeField]
-    private ParticleSystem m_pickupEffect = null;
-
     [Tooltip("Audio source of pickup SFX.")]
     [SerializeField]
     private AudioSource m_pickupSFXSource = null;
@@ -25,6 +21,10 @@ public class BeamPickup : MonoBehaviour
     [Tooltip("Sound effect played upon pickup.")]
     [SerializeField]
     private AudioClip m_pickupSFX = null;
+
+    [Tooltip("VFX played on pickup.")]
+    [SerializeField]
+    private ParticleObject m_pickupVFX = new ParticleObject();
 
     private GameObject m_player;
     private PlayerBeam m_playerBeamScript;
@@ -43,14 +43,8 @@ public class BeamPickup : MonoBehaviour
         newObj.GetComponent<SphereCollider>().radius = 30.0f;
         newObj.GetComponent<SphereCollider>().isTrigger = true;
 
-        // Pickup particle effect
-        if(m_pickupEffect)
-        {
-            // Detach object.
-            m_pickupEffect.gameObject.transform.parent = null;
-
-            m_pickupEffect.gameObject.SetActive(false);
-        }
+        if (m_pickupVFX.m_particleSystems.Length > 0)
+            m_pickupVFX.m_particleSystems[0].transform.parent = null;
 
         if(m_pickupSFXSource)
         {
@@ -62,6 +56,12 @@ public class BeamPickup : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        // Stop VFX.
+        m_pickupVFX.Stop();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         // If the collider is from the player increment the beam charge and destroy.
@@ -71,11 +71,7 @@ public class BeamPickup : MonoBehaviour
             m_playerBeamScript.IncreaseCharge(m_fChargeAmount);
 
             // Play pickup particle effect.
-            if(m_pickupEffect)
-            {
-                m_pickupEffect.gameObject.SetActive(true);
-                m_pickupEffect.Play();
-            }
+            m_pickupVFX.Play();
 
             // Play pickup sound FX.
             if(m_pickupSFX && m_pickupSFXSource)

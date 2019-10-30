@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Experimental.Rendering.HDPipeline;
 
 /*
  * Description: Handles all camera related effects. Such as shake, head bobbing, FOV adjustments, rewind etc.
@@ -15,6 +17,10 @@ public struct CameraSplineState
 
 public class CameraEffects : MonoBehaviour
 {
+    [Tooltip("HDRP post processing volume.")]
+    [SerializeField]
+    private Volume m_postProcessing = null;
+
     [Tooltip("Lerp rate of FOV changes.")]
     [SerializeField]
     private float m_fFOVChangeRate = 0.1f;
@@ -22,6 +28,10 @@ public class CameraEffects : MonoBehaviour
     [Tooltip("Rate in which new shake offsets will be applied.")]
     [SerializeField]
     private float m_fShakeDelay = 0.03f;
+
+    [Tooltip("Rate in which new chromatic abberation shake values will be applied.")]
+    [SerializeField]
+    private float m_fChromAbbShakeDelay = 0.03f;
 
     [Tooltip("Amount of time for the shake offset to fade.")]
     [SerializeField]
@@ -45,12 +55,10 @@ public class CameraEffects : MonoBehaviour
 
     private Camera m_camera;
     private List<CameraSplineState> m_camSpline;
-    private CameraSplineState m_currentSplineState;
-    private CameraSplineState m_nextSplineState;
-    private Quaternion m_currentRotOffset;
     private Quaternion m_startCamRot;
-    private Quaternion m_shakeRot;
-    private Vector3 m_v3StartPosition;
+    private ClampedFloatParameter m_chromAbb;
+
+    // Head bobbing.
     private Vector3 m_v3BobbingEuler;
     private Vector3 m_v3BobbingOffset;
     private float m_fVertBobbingLevel; // Range between 0 and 1.
@@ -59,17 +67,35 @@ public class CameraEffects : MonoBehaviour
     private int m_nBobbingDirection; // 1 or -1.
     private int m_nBobbingSideDirection; // 1 or -1.
     private int m_nLandingBobDirection; // 1 or -1.
+    private bool m_bBobbing; // Whether or not to enable head bobbing from walking or running.
+
+    // Chromatic Abberation shake
+    private float m_fChromAbbShakeDuration;
+    private float m_fChromAbbMinMagnitude;
+    private float m_fChromAbbMaxMagnitude;
+    private float m_fCurrentCAShakeDelay;
+    private float m_fChromAbbTarget;
+
+    // Screen shake.
+    private Vector3 m_v3StartPosition;
+    private Quaternion m_currentRotOffset;
+    private Quaternion m_shakeRot;
     private float m_fShakeDuration;
     private float m_fShakeReturnTime;
     private float m_fCurrentShakeDelay;
     private float m_fShakeMagnitude;
+    private bool m_bFullMag; // Whether or not to use the full shake magnitude always when shaking.
+
+    // FOV
     private float m_fStartFOV;
     private float m_fFOVOffset;
+
+    // Rewind
+    private CameraSplineState m_currentSplineState;
+    private CameraSplineState m_nextSplineState;
     private const int m_nSplineSampleCount = 3;
-    private const int m_nMaxSplinePoints = 256;
+    private const int m_nMaxSplinePoints = 512;
     private int m_nSplineIndex;
-    private bool m_bFullMag; // Whether or not to use the full shake magnitude always when shaking.
-    private bool m_bBobbing; // Whether or not to enable head bobbing from walking or running.
 
     void Awake()
     {
@@ -86,6 +112,10 @@ public class CameraEffects : MonoBehaviour
         m_startCamRot = transform.localRotation;
         m_fStartFOV = m_camera.fieldOfView;
 
+        ChromaticAberration chromAbbValue = null;
+        m_postProcessing.profile.TryGet<ChromaticAberration>(out chromAbbValue);
+        m_chromAbb = chromAbbValue.intensity;
+
         m_fShakeDuration = 0.0f;
         m_fShakeMagnitude = 0.0f;
 
@@ -100,6 +130,7 @@ public class CameraEffects : MonoBehaviour
 
         // Apply shake.
         Shake(m_fShakeMagnitude, m_bFullMag);
+        ShakeChromAbb();
 
         // Apply FOV offset over time.
         m_camera.fieldOfView = Mathf.MoveTowards(m_camera.fieldOfView, m_fStartFOV + m_fFOVOffset, m_fFOVChangeRate * Time.deltaTime);
@@ -138,6 +169,7 @@ public class CameraEffects : MonoBehaviour
         // Change vertical bobbing direction if the downwards bob is complete.
         if (m_fVertBobbingLevel >= 1.0f)
         {
+            m_fVertBobbingLevel = 1.0f;
             m_nBobbingDirection = -1;
         }
 
@@ -145,7 +177,7 @@ public class CameraEffects : MonoBehaviour
             m_nLandingBobDirection = -1;
 
         // Vertical bobbing value used for position and angle offset.
-        float fVertBobbingValue = Mathf.Abs(Mathf.Sin(m_fVertBobbingLevel * Mathf.PI * 0.5f));
+        float fVertBobbingValue = Mathf.Abs(Mathf.Sin(m_fVertBobbingLevel * Mathf.PI * 0.5f) + 1.0f);
 
         m_v3BobbingEuler.x = fVertBobbingValue * m_fBobbingXAngleMagnitude; // X angle offset. (Vertical)
         m_v3BobbingEuler.y = Mathf.Sin(m_fSideBobbingLevel * Mathf.PI * 0.5f) * m_fBobbingYAngleMagnitude * m_nBobbingSideDirection; // Y angle offset. (Horizontal)
@@ -201,6 +233,23 @@ public class CameraEffects : MonoBehaviour
             m_fShakeMagnitude = fMagnitude;
             m_fShakeDuration = fTime;
             m_bFullMag = bFullMag;
+        }
+    }
+
+    /*
+    Description: Apply a chromatic abberation shake effect to the screen for a given amount of time.
+    Param:
+        float fTime: The amount of time to shake.
+        float fMinMag: The minimum magnitude of the shake.
+        float fMaxMag: The maximum magnitude of the shake.
+    */
+    public void ApplyChromAbbShake(float fTime, float fMinMag = 0.0f, float fMaxMag = 1.0f)
+    {
+        if (m_fChromAbbShakeDuration <= 0.0f || (m_fChromAbbMinMagnitude < fMinMag || m_fChromAbbMaxMagnitude < fMaxMag))
+        {
+            m_fChromAbbShakeDuration = fTime;
+            m_fChromAbbMinMagnitude = fMinMag;
+            m_fChromAbbMaxMagnitude = fMaxMag;
         }
     }
 
@@ -268,6 +317,30 @@ public class CameraEffects : MonoBehaviour
         m_fShakeReturnTime -= Time.deltaTime;
         m_fShakeDuration -= Time.deltaTime;
         m_fCurrentShakeDelay -= Time.deltaTime;
+    }
+
+    /*
+    Description: Apply a shake to the chromatic abberation post effect value.
+    */
+    public void ShakeChromAbb()
+    {
+        if(m_fChromAbbShakeDuration <= 0.0f)
+        {
+            m_chromAbb.value = Mathf.MoveTowards(m_chromAbb.value, 0.0f, 5.0f * Time.unscaledDeltaTime);
+            return;
+        }
+
+        if(m_fCurrentCAShakeDelay <= 0.0f)
+        {
+            m_fChromAbbTarget = Random.Range(m_fChromAbbMinMagnitude, m_fChromAbbMaxMagnitude);
+            m_fCurrentCAShakeDelay = m_fChromAbbShakeDelay;
+        }
+
+        m_fCurrentCAShakeDelay -= Time.unscaledDeltaTime;
+        m_fChromAbbShakeDuration -= Time.unscaledDeltaTime;
+
+        // Move towards target value.
+        m_chromAbb.value = Mathf.MoveTowards(m_chromAbb.value, m_fChromAbbTarget, 10.0f * Time.unscaledDeltaTime);
     }
 
     /*

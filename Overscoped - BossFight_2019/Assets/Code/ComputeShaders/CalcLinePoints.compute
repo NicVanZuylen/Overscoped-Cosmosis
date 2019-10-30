@@ -73,7 +73,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	// Rope wave
 	float fWaveInput = pow((1.0f - fProgress), 2) * WAVE_COUNT * PI;
-	float fCurveMag = sin(fWaveInput);
+	float fCurveMag = -sin(fWaveInput);
 	float fCurveMagY = -cos(fWaveInput);
 
 	// Directions

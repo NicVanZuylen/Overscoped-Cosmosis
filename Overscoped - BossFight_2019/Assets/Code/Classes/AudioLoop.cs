@@ -65,11 +65,16 @@ public class AudioLoop
 
     /*
     Description: Play the audio loop.
+    Param:
+        float fVolume: The volume to play the audio at.
     */
-    public void Play()
+    public void Play(float fVolume = 1.0f)
     {
         if(!m_bClipIsNull)
+        {
+            m_source.volume = fVolume;
             m_source.Play();
+        }
     }
 
     /*

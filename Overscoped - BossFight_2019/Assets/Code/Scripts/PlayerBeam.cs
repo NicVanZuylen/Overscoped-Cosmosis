@@ -72,7 +72,9 @@ public class PlayerBeam : MonoBehaviour
     // -------------------------------------------------------------------------------------------------
 
     private PlayerController m_controller;
+    private GrappleHook m_grappleScript;
     private CameraEffects m_camEffects;
+    private Animator m_animator;
     private RaycastHit m_sphereCastHit;
     private GameObject m_endObj;
     private ChestPlate m_bossChestScript;
@@ -80,8 +82,9 @@ public class PlayerBeam : MonoBehaviour
     private float m_fCurrentMeterLevel; // Current charge as displayed on the HUD.
     private int m_nDissolveBracerIndex;
     private const int m_nRayMask = ~(1 << 2); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple.
-    private bool m_bCanCast;
     private bool m_bBeamUnlocked;
+    private bool m_bCanCast;
+    private bool m_bCasting;
     private bool m_bBeamEnabled;
 
     // Volumetric beam effect.
@@ -97,11 +100,17 @@ public class PlayerBeam : MonoBehaviour
     {
         // Component retreival.
         m_controller = GetComponent<PlayerController>();
+        m_grappleScript = GetComponent<GrappleHook>();
         m_camEffects = GetComponentInChildren<CameraEffects>();
+        m_animator = GetComponentInChildren<Animator>();
 
         m_bBeamUnlocked = true;
 
+#if UNITY_EDITOR
         m_fBeamCharge = 100000.0f;
+#else
+        m_fBeamCharge = 0.0f;
+#endif
 
         m_beamParticles = new ParticleSystem[m_beamParticleObjects.Length];
         m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticleObjects.Length];
@@ -110,6 +119,10 @@ public class PlayerBeam : MonoBehaviour
         {
             m_beamParticles[i] = m_beamParticleObjects[i].GetComponent<ParticleSystem>();
             m_beamParticleRenderers[i] = m_beamParticleObjects[i].GetComponent<ParticleSystemRenderer>();
+
+            // Set origin and length in shader.
+            m_beamParticleRenderers[i].material.SetVector("_LineOrigin", m_beamOrigin.position);
+            m_beamParticleRenderers[i].material.SetFloat("_LineLength", 0.0f);
         }
 
         m_particles = new ParticleSystem.Particle[m_nBeamLength / 2];
@@ -156,14 +169,14 @@ public class PlayerBeam : MonoBehaviour
 
             // Set new offset.
             particles[i].position = new Vector3(0.0f, 0.0f, fOffset);
-            particles[i].startSize3D = Vector3.one;
+            particles[i].startSize3D = new Vector3(0.1f, 0.1f, 1.0f);
             particles[i].startColor = Color.white;
             ++nParticleAmount;
 
             // Stop once length is exceeded.
             if (fOffset + fSegmentLength >= fMaxLength)
             {
-                particles[i].startSize3D = new Vector3(1.0f, 1.0f, (fMaxLength - fOffset) / fSegmentLength);
+                particles[i].startSize3D = new Vector3(0.1f, 0.1f, (fMaxLength - fOffset) / fSegmentLength);
 
                 break;
             }
@@ -176,7 +189,7 @@ public class PlayerBeam : MonoBehaviour
 
             // Set origin and length in shader.
             renderers[i].material.SetVector("_LineOrigin", v3Origin);
-            renderers[i].material.SetFloat("_LineLength", fMaxLength);
+            renderers[i].material.SetFloat("_LineLength", fMaxLength + 1.0f);
         }
     }
 
@@ -185,12 +198,20 @@ public class PlayerBeam : MonoBehaviour
         // Stop volumetric beam effect.
         for (int i = 0; i < m_beamParticles.Length; ++i)
         {
-            m_beamParticleRenderers[i].enabled = false;
+            if(m_beamParticleRenderers[i].enabled)
+                m_beamParticleRenderers[i].enabled = false;
         }
 
         // Stop audio and particle effects.
-        m_fireAudioLoop.Stop();
-        m_impactAudioLoop.Stop();
+        if(m_fireAudioLoop.IsPlaying())
+            m_fireAudioLoop.Stop();
+
+        if(m_impactAudioLoop.IsPlaying())
+            m_impactAudioLoop.Stop();
+
+        // Stop animations.
+        m_animator.SetBool("isBeamCasting", false);
+        m_animator.SetBool("beamActive", false);
 
         if (m_originParticles)
             m_originParticles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
@@ -203,9 +224,23 @@ public class PlayerBeam : MonoBehaviour
 
         if (m_bBeamUnlocked)
         {
-            m_bCanCast = m_bBeamEnabled || (Input.GetMouseButtonDown(1) && m_fBeamCharge >= m_fMinBeamCharge);
+            m_bCanCast = m_fBeamCharge >= m_fMinBeamCharge && !m_grappleScript.GrappleActive();
+            m_bCasting = m_bCanCast && !m_bBeamEnabled && Input.GetMouseButton(1);
 
-            m_bBeamEnabled = Input.GetMouseButton(1) && m_bCanCast && m_fBeamCharge >= 0.0f;
+            // Tell the animator whether or not to play to beam casting animation.
+            m_animator.SetBool("isBeamCasting", m_bCasting);
+
+            // Release condition.
+            if (m_bBeamEnabled && (Input.GetMouseButtonUp(1) || m_fBeamCharge <= 0.0f))
+            {
+                // Stop beam and ensure beam charge does not fall below zero.
+
+                if (m_fBeamCharge < 0.0f)
+                    m_fBeamCharge = 0.0f;
+
+                m_bBeamEnabled = false;
+                m_animator.SetBool("beamActive", false);
+            }
 
             if (m_bBeamEnabled)
             {
@@ -223,6 +258,7 @@ public class PlayerBeam : MonoBehaviour
 
                 // Apply camera shake.
                 m_camEffects.ApplyShake(0.1f, 0.3f);
+                m_camEffects.ApplyChromAbbShake(0.1f, 0.1f, 0.5f);
 
                 // Play origin effect.
                 if (m_originParticles && !m_originParticles.isPlaying)
@@ -276,7 +312,7 @@ public class PlayerBeam : MonoBehaviour
                 // Reduce beam charge.
                 m_fBeamCharge -= m_fChargeLossRate * Time.deltaTime;
             }
-            else if (m_fireAudioLoop.IsPlaying() || m_impactAudioLoop.IsPlaying() || (m_originParticles && m_originParticles.isPlaying))
+            else if(m_beamParticleRenderers[0].enabled)
             {
                 // Stop all particle and sound FX.
                 StopEffects();
@@ -310,6 +346,16 @@ public class PlayerBeam : MonoBehaviour
     public bool BeamUnlocked()
     {
         return m_bBeamUnlocked;
+    }
+    
+    /*
+    Description: Finish beam charge and enable the beam.
+    */
+    public void StartBeam()
+    {
+        m_bBeamEnabled = true;
+
+        m_animator.SetBool("beamActive", true);
     }
 
     /*

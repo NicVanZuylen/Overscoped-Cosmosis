@@ -100,6 +100,7 @@ public class PullObject : MonoBehaviour
         m_rigidbody.isKinematic = false;
         m_bTriggered = false;
         transform.parent = null;
+        gameObject.layer = 11; // Set layer to no grapple.
         m_fTension = 0.0f;
 
         if(m_decoupleVector != null)

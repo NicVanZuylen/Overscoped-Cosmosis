@@ -802,7 +802,7 @@ public class PlayerController : MonoBehaviour
             CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
 
             // Set gravity to drop gravity if not jumping.
-            if (!m_bJumping)
+            if (bPrevGrounded && !m_bJumping)
                 m_fCurrentGravity = m_fDropGravity;
         }
 

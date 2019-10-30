@@ -5,13 +5,13 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
     Properties
     {
 		_ColourTexture("Colour Texture", 2D) = "white" {}
-		_FresnelOnOff("Fresnel On Off", Int) = 0
+		_Tiling("Tiling", Vector) = (1,1,0,0)
 		[HDR]_FresnelColour("Fresnel Colour", Color) = (7.937255,2.007843,0,0)
-		_FresnelStrength("Fresnel Strength", Float) = 4
-		_PulseSpeed("Pulse Speed", Float) = 3.3
-		_Smooth("Smooth", Range( 0 , 1)) = 0
 		_Metal("Metal", Range( 0 , 1)) = 0
-		[HideInInspector] _texcoord( "", 2D ) = "white" {}
+		_Smooth("Smooth", Range( 0 , 1)) = 0
+		_NoiseTexture("Noise Texture", 2D) = "white" {}
+		_NoiseTiling("Noise Tiling", Vector) = (2,2,0,0)
+		_NoiseOffset("Noise Offset", Vector) = (0.5,1,0,0)
     }
 
     SubShader
@@ -187,12 +187,12 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 				};
 
 				sampler2D _ColourTexture;
-				float4 _ColourTexture_ST;
-				float _Metal;
+				float2 _Tiling;
+				sampler2D _NoiseTexture;
+				float2 _NoiseTiling;
+				float2 _NoiseOffset;
 				float4 _FresnelColour;
-				float _FresnelStrength;
-				float _PulseSpeed;
-				int _FresnelOnOff;
+				float _Metal;
 				float _Smooth;
 
 				    
@@ -413,12 +413,13 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 				BuiltinData builtinData;
 
 				GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
-				float2 uv_ColourTexture = packedInput.ase_texcoord5.xy * _ColourTexture_ST.xy + _ColourTexture_ST.zw;
+				float2 uv031 = packedInput.ase_texcoord5.xy * _Tiling + float2( 0,0 );
+				float4 tex2DNode26 = tex2D( _ColourTexture, uv031 );
+				float2 uv046 = packedInput.ase_texcoord5.xy * _NoiseTiling + ( _Time.y * _NoiseOffset );
+				float smoothstepResult39 = smoothstep( ( 0.97 - 0.01 ) , ( 0.97 + 0.01 ) , ( 1.0 - tex2DNode26.r ));
+				float4 temp_output_37_0 = ( ( tex2D( _NoiseTexture, uv046 ) * _FresnelColour ) * smoothstepResult39 );
 				
-				float fresnelNdotV9 = dot( normalWS, normalizedWorldViewDir );
-				float fresnelNode9 = ( 0.0 + 1.0 * pow( 1.0 - fresnelNdotV9, ( _FresnelStrength + sin( ( _Time.y * _PulseSpeed ) ) ) ) );
-				
-                surfaceDescription.Albedo = tex2D( _ColourTexture, uv_ColourTexture ).rgb;
+                surfaceDescription.Albedo = ( tex2DNode26 + temp_output_37_0 ).rgb;
                 surfaceDescription.Normal = float3( 0, 0, 1 );
                 surfaceDescription.BentNormal = float3( 0, 0, 1 );
                 surfaceDescription.CoatMask = 0;
@@ -428,7 +429,7 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 				surfaceDescription.Specular = 0;
 				#endif
                 
-				surfaceDescription.Emission = ( _FresnelColour * fresnelNode9 * _FresnelOnOff ).rgb;
+				surfaceDescription.Emission = temp_output_37_0.rgb;
                 surfaceDescription.Smoothness = _Smooth;
                 surfaceDescription.Occlusion = 1;
 				surfaceDescription.Alpha = 1;
@@ -556,20 +557,18 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 				{
 					float4 positionCS : SV_Position; 
 					float4 ase_texcoord : TEXCOORD0;
-					float4 ase_texcoord1 : TEXCOORD1;
-					float4 ase_texcoord2 : TEXCOORD2;
 					#if INSTANCING_ON
 					uint instanceID : INSTANCEID_SEMANTIC;
 					#endif
 				};
 
 				sampler2D _ColourTexture;
-				float4 _ColourTexture_ST;
-				float _Metal;
+				float2 _Tiling;
+				sampler2D _NoiseTexture;
+				float2 _NoiseTiling;
+				float2 _NoiseOffset;
 				float4 _FresnelColour;
-				float _FresnelStrength;
-				float _PulseSpeed;
-				int _FresnelOnOff;
+				float _Metal;
 				float _Smooth;
 				
 				                
@@ -737,17 +736,10 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 					UNITY_SETUP_INSTANCE_ID(inputMesh);
 					UNITY_TRANSFER_INSTANCE_ID(inputMesh, outputPackedVaryingsMeshToPS);
 
-					float3 ase_worldPos = GetAbsolutePositionWS( TransformObjectToWorld( (inputMesh.positionOS).xyz ) );
-					outputPackedVaryingsMeshToPS.ase_texcoord1.xyz = ase_worldPos;
-					float3 ase_worldNormal = TransformObjectToWorldNormal(inputMesh.normalOS);
-					outputPackedVaryingsMeshToPS.ase_texcoord2.xyz = ase_worldNormal;
-					
 					outputPackedVaryingsMeshToPS.ase_texcoord.xy = inputMesh.uv0.xy;
 					
 					//setting value to unused interpolator channels and avoid initialization warnings
 					outputPackedVaryingsMeshToPS.ase_texcoord.zw = 0;
-					outputPackedVaryingsMeshToPS.ase_texcoord1.w = 0;
-					outputPackedVaryingsMeshToPS.ase_texcoord2.w = 0;
 					float3 vertexValue =  float3( 0, 0, 0 ) ;
 					#ifdef ASE_ABSOLUTE_VERTEX_POS
 					inputMesh.positionOS.xyz = vertexValue;
@@ -786,16 +778,13 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 					SurfaceData surfaceData;
 					BuiltinData builtinData;
 					GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
-					float2 uv_ColourTexture = packedInput.ase_texcoord.xy * _ColourTexture_ST.xy + _ColourTexture_ST.zw;
+					float2 uv031 = packedInput.ase_texcoord.xy * _Tiling + float2( 0,0 );
+					float4 tex2DNode26 = tex2D( _ColourTexture, uv031 );
+					float2 uv046 = packedInput.ase_texcoord.xy * _NoiseTiling + ( _Time.y * _NoiseOffset );
+					float smoothstepResult39 = smoothstep( ( 0.97 - 0.01 ) , ( 0.97 + 0.01 ) , ( 1.0 - tex2DNode26.r ));
+					float4 temp_output_37_0 = ( ( tex2D( _NoiseTexture, uv046 ) * _FresnelColour ) * smoothstepResult39 );
 					
-					float3 ase_worldPos = packedInput.ase_texcoord1.xyz;
-					float3 ase_worldViewDir = ( _WorldSpaceCameraPos.xyz - ase_worldPos );
-					ase_worldViewDir = normalize(ase_worldViewDir);
-					float3 ase_worldNormal = packedInput.ase_texcoord2.xyz;
-					float fresnelNdotV9 = dot( ase_worldNormal, ase_worldViewDir );
-					float fresnelNode9 = ( 0.0 + 1.0 * pow( 1.0 - fresnelNdotV9, ( _FresnelStrength + sin( ( _Time.y * _PulseSpeed ) ) ) ) );
-					
-					surfaceDescription.Albedo = tex2D( _ColourTexture, uv_ColourTexture ).rgb;
+					surfaceDescription.Albedo = ( tex2DNode26 + temp_output_37_0 ).rgb;
 					surfaceDescription.Normal = float3( 0, 0, 1 );
 					surfaceDescription.BentNormal = float3( 0, 0, 1 );
 					surfaceDescription.CoatMask = 0;
@@ -805,7 +794,7 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 					surfaceDescription.Specular = 0;
 					#endif
 					
-					surfaceDescription.Emission = ( _FresnelColour * fresnelNode9 * _FresnelOnOff ).rgb;
+					surfaceDescription.Emission = temp_output_37_0.rgb;
 					surfaceDescription.Smoothness = _Smooth;
 					surfaceDescription.Occlusion = 1;
 					surfaceDescription.Alpha = 1;
@@ -2163,12 +2152,12 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 				};
 
 				sampler2D _ColourTexture;
-				float4 _ColourTexture_ST;
-				float _Metal;
+				float2 _Tiling;
+				sampler2D _NoiseTexture;
+				float2 _NoiseTiling;
+				float2 _NoiseOffset;
 				float4 _FresnelColour;
-				float _FresnelStrength;
-				float _PulseSpeed;
-				int _FresnelOnOff;
+				float _Metal;
 				float _Smooth;
 
 				                  
@@ -2397,12 +2386,13 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 					SurfaceData surfaceData;
 					BuiltinData builtinData;
 					GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
-					float2 uv_ColourTexture = packedInput.ase_texcoord5.xy * _ColourTexture_ST.xy + _ColourTexture_ST.zw;
+					float2 uv031 = packedInput.ase_texcoord5.xy * _Tiling + float2( 0,0 );
+					float4 tex2DNode26 = tex2D( _ColourTexture, uv031 );
+					float2 uv046 = packedInput.ase_texcoord5.xy * _NoiseTiling + ( _Time.y * _NoiseOffset );
+					float smoothstepResult39 = smoothstep( ( 0.97 - 0.01 ) , ( 0.97 + 0.01 ) , ( 1.0 - tex2DNode26.r ));
+					float4 temp_output_37_0 = ( ( tex2D( _NoiseTexture, uv046 ) * _FresnelColour ) * smoothstepResult39 );
 					
-					float fresnelNdotV9 = dot( normalWS, normalizedWorldViewDir );
-					float fresnelNode9 = ( 0.0 + 1.0 * pow( 1.0 - fresnelNdotV9, ( _FresnelStrength + sin( ( _Time.y * _PulseSpeed ) ) ) ) );
-					
-					surfaceDescription.Albedo = tex2D( _ColourTexture, uv_ColourTexture ).rgb;
+					surfaceDescription.Albedo = ( tex2DNode26 + temp_output_37_0 ).rgb;
 					surfaceDescription.Normal = float3( 0, 0, 1 );
 					surfaceDescription.BentNormal = float3( 0, 0, 1 );
 					surfaceDescription.CoatMask = 0;
@@ -2412,7 +2402,7 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 					surfaceDescription.Specular = 0;
 					#endif
 					
-					surfaceDescription.Emission = ( _FresnelColour * fresnelNode9 * _FresnelOnOff ).rgb;
+					surfaceDescription.Emission = temp_output_37_0.rgb;
 					surfaceDescription.Smoothness = _Smooth;
 					surfaceDescription.Occlusion = 1;
 					surfaceDescription.Alpha = 1;
@@ -2512,43 +2502,78 @@ Shader "Cosmosis/Player/Pullable_Fresnel"
 }
 /*ASEBEGIN
 Version=16900
-7;1;1666;981;888.6716;350.4095;1;True;True
-Node;AmplifyShaderEditor.RangedFloatNode;14;-1403,276;Float;False;Property;_PulseSpeed;Pulse Speed;4;0;Create;True;0;0;False;0;3.3;3.3;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleTimeNode;12;-1404,194;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;13;-1233,217;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.SinOpNode;16;-1099,225;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;11;-1168,133;Float;False;Property;_FresnelStrength;Fresnel Strength;3;0;Create;True;0;0;False;0;4;10.37;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;10;-973,72;Float;False;Constant;_Float0;Float 0;0;0;Create;True;0;0;False;0;1;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleAddOpNode;17;-968,163;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.FresnelNode;9;-828,17;Float;True;Standard;WorldNormal;ViewDir;False;5;0;FLOAT3;0,0,1;False;4;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;5;False;1;FLOAT;0
-Node;AmplifyShaderEditor.IntNode;25;-706,256;Float;False;Property;_FresnelOnOff;Fresnel On Off;1;0;Create;True;0;0;False;0;0;1;0;1;INT;0
-Node;AmplifyShaderEditor.ColorNode;19;-745,-159;Float;False;Property;_FresnelColour;Fresnel Colour;2;1;[HDR];Create;True;0;0;False;0;7.937255,2.007843,0,0;4.719182,4.719182,4.719182,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.RangedFloatNode;27;-97.67163,75.59052;Float;False;Property;_Metal;Metal;6;0;Create;True;0;0;False;0;0;1;0;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;28;-89.67163,173.5905;Float;False;Property;_Smooth;Smooth;5;0;Create;True;0;0;False;0;0;0;0;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;18;-413,-79;Float;False;3;3;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;2;INT;0;False;1;COLOR;0
-Node;AmplifyShaderEditor.SamplerNode;26;-125,-161;Float;True;Property;_ColourTexture;Colour Texture;0;0;Create;True;0;0;False;0;None;9b64f8cfc3dc99a4daf016af60eff944;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;226,-19;Float;False;True;2;Float;ASEMaterialInspector;0;2;Cosmosis/Player/Pullable_Fresnel;091c43ba8bd92c9459798d59b089ce4e;True;GBuffer;0;0;GBuffer;26;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;True;True;2;False;-1;255;False;-1;7;False;-1;7;False;-1;3;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;3;False;-1;False;True;1;LightMode=GBuffer;False;0;;0;0;Standard;18;Material Type,InvertActionOnDeselection;0;Energy Conserving Specular,InvertActionOnDeselection;0;Transmission,InvertActionOnDeselection;0;Surface Type;0;Receive Decals;1;Alpha Cutoff;0;Receives SSR;1;Specular AA;0;Specular Occlusion Mode;0;Distortion;0;Distortion Mode;0;Distortion Depth Test;0;Back Then Front Rendering;0;Blend Preserves Specular;1;Fog;1;Draw Before Refraction;0;Refraction Model;0;Vertex Position,InvertActionOnDeselection;1;0;9;True;True;True;True;True;True;False;False;True;False;26;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT;0;False;14;FLOAT;0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;FLOAT;0;False;18;FLOAT3;0,0,0;False;19;FLOAT;0;False;20;FLOAT;0;False;21;FLOAT;0;False;22;FLOAT;0;False;23;FLOAT3;0,0,0;False;24;FLOAT;0;False;25;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;6;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;Distortion;0;6;Distortion;2;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;True;4;1;False;-1;1;False;-1;4;1;False;-1;1;False;-1;True;1;False;-1;5;False;-1;False;False;False;False;False;True;3;False;-1;False;True;1;LightMode=DistortionVectors;False;0;;0;0;Standard;0;6;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT2;0,0;False;3;FLOAT;0;False;4;FLOAT3;0,0,0;False;5;FLOAT3;0,0,0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;5;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;Motion Vectors;0;5;Motion Vectors;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;True;True;128;False;-1;255;False;-1;128;False;-1;7;False;-1;3;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=MotionVectors;False;0;;0;0;Standard;0;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
+1920;1;1906;1011;2303.813;1045.906;1.3;True;False
+Node;AmplifyShaderEditor.CommentaryNode;54;-1716.228,-537.9237;Float;False;928;391;Panning Noise;6;48;50;47;49;46;45;;1,1,1,1;0;0
+Node;AmplifyShaderEditor.Vector2Node;32;-1455.871,122.4023;Float;False;Property;_Tiling;Tiling;1;0;Create;True;0;0;False;0;1,1;0,0;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
+Node;AmplifyShaderEditor.SimpleTimeNode;50;-1664.228,-374.9237;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
+Node;AmplifyShaderEditor.Vector2Node;48;-1666.228,-307.9237;Float;False;Property;_NoiseOffset;Noise Offset;10;0;Create;True;0;0;False;0;0.5,1;0,0;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
+Node;AmplifyShaderEditor.TextureCoordinatesNode;31;-1297.871,122.4023;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;49;-1482.228,-332.9237;Float;False;2;2;0;FLOAT;0;False;1;FLOAT2;0,0;False;1;FLOAT2;0
+Node;AmplifyShaderEditor.Vector2Node;47;-1496.228,-454.9237;Float;False;Property;_NoiseTiling;Noise Tiling;9;0;Create;True;0;0;False;0;2,2;5,5;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
+Node;AmplifyShaderEditor.RangedFloatNode;42;-1106.871,359.4024;Float;False;Constant;_Float2;Float 2;9;0;Create;True;0;0;False;0;0.01;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SamplerNode;26;-1070.871,54.40232;Float;True;Property;_ColourTexture;Colour Texture;0;0;Create;True;0;0;False;0;25ac9c70badb7734fb4ab2fe39db33ab;410e8a60aac365040bb3c2f5d30174f0;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;36;-1111.871,244.4022;Float;False;Constant;_Float1;Float 1;9;0;Create;True;0;0;False;0;0.97;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.TextureCoordinatesNode;46;-1334.228,-417.9237;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.SamplerNode;45;-1109.228,-487.9237;Float;True;Property;_NoiseTexture;Noise Texture;8;0;Create;True;0;0;False;0;82e88416b80b6154d956b2440066a233;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.OneMinusNode;34;-759.871,168.4023;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleSubtractOpNode;41;-913.871,347.4024;Float;False;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.ColorNode;19;-753,-142;Float;False;Property;_FresnelColour;Fresnel Colour;2;1;[HDR];Create;True;0;0;False;0;7.937255,2.007843,0,0;23.96863,6.14902,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.SimpleAddOpNode;40;-895.871,258.4023;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SmoothstepOpNode;39;-584.8708,231.4022;Float;False;3;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;43;-515.2,-205.5;Float;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.CommentaryNode;44;-1567,-927;Float;False;761;335;Pulsing {Fresnel};8;12;14;13;16;30;29;11;17;;1,1,1,1;0;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;37;-327.8708,127.4022;Float;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;1;COLOR;0
+Node;AmplifyShaderEditor.RangedFloatNode;30;-1284,-707;Float;False;Property;_PulseStrength;Pulse Strength;4;0;Create;True;0;0;False;0;1;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleAddOpNode;17;-960,-840;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;11;-1163,-877;Float;False;Property;_FresnelStrength;Fresnel Strength;3;0;Create;True;0;0;False;0;4;5;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleAddOpNode;38;-137.8708,51.40222;Float;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.SimpleTimeNode;12;-1517,-827;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;14;-1516,-745;Float;False;Property;_PulseSpeed;Pulse Speed;5;0;Create;True;0;0;False;0;3.3;5.5;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;29;-1089,-775;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;27;-337,221;Float;False;Property;_Metal;Metal;6;0;Create;True;0;0;False;0;0;0;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;28;-338,309;Float;False;Property;_Smooth;Smooth;7;0;Create;True;0;0;False;0;0;0;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SinOpNode;16;-1212,-796;Float;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;13;-1346,-804;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;85,82;Float;False;True;2;Float;ASEMaterialInspector;0;2;Cosmosis/Player/Pullable_Fresnel;091c43ba8bd92c9459798d59b089ce4e;True;GBuffer;0;0;GBuffer;26;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;True;True;2;False;-1;255;False;-1;7;False;-1;7;False;-1;3;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;3;False;-1;False;True;1;LightMode=GBuffer;False;0;;0;0;Standard;18;Material Type,InvertActionOnDeselection;0;Energy Conserving Specular,InvertActionOnDeselection;0;Transmission,InvertActionOnDeselection;0;Surface Type;0;Receive Decals;1;Alpha Cutoff;0;Receives SSR;1;Specular AA;0;Specular Occlusion Mode;0;Distortion;0;Distortion Mode;0;Distortion Depth Test;0;Back Then Front Rendering;0;Blend Preserves Specular;1;Fog;1;Draw Before Refraction;0;Refraction Model;0;Vertex Position,InvertActionOnDeselection;1;0;9;True;True;True;True;True;True;False;False;True;False;26;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT;0;False;14;FLOAT;0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;FLOAT;0;False;18;FLOAT3;0,0,0;False;19;FLOAT;0;False;20;FLOAT;0;False;21;FLOAT;0;False;22;FLOAT;0;False;23;FLOAT3;0,0,0;False;24;FLOAT;0;False;25;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;4;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;DepthOnly;0;4;DepthOnly;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;False;False;False;False;True;1;LightMode=DepthOnly;False;0;;0;0;Standard;0;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;3;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;SceneSelectionPass;0;3;SceneSelectionPass;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;False;False;False;False;True;1;LightMode=SceneSelectionPass;False;0;;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;ShadowCaster;0;2;ShadowCaster;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;False;False;False;False;True;1;LightMode=ShadowCaster;False;0;;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;META;0;1;META;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;True;2;False;-1;False;False;False;False;False;True;1;LightMode=Meta;False;0;;0;0;Standard;0;26;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT;0;False;14;FLOAT;0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;FLOAT;0;False;18;FLOAT3;0,0,0;False;19;FLOAT;0;False;20;FLOAT;0;False;21;FLOAT;0;False;22;FLOAT;0;False;23;FLOAT3;0,0,0;False;24;FLOAT;0;False;25;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;7;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;TransparentBackface;0;7;TransparentBackface;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;True;1;False;-1;False;False;False;False;False;True;1;LightMode=TransparentBackface;False;0;;0;0;Standard;0;13;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;6;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;Distortion;0;6;Distortion;2;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;True;4;1;False;-1;1;False;-1;4;1;False;-1;1;False;-1;True;1;False;-1;5;False;-1;False;False;False;False;False;True;3;False;-1;False;True;1;LightMode=DistortionVectors;False;0;;0;0;Standard;0;6;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT2;0,0;False;3;FLOAT;0;False;4;FLOAT3;0,0,0;False;5;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;3;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;SceneSelectionPass;0;3;SceneSelectionPass;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;True;False;False;False;False;0;False;-1;False;False;False;False;True;1;LightMode=SceneSelectionPass;False;0;;0;0;Standard;0;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;8;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;Forward;0;8;Forward;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;True;True;2;False;-1;255;False;-1;7;False;-1;7;False;-1;3;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;3;False;-1;False;True;1;LightMode=Forward;False;0;;0;0;Standard;0;26;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT;0;False;14;FLOAT;0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;FLOAT;0;False;18;FLOAT3;0,0,0;False;19;FLOAT;0;False;20;FLOAT;0;False;21;FLOAT;0;False;22;FLOAT;0;False;23;FLOAT3;0,0,0;False;24;FLOAT;0;False;25;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;META;0;1;META;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;True;2;False;-1;False;False;False;False;False;True;1;LightMode=Meta;False;0;;0;0;Standard;0;26;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0;False;4;FLOAT;0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT;0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT;0;False;14;FLOAT;0;False;15;FLOAT;0;False;16;FLOAT;0;False;17;FLOAT;0;False;18;FLOAT3;0,0,0;False;19;FLOAT;0;False;20;FLOAT;0;False;21;FLOAT;0;False;22;FLOAT;0;False;23;FLOAT3;0,0,0;False;24;FLOAT;0;False;25;FLOAT;0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;5;0,0;Float;False;False;2;Float;ASEMaterialInspector;0;1;Hidden/Templates/HDSRPLit;091c43ba8bd92c9459798d59b089ce4e;True;Motion Vectors;0;5;Motion Vectors;0;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;True;0;False;-1;False;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;0;False;False;False;False;False;True;True;128;False;-1;255;False;-1;128;False;-1;7;False;-1;3;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=MotionVectors;False;0;;0;0;Standard;0;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
+WireConnection;31;0;32;0
+WireConnection;49;0;50;0
+WireConnection;49;1;48;0
+WireConnection;26;1;31;0
+WireConnection;46;0;47;0
+WireConnection;46;1;49;0
+WireConnection;45;1;46;0
+WireConnection;34;0;26;1
+WireConnection;41;0;36;0
+WireConnection;41;1;42;0
+WireConnection;40;0;36;0
+WireConnection;40;1;42;0
+WireConnection;39;0;34;0
+WireConnection;39;1;41;0
+WireConnection;39;2;40;0
+WireConnection;43;0;45;0
+WireConnection;43;1;19;0
+WireConnection;37;0;43;0
+WireConnection;37;1;39;0
+WireConnection;17;0;11;0
+WireConnection;17;1;29;0
+WireConnection;38;0;26;0
+WireConnection;38;1;37;0
+WireConnection;29;0;16;0
+WireConnection;29;1;30;0
+WireConnection;16;0;13;0
 WireConnection;13;0;12;0
 WireConnection;13;1;14;0
-WireConnection;16;0;13;0
-WireConnection;17;0;11;0
-WireConnection;17;1;16;0
-WireConnection;9;2;10;0
-WireConnection;9;3;17;0
-WireConnection;18;0;19;0
-WireConnection;18;1;9;0
-WireConnection;18;2;25;0
-WireConnection;0;0;26;0
+WireConnection;0;0;38;0
 WireConnection;0;4;27;0
-WireConnection;0;6;18;0
+WireConnection;0;6;37;0
 WireConnection;0;7;28;0
 ASEEND*/
-//CHKSM=A31C21ADA7679304850C7903D45B550C1F874E79
+//CHKSM=162AF0406943971464FF18B3596B6AE3B8958D5A

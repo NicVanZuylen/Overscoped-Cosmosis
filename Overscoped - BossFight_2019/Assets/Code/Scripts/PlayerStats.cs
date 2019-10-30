@@ -147,6 +147,7 @@ public class PlayerStats : MonoBehaviour
     private Transform m_camPivot;
     private ScreenFade m_fadeScript;
     private AudioLoop m_windAudioLoop;
+    private static float m_fWindVolume = 1.0f;
     private static float m_fPlayerVolume = 1.0f;
     private static bool m_bCheckpointReached = false;
     private bool m_bNearPickup = false;
@@ -245,7 +246,7 @@ public class PlayerStats : MonoBehaviour
             windSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed, 0.0f);
 
             if (!m_windAudioLoop.IsPlaying())
-                m_windAudioLoop.Play(m_fPlayerVolume);
+                m_windAudioLoop.Play(m_fWindVolume);
         }
         else if(m_windAudioLoop.IsPlaying())
         {
@@ -580,5 +581,10 @@ public class PlayerStats : MonoBehaviour
         {
             m_bNearPickup = false;
         }
+    }
+
+    public static void SetVolume(float volume)
+    {
+        m_fWindVolume = volume;
     }
 }

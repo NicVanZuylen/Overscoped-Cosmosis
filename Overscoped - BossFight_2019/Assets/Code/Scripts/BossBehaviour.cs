@@ -975,6 +975,11 @@ public class BossBehaviour : MonoBehaviour
         //m_punchVoiceSelection.PlayRandom();
     }
 
+    public static void SetVolume(float volume)
+    {
+        m_fBossVolume = volume;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.DrawSphere(m_v3BeamEnd, 1.0f);

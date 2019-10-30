@@ -646,4 +646,9 @@ public class GrappleHook : MonoBehaviour
     {
         return m_bWithinRange || m_bGrappleHookActive;
     }
+
+    public static void SetVolume(float volume)
+    {
+        m_fGrappleVolume = volume;
+    }
 }

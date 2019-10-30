@@ -13,6 +13,8 @@ public class MainMenu : MonoBehaviour
 {
     private ScreenFade m_fadeScript;
     private MusicManager m_musicManager;
+    private Settings m_settings;
+    private SettingsIO m_settingSaver;
 
     private void Awake()
     {
@@ -21,11 +23,21 @@ public class MainMenu : MonoBehaviour
         m_musicManager = GetComponent<MusicManager>();
 
         m_musicManager.PlayTrackIndex(0);
+
+        m_settingSaver = new SettingsIO();
+
+        m_settings.m_fBossVolume = 1.1f;
+        m_settings.m_fGrappleVolume = 1.4f;
+        m_settings.m_fPlayerVolume = 3.5f;
+        m_settings.m_fWindVolume = 0.3f;
+
+        m_settingSaver.SetData(m_settings);
+        m_settingSaver.WriteFile();
+        
     }
 
     private void Update()
     {
-        
     }
 
     public void LoadGameScene()

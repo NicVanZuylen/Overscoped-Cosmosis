@@ -53,8 +53,6 @@ public class MusicManager : MonoBehaviour
         m_currentSource.volume = fUnitProgress;
         m_lastSource.volume = 1.0f - fUnitProgress;
 
-        Debug.Log("Volume Now: " + m_currentSource.volume + " Volume Last: " + m_lastSource.volume);
-
         // Disable when finished.
         if(m_fCrossFadeProgress >= m_fCrossFadeTime)
         {

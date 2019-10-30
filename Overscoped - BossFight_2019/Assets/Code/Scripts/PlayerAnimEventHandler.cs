@@ -40,6 +40,8 @@ public class PlayerAnimEventHandler : MonoBehaviour
         // Play random footstep noise.
         m_footStepSFX.PlayRandom();
 
+        Debug.Log("Bob!");
+
         m_camEffects.Step();
     }
 

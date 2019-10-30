@@ -33,9 +33,9 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private float m_fPullAcceleration = 30.0f;
 
-    [Tooltip("Acceleration due to grapple pull.")]
+    [Tooltip("Acceleration when moving with WASD while grappling.")]
     [SerializeField]
-    private float m_fAirAcceleration = 30.0f;
+    private float m_fGrappleMoveAcceleration = 30.0f;
 
     [Tooltip("Maximum speed in the direction of the grapple line the player can travel.")]
     [SerializeField]
@@ -65,6 +65,10 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private float m_fReleaseForce = 20.0f;
 
+    [Tooltip("New player acceleration due to gravity after releasing the grapple.")]
+    [SerializeField]
+    private float m_fReleaseGravity = -9.81f;
+
     [Tooltip("The magnitude of the foward force applied to the player when grappling from the ground.")]
     [SerializeField]
     private float m_fForwardGroundGrappleForce = 10.0f;
@@ -72,10 +76,6 @@ public class GrappleHook : MonoBehaviour
     [Tooltip("The magnitude of the upward force applied to the player when grappling from the ground.")]
     [SerializeField]
     private float m_fUpGroundGrappleForce = 5.0f;
-
-    [Tooltip("Whether or not to use the default jumping gravity whilst flying after grapple.")]
-    [SerializeField]
-    private bool m_bJumpGravOnRelease = false;
 
     // -------------------------------------------------------------------------------------------------
     [Header("Grapple Mode")]
@@ -209,9 +209,6 @@ public class GrappleHook : MonoBehaviour
     // Effects
     private LineEffects m_grapLineEffects;
 
-    // Misc.
-    private float m_fReleaseGravity;
-
     void Awake()
     {
         LineEffectParameters lineEffectParams;
@@ -255,11 +252,6 @@ public class GrappleHook : MonoBehaviour
         // Misc.
         m_fGrappleTime = 0.0f;
         m_bGrappleHookActive = false;
-
-        if (m_bJumpGravOnRelease)
-            m_fReleaseGravity = m_controller.JumpGravity();
-        else
-            m_fReleaseGravity = Physics.gravity.y;
     }
 
     private void OnDestroy()
@@ -459,7 +451,7 @@ public class GrappleHook : MonoBehaviour
             v3MoveDir.Normalize();
 
         // Controls
-        v3NetForce += v3MoveDir * m_fAirAcceleration * fDeltaTime;
+        v3NetForce += v3MoveDir * m_fGrappleMoveAcceleration * fDeltaTime;
 
         // Lateral drag.
         if (v3NonPullComponent.sqrMagnitude < 1.0f)
@@ -606,7 +598,9 @@ public class GrappleHook : MonoBehaviour
 
         m_bArmExtending = false;
         m_bGrappleHookActive = true;
-        m_bPullMode = m_fireHit.collider.tag == "PullObj";
+
+        if(m_fireHit.collider)
+           m_bPullMode = m_fireHit.collider.tag == "PullObj";
 
         if (m_bPullMode)
             m_pullObj = m_fireHit.collider.gameObject.GetComponent<PullObject>();

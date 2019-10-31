@@ -45,13 +45,17 @@ public class PlayerBeam : MonoBehaviour
     // -------------------------------------------------------------------------------------------------
     [Header("Effects")]
 
+    [Tooltip("Transform of the end particles object.")]
+    [SerializeField]
+    private Transform m_endParticleTransform = null;
+
     [Tooltip("VFX played at the beam's origin point.")]
     [SerializeField]
-    private ParticleSystem m_originParticles = null;
+    private ParticleObject m_originParticles = new ParticleObject();
 
     [Tooltip("VFX played at the beam impact point.")]
     [SerializeField]
-    private GameObject m_impactParticles = null;
+    private ParticleObject m_impactParticles = new ParticleObject();
 
     // -------------------------------------------------------------------------------------------------
     [Header("Audio")]
@@ -75,7 +79,7 @@ public class PlayerBeam : MonoBehaviour
     private GrappleHook m_grappleScript;
     private CameraEffects m_camEffects;
     private Animator m_animator;
-    private RaycastHit m_sphereCastHit;
+    private RaycastHit m_beamHit;
     private GameObject m_endObj;
     private ChestPlate m_bossChestScript;
     private float m_fBeamCharge; // Actual current charge value.
@@ -131,13 +135,11 @@ public class PlayerBeam : MonoBehaviour
 
         m_endObj = new GameObject("Player_Beam_End_Point");
 
-        // Instantiate impact effect object as a child of the end point object.
-        if(m_impactParticles)
+        // Set end particle effect parent object.
+        if(m_endParticleTransform)
         {
-            GameObject newImpactObj = Instantiate(m_impactParticles, m_endObj.transform, false);
-            newImpactObj.transform.localPosition = Vector3.zero;
-
-            m_impactEffect = newImpactObj.GetComponent<ParticleSystem>();
+            m_endParticleTransform.parent = m_endObj.transform;
+            m_endParticleTransform.localPosition = Vector3.zero;
         }
 
         m_bossChestScript = GameObject.FindGameObjectWithTag("BossChest").GetComponentInChildren<ChestPlate>();
@@ -189,7 +191,7 @@ public class PlayerBeam : MonoBehaviour
 
             // Set origin and length in shader.
             renderers[i].material.SetVector("_LineOrigin", v3Origin);
-            renderers[i].material.SetFloat("_LineLength", fMaxLength + 1.0f);
+            renderers[i].material.SetFloat("_LineLength", fMaxLength);
         }
     }
 
@@ -213,8 +215,8 @@ public class PlayerBeam : MonoBehaviour
         m_animator.SetBool("isBeamCasting", false);
         m_animator.SetBool("beamActive", false);
 
-        if (m_originParticles)
-            m_originParticles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+        if (m_originParticles.IsPlaying())
+            m_originParticles.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     void LateUpdate()
@@ -261,7 +263,7 @@ public class PlayerBeam : MonoBehaviour
                 m_camEffects.ApplyChromAbbShake(0.1f, 0.1f, 0.5f);
 
                 // Play origin effect.
-                if (m_originParticles && !m_originParticles.isPlaying)
+                if (!m_originParticles.IsPlaying())
                     m_originParticles.Play();
 
                 // Play SFX loops.
@@ -272,7 +274,7 @@ public class PlayerBeam : MonoBehaviour
                     m_impactAudioLoop.Play();
 
                 Ray sphereRay = new Ray(m_beamOrigin.position, m_beamOrigin.forward);
-                bool bRayHit = Physics.Raycast(sphereRay, out m_sphereCastHit, (float)m_nBeamLength, m_nRayMask, QueryTriggerInteraction.Ignore);
+                bool bRayHit = Physics.Raycast(sphereRay, out m_beamHit, (float)m_nBeamLength, m_nRayMask, QueryTriggerInteraction.Ignore);
 
                 // Find end point of the line.
                 if (bRayHit)
@@ -282,9 +284,9 @@ public class PlayerBeam : MonoBehaviour
                         m_impactEffect.Play();
 
                     // Update volumetric beam particle positions.
-                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_sphereCastHit.distance, m_fMeshLength, true);
+                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, m_beamOrigin.position, Mathf.Max(m_beamHit.distance, 2.0f), m_fMeshLength, true);
 
-                    float fHitProj = Vector3.Dot(m_sphereCastHit.point, m_beamOrigin.forward);
+                    float fHitProj = Vector3.Dot(m_beamHit.point, m_beamOrigin.forward);
                     float fOriginProj = Vector3.Dot(m_beamOrigin.position, m_beamOrigin.forward);
 
                     float fProjDiff = fHitProj - fOriginProj;
@@ -292,7 +294,7 @@ public class PlayerBeam : MonoBehaviour
                     m_endObj.transform.position = m_beamOrigin.position + (m_beamOrigin.forward * fProjDiff);
 
                     // Deal damage if the beam ray hits the force field.
-                    if(m_sphereCastHit.collider.tag == "BossChest")
+                    if(m_beamHit.collider.tag == "BossChest")
                     {
                         m_bossChestScript.DealBeamDamage();
                     }
@@ -304,7 +306,7 @@ public class PlayerBeam : MonoBehaviour
                         m_impactEffect.Stop(false, ParticleSystemStopBehavior.StopEmitting);
                     
                     // Update volumetric beam particle positions.
-                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, transform.position, m_nBeamLength, m_fMeshLength, false);
+                    UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, m_beamOrigin.position, m_nBeamLength, m_fMeshLength, false);
 
                     m_endObj.transform.position = m_beamOrigin.position + (m_beamOrigin.forward * m_nBeamLength);
                 }

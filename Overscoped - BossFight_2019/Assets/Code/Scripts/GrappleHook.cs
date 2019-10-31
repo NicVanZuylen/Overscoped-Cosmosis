@@ -308,7 +308,7 @@ public class GrappleHook : MonoBehaviour
                 m_targetVFX.Play();
         }
         else if (m_targetVFX.IsPlaying()) // Stop target VFX when grapple is not available.
-            m_targetVFX.Stop();
+            m_targetVFX.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
 
         bool bImpacted = m_bGrappleLocked && m_bGrappleHookActive;
 

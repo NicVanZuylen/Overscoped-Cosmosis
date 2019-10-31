@@ -8,6 +8,7 @@ using UnityEngine;
 [System.Serializable]
 public struct Settings
 {
+    public float m_fMasterVolume;
     public float m_fBossVolume;
     public float m_fPlayerVolume;
     public float m_fGrappleVolume;

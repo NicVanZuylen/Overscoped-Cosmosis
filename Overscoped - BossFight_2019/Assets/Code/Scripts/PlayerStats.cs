@@ -267,7 +267,7 @@ public class PlayerStats : MonoBehaviour
     void OnJump(PlayerController controller)
     {
         // Play SFX.
-        m_jumpGruntSFX.PlayRandom();
+        m_jumpGruntSFX.PlayRandom(m_fPlayerVolume);
     }
 
     /*
@@ -277,7 +277,7 @@ public class PlayerStats : MonoBehaviour
     */
     void OnLand(PlayerController controller)
     {
-        m_landSFX.PlayRandom();
+        m_landSFX.PlayRandom(m_fPlayerVolume);
     }
 
     // Update is called once per frame
@@ -514,7 +514,7 @@ public class PlayerStats : MonoBehaviour
         m_fHealth -= fDamage;
 
         // Hurt SFX
-        m_hurtSFX.PlayRandom();
+        m_hurtSFX.PlayRandom(m_fPlayerVolume);
 
         if(m_fHealth <= 0.0f)
         {
@@ -583,8 +583,14 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    public static void SetVolume(float volume)
+    public static void SetVolume(float fPlayerVolume, float fWindVolume, float fMaster)
     {
-        m_fWindVolume = volume;
+        m_fPlayerVolume = fPlayerVolume * fMaster;
+        m_fWindVolume = fWindVolume * fMaster;
+    }
+
+    public static float GetPlayerVolume()
+    {
+        return m_fPlayerVolume;
     }
 }

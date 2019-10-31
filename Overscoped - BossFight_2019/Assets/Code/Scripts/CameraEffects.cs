@@ -169,6 +169,7 @@ public class CameraEffects : MonoBehaviour
         // Change vertical bobbing direction if the downwards bob is complete.
         if (m_fVertBobbingLevel >= 1.0f)
         {
+            m_fVertBobbingLevel = 1.0f;
             m_nBobbingDirection = -1;
         }
 
@@ -176,7 +177,7 @@ public class CameraEffects : MonoBehaviour
             m_nLandingBobDirection = -1;
 
         // Vertical bobbing value used for position and angle offset.
-        float fVertBobbingValue = Mathf.Abs(Mathf.Sin(m_fVertBobbingLevel * Mathf.PI * 0.5f));
+        float fVertBobbingValue = Mathf.Abs(Mathf.Sin(m_fVertBobbingLevel * Mathf.PI * 0.5f) + 1.0f);
 
         m_v3BobbingEuler.x = fVertBobbingValue * m_fBobbingXAngleMagnitude; // X angle offset. (Vertical)
         m_v3BobbingEuler.y = Mathf.Sin(m_fSideBobbingLevel * Mathf.PI * 0.5f) * m_fBobbingYAngleMagnitude * m_nBobbingSideDirection; // Y angle offset. (Horizontal)

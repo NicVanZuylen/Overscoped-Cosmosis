@@ -5203,7 +5203,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2230273340261992293}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9789a6ac4ed2729439bc4384b83b906e, type: 3}
   m_Name: 
@@ -5241,6 +5241,15 @@ MonoBehaviour:
     m_objects: []
   m_spawnVFX: {fileID: 3729592265509758162}
   m_dissolveMat: {fileID: 2100000, guid: fd8102280a162cf44ab6e9ef97c9c381, type: 2}
+  m_spawnSFX:
+    m_clips:
+    - {fileID: 8300000, guid: c19094d3606b1a34aa77132b97a2e838, type: 3}
+    - {fileID: 8300000, guid: 57c1ee382bd74714f806ba14b163743f, type: 3}
+    - {fileID: 8300000, guid: b339a621b874fba4fb4ca344e85e9c44, type: 3}
+    - {fileID: 8300000, guid: d5ac4eaff769ec040804527679258896, type: 3}
+    - {fileID: 8300000, guid: b0b45f02d3dc32c41bc97f8ac3b1a54c, type: 3}
+    m_source: {fileID: 1644997943362067396}
+    m_fCooldown: 1
   m_bossHitSFX:
     m_clips:
     - {fileID: 8300000, guid: 041c0e1b0ab5a2c4ab879772b9f58fa1, type: 3}
@@ -5252,6 +5261,19 @@ MonoBehaviour:
     - {fileID: 8300000, guid: f0627cb06d00a134882d1fa67e9a2b83, type: 3}
     m_source: {fileID: 1644997943362067396}
     m_fCooldown: 10
+  m_bossDeathSFX:
+    m_clips:
+    - {fileID: 8300000, guid: cd08435472f3b9a4ba492d6bca89a273, type: 3}
+    - {fileID: 8300000, guid: 744a1c98821a0664da67199d274efcb9, type: 3}
+    - {fileID: 8300000, guid: acfd2c3c7b1ac1149a33cde04ea6e0e4, type: 3}
+    - {fileID: 8300000, guid: 3f7f38b85c3c7304fbd1a2643a65612e, type: 3}
+    - {fileID: 8300000, guid: 71b3eb43027a0174fbbd65c74f3fe1c4, type: 3}
+    - {fileID: 8300000, guid: 1f68086064aea1e4bbd9d8f573a606de, type: 3}
+    - {fileID: 8300000, guid: e216ed91a517d6a46bf37b0943d323d3, type: 3}
+    - {fileID: 8300000, guid: 6f640d5fd179241458c955f77fc10347, type: 3}
+    - {fileID: 8300000, guid: b7cb7cb00595ed74a90148d19af47f6e, type: 3}
+    m_source: {fileID: 1644997943362067396}
+    m_fCooldown: 0
   m_meteorVoiceSelection:
     m_clips:
     - {fileID: 8300000, guid: c3a8b86cabb63bf4ab5bbd8f639f3beb, type: 3}
@@ -5288,6 +5310,7 @@ MonoBehaviour:
     type: 3}
   m_beamImpactLoopingSFX: {fileID: 0}
   m_fTimeBetweenAttacks: 5
+  m_fDeathTime: 5
 --- !u!1 &2481678417162020939
 GameObject:
   m_ObjectHideFlags: 0
@@ -10790,21 +10813,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3729592265169793723, guid: bca3813edeb8dd240a9e69dda8115d30,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3729592265169793723, guid: bca3813edeb8dd240a9e69dda8115d30,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3729592265169793723, guid: bca3813edeb8dd240a9e69dda8115d30,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3729592265169793720, guid: bca3813edeb8dd240a9e69dda8115d30,
         type: 3}
       propertyPath: m_PropertySheet.m_Vector3f.m_Array.Array.data[1].m_Value.x
@@ -10819,16 +10827,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_PropertySheet.m_Vector3f.m_Array.Array.data[1].m_Value.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3729592265169793720, guid: bca3813edeb8dd240a9e69dda8115d30,
-        type: 3}
-      propertyPath: m_PropertySheet.m_Float.m_Array.Array.data[1].m_Value
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 3729592265169793721, guid: bca3813edeb8dd240a9e69dda8115d30,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3729592265169793719, guid: bca3813edeb8dd240a9e69dda8115d30,
         type: 3}

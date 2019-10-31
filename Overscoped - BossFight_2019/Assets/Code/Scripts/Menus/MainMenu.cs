@@ -24,16 +24,22 @@ public class MainMenu : MonoBehaviour
 
         m_musicManager.PlayTrackIndex(0);
 
+        // Creates a instance of SettingIO
         m_settingSaver = new SettingsIO();
+
+        // Sets the volume 
+        m_settings.m_fMasterVolume = 1.0f;
 
         m_settings.m_fBossVolume = 1.1f;
         m_settings.m_fGrappleVolume = 1.4f;
         m_settings.m_fPlayerVolume = 3.5f;
         m_settings.m_fWindVolume = 0.3f;
 
+        // Sets the data to the settings values
         m_settingSaver.SetData(m_settings);
-        m_settingSaver.WriteFile();
-        
+        // Writes the data into the file
+        m_settingSaver.WriteFile();   
+
     }
 
     private void Update()

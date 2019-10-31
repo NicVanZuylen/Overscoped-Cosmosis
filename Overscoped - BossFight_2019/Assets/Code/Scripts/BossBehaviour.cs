@@ -109,10 +109,18 @@ public class BossBehaviour : MonoBehaviour
     private Material m_dissolveMat = null;
 
     // -------------------------------------------------------------------------------------------------
+    [Header("SpawnSFX")]
+
+    [SerializeField]
+    private AudioSelection m_spawnSFX = new AudioSelection();
+
     [Header("Hit SFX")]
 
     [SerializeField]
     private AudioSelection m_bossHitSFX = new AudioSelection();
+
+    [SerializeField]
+    private AudioSelection m_bossDeathSFX = new AudioSelection();
 
     // -------------------------------------------------------------------------------------------------
     [Header("Attack Noises SFX")]
@@ -160,6 +168,10 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private float m_fTimeBetweenAttacks = 5.0f;
 
+    [Tooltip("Length of the boss death effects.")]
+    [SerializeField]
+    private float m_fDeathTime = 5.0f;
+
     // Global
     private PlayerController m_playerController;
     private PlayerStats m_playerStats;
@@ -170,12 +182,19 @@ public class BossBehaviour : MonoBehaviour
     private float m_fTimeSinceGlobalAttack = 0.0f;
     private float m_fTimeSinceHit; // Time since the boss was hit by the beam.
     private float m_fSpawnTime;
-    private float m_fCurrentSpawnTime;
     private bool m_bUnderAttack;
+
+    // State delegate.
+    public delegate void StateFunc();
+    private StateFunc m_state;
 
     // Stages
     private BehaviourNode[] m_bossTreeStages;
     private int m_nStageIndex;
+
+    // Spawn/Death
+    private float m_fCurrentSpawnTime;
+    private float m_fCurrentDeathTime;
 
     // Attack decision making
     private AttackRating[] m_attackRatings;
@@ -224,6 +243,9 @@ public class BossBehaviour : MonoBehaviour
         m_endPortal = GameObject.FindGameObjectWithTag("EndPortal");
         m_endPortal.SetActive(false);
 
+        // Initial behaviour state.
+        m_state = SpawnState;
+
         // Initial attack cooldowns.
         m_fPortalPunchCDTimer = m_fPortalPunchCD;
         m_fMeteorCDTimer = m_fMeteorCD;
@@ -235,10 +257,9 @@ public class BossBehaviour : MonoBehaviour
 
         // VFX
 
-        // Spawn
-        m_animator.enabled = false;
-
+        // Spawn/Death
         m_dissolveMat.SetFloat("_Dissolve", 0.0f);
+        m_animator.SetBool("Spawned", false);
 
         m_fSpawnTime = m_spawnVFX.GetFloat("Lifetime Max");
         m_fCurrentSpawnTime = m_fSpawnTime;
@@ -317,11 +338,40 @@ public class BossBehaviour : MonoBehaviour
         m_beamImpactAudioLoop = new AudioLoop(m_beamImpactLoopingSFX, m_beamDestinationVFX.m_particleSystems[0].gameObject, ESpacialMode.AUDIO_SPACE_WORLD);
     }
 
-    void Update()
+    public void SpawnState()
+    {
+        if (m_fCurrentSpawnTime > 0.0f)
+        {
+            // Find and set dissolve shader value...
+            m_fCurrentSpawnTime = Mathf.Max(m_fCurrentSpawnTime - Time.deltaTime, 0.0f);
+            float fDissolveLevel = Mathf.Min((1.0f - (m_fCurrentSpawnTime / m_fSpawnTime) * 2.0f), 1.0f);
+
+            m_dissolveMat.SetFloat("_Dissolve", Mathf.Max(fDissolveLevel, 0.0f));
+
+            // Begin spawn animation when dissolve level reaches zero.
+            if (fDissolveLevel > 0.0f)
+                m_animator.SetBool("Spawned", true);
+
+            if(fDissolveLevel > -0.5f)
+            {
+                // Play spawn voice line.
+                m_spawnSFX.PlayRandom(m_fBossVolume);
+            }
+        }
+        
+        // The idle animation state before the spawn animation is a different node, we only want to know if he is in the post-spawn idle state.
+        if(CondIsIdleAnimation() == ENodeResult.NODE_SUCCESS) // Change state once spawn animation is complete.
+            m_state = AliveState;
+    }
+
+    public void AliveState()
     {
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.P))
             ProgressStage();
+
+        if (Input.GetKeyDown(KeyCode.B))
+            KillBoss();
 #endif
 
         // Reset attack descision making data.
@@ -346,7 +396,7 @@ public class BossBehaviour : MonoBehaviour
         }
 
         // Perform attack after delay.
-        if(m_bAttackPending && m_fCurrentAttackDelay <= 0.0f)
+        if (m_bAttackPending && m_fCurrentAttackDelay <= 0.0f)
         {
             m_attacks[m_nChosenAttackIndex]();
 
@@ -362,17 +412,30 @@ public class BossBehaviour : MonoBehaviour
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
         m_fCurrentAttackDelay -= Time.deltaTime;
 
-        if (m_fCurrentSpawnTime > 0.0f)
-        {
-            m_fCurrentSpawnTime = Mathf.Max(m_fCurrentSpawnTime - Time.deltaTime, 0.0f);
-            float fDissolveLevel = Mathf.Min((1.0f - (m_fCurrentSpawnTime / m_fSpawnTime) * 2.0f), 1.0f);
-
-            m_dissolveMat.SetFloat("_Dissolve", fDissolveLevel);
-        }
-
         m_fPortalPunchCDTimer -= Time.deltaTime;
         m_fMeteorCDTimer -= Time.deltaTime;
         m_fBeamAttackCDTimer -= Time.deltaTime;
+    }
+
+    public void DeathState()
+    {
+        // Death dissolve effect.
+        if (m_fCurrentDeathTime > 0.0f)
+        {
+            m_fCurrentDeathTime -= Time.deltaTime;
+
+            float fDissolveLevel = m_fCurrentDeathTime / m_fDeathTime;
+
+            m_dissolveMat.SetFloat("_Dissolve", fDissolveLevel);
+        }
+        else // Disable script once death state is complete.
+            enabled = false;
+    }
+
+    void Update()
+    {
+        // Run current state function.
+        m_state();
     }
 
     /*
@@ -399,7 +462,7 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetBool("UnderAttack", true);
         m_animator.SetBool("PortalPunchComplete", true);
 
-        m_bossHitSFX.PlayRandom();
+        m_bossHitSFX.PlayRandom(m_fBossVolume);
 
         DeactivateBeam();
         m_portalScript.SetPortalCloseStage();
@@ -429,12 +492,25 @@ public class BossBehaviour : MonoBehaviour
     */
     public void KillBoss()
     {
-        //enable end portal
-        Debug.Log("Boss Dead");
-        gameObject.SetActive(false);
+        // Enable end portal
         m_endPortal.SetActive(true);
 
+        // Set state.
+        m_state = DeathState;
+
+        // Play animation.
+        m_animator.SetBool("IsDead", true);
+
+        // Activate death state.
+        m_fCurrentDeathTime = m_fDeathTime;
+
+        // Play voice line.
+        m_bossDeathSFX.PlayRandom(m_fBossVolume);
+
         // Cancel attacks.
+        m_animator.SetInteger("AttackID", 0);
+        m_animator.SetBool("PortalPunchComplete", true);
+
         DeactivateBeam();
         m_portalScript.SetPortalCloseStage();
     }
@@ -656,7 +732,7 @@ public class BossBehaviour : MonoBehaviour
                 m_bAttackPending = true;
 
                 // Play voice line.
-                m_attackVoices[m_nChosenAttackIndex].PlayRandom();
+                m_attackVoices[m_nChosenAttackIndex].PlayRandom(m_fBossVolume);
             }
         }
         else
@@ -975,14 +1051,13 @@ public class BossBehaviour : MonoBehaviour
         //m_punchVoiceSelection.PlayRandom();
     }
 
-    public static void SetVolume(float volume)
+    public static void SetVolume(float fVolume, float master)
     {
-        m_fBossVolume = volume;
+        m_fBossVolume = fVolume * master;
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.DrawSphere(m_v3BeamEnd, 1.0f);
     }
-
 }

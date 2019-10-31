@@ -34,8 +34,9 @@ public struct AudioSelection
     Description: Play an audio clip at the given index.
     Param:
         int nIndex: The index of the clip to play. If the index is out of range play the final clip.
+        float fVolume: The volume to play audio at.
     */
-    public void PlayIndex(int nIndex)
+    public void PlayIndex(int nIndex, float fVolume = 1.0f)
     {
         if (m_clips.Length == 0 || m_fCurrentCD > 0.0f)
             return;
@@ -47,15 +48,17 @@ public struct AudioSelection
         // Check the clip exists and play it.
         if (m_clips[nIndex] && m_source)
         {
-            m_source.PlayOneShot(m_clips[nIndex]);
+            m_source.PlayOneShot(m_clips[nIndex], fVolume);
             m_fCurrentCD = m_fCooldown;
         }
     }
 
     /*
     Description: Play a random audio clip.
+    Param:
+        float fVolume: The volume to play audio at.
     */
-    public void PlayRandom()
+    public void PlayRandom(float fVolume = 1.0f)
     {
         if (m_clips.Length == 0 || m_fCurrentCD > 0.0f)
             return;
@@ -65,11 +68,18 @@ public struct AudioSelection
         // If the new random index is equal to the last find a random index in the range before or after it.
         if(nRandIndex == m_nLastRandIndex)
         {
+            int nPartitionIndex = 0;
+
             // Select a partition of the array range before or after the new random index.
-            int nPartitionIndex = Random.Range(0, 2);
+            if (m_nLastRandIndex == m_clips.Length - 1)
+                nPartitionIndex = 0;
+            else if (m_nLastRandIndex == 0)
+                nPartitionIndex = 1;
+            else
+                nPartitionIndex = Random.Range(0, 2);
 
             // Pick a random index in the chosen partition.
-            switch(nPartitionIndex)
+            switch (nPartitionIndex)
             {
                 case 0:
                     nRandIndex = Random.Range(0, m_nLastRandIndex);
@@ -84,7 +94,7 @@ public struct AudioSelection
         // Check the clip exists and play it.
         if (m_clips[nRandIndex] && m_source)
         {
-            m_source.PlayOneShot(m_clips[nRandIndex]);
+            m_source.PlayOneShot(m_clips[nRandIndex], fVolume);
             m_fCurrentCD = m_fCooldown;
             m_nLastRandIndex = nRandIndex;
         }

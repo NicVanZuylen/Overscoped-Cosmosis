@@ -29,18 +29,19 @@ public class GameManager : MonoBehaviour
         // Plane is no longer needed.
         Destroy(worldPlane);
 
-        //Create instance of SettingsIO
+        // Create instance of SettingsIO
         m_settingLoader = new SettingsIO();
 
-        //Reads the folder
+        // Reads the folder
         m_settingLoader.ReadFile();
 
-        //Sets settings to the values in the file
+        // Sets settings to the values in the file
         m_settings = m_settingLoader.GetData();
 
-        BossBehaviour.SetVolume(m_settings.m_fBossVolume);
-        PlayerStats.SetVolume(m_settings.m_fWindVolume);
-        GrappleHook.SetVolume(m_settings.m_fGrappleVolume);
+        // Sets the volume
+        BossBehaviour.SetVolume(m_settings.m_fBossVolume, m_settings.m_fMasterVolume);
+        PlayerStats.SetVolume(m_settings.m_fPlayerVolume,m_settings.m_fWindVolume, m_settings.m_fMasterVolume);
+        GrappleHook.SetVolume(m_settings.m_fGrappleVolume, m_settings.m_fMasterVolume);
 
 
     }

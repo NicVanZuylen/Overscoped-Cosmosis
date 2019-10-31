@@ -1,11 +1,11 @@
 fileFormatVersion: 2
-guid: 5b6d1319f76dbd34dab09fa48c163266
+guid: e5319d8041ba60540b61ba133cf0affd
 ModelImporter:
   serializedVersion: 25
   internalIDToNameTable:
   - first:
-      74: 1827226128182048838
-    second: Take 001
+      74: 5522812681064789136
+    second: Run
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -35,18 +35,18 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Take 001
-      takeName: Take 001
-      internalID: 1827226128182048838
-      firstFrame: 31
-      lastFrame: 90
+      name: Run
+      takeName: Run
+      internalID: 5522812681064789136
+      firstFrame: 1
+      lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -58,7 +58,21 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.091295116
+        functionName: EvBob
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.6029724
+        functionName: EvBob
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

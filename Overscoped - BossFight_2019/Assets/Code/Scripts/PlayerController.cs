@@ -43,8 +43,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float m_fSlideDrag = 5.0f;
 
+    [Tooltip("Acceleration due to gravity when falling without jumping first.")]
+    [SerializeField]
+    private float m_fDropGravity = -9.81f;
+
     [Header("In-air")]
     [Space(10)]
+
     [Tooltip("Rate of acceleration when jumping/falling.")]
     [SerializeField]
     private float m_fAirAcceleration = 0.1f;
@@ -688,6 +693,9 @@ public class PlayerController : MonoBehaviour
             // Add jumping impulse.
             v3NetForce.y = m_fJumpInitialVelocity;
 
+            // Set jump gravity.
+            m_fCurrentGravity = m_fJumpGravity;
+
             m_bShouldJump = false;
             m_bOnGround = false;
             m_bJumping = true;
@@ -792,6 +800,10 @@ public class PlayerController : MonoBehaviour
             // Calculate surface vectors for airborne movement.
             // We're giving it the upward vector to represent a flat surface.
             CalculateSurfaceAxesUnlimited(Vector3.up, out m_v3SurfaceForward, out m_v3SurfaceUp, out m_v3SurfaceRight);
+
+            // Set gravity to drop gravity if not jumping.
+            if (bPrevGrounded && !m_bJumping)
+                m_fCurrentGravity = m_fDropGravity;
         }
 
         if (!bPrevGrounded && m_v3Velocity.y < 0.0f && m_bOnGround)

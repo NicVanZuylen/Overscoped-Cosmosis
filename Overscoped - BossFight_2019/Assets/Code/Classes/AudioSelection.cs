@@ -31,6 +31,15 @@ public struct AudioSelection
     }
 
     /*
+    Description: Returns if the audio cooldown has expired.
+    Return Type: bool
+    */
+    public bool CooldownExpired()
+    {
+        return m_fCooldown <= 0.0f;
+    }
+
+    /*
     Description: Play an audio clip at the given index.
     Param:
         int nIndex: The index of the clip to play. If the index is out of range play the final clip.

@@ -96,6 +96,9 @@ class LineEffects
         m_computeShader = shader;
     }
 
+    /*
+    Description: Clean up compute shader buffer memory.
+    */
     public void DestroyBuffers()
     {
         m_outputPointBuffer.Release();
@@ -103,6 +106,18 @@ class LineEffects
         m_bezierIntPointBuffer.Release();
     }
 
+    /*
+    Description: Get the grapple line renderer points.
+    Return Type: Vector3[]
+    */
+    public Vector3[] GetLinePoints()
+    {
+        return m_v3GrapLinePoints;
+    }
+
+    /*
+    Description: Calculate line renderer effects, including positions.
+    */
     public void ProcessLine(LineRenderer line, PlayerController controller, Transform originNode, Vector3 v3Destination, float fProgress, bool bActive)
     {
         // ------------------------------------------------------------------------------------------------------------------------------
@@ -120,12 +135,14 @@ class LineEffects
             line.startWidth = m_fCurrentLineThickness;
             line.endWidth = m_fCurrentLineThickness;
 
-            line.enabled = m_fCurrentLineThickness < (m_fPopThickness - 0.1f);
+            if (m_fCurrentLineThickness >= (m_fPopThickness - 0.1f))
+                line.enabled = false;
 
             return;
         }
 
-        line.enabled = true;
+        if(!line.enabled)
+            line.enabled = true;
 
         // Reset thickness to default when in use.
         m_fCurrentLineThickness = m_fLineThickness;

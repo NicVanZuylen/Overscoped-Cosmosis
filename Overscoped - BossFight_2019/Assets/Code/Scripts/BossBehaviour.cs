@@ -108,6 +108,18 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private Material m_dissolveMat = null;
 
+    [Tooltip("Chest barrier material for spawn effects.")]
+    [SerializeField]
+    private Material m_barrierMat = null;
+
+    [Tooltip("Heart mesh renderer.")]
+    [SerializeField]
+    private MeshRenderer m_heartRenderer = null;
+
+    [Tooltip("Heart tendrils mesh renderer.")]
+    [SerializeField]
+    private MeshRenderer m_tentrilsRenderer = null;
+
     // -------------------------------------------------------------------------------------------------
     [Header("SpawnSFX")]
 
@@ -256,12 +268,29 @@ public class BossBehaviour : MonoBehaviour
 
         // VFX
 
+        // Stop beam origin vfx.
+        m_beamOriginVFX.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
+
         // Spawn/Death
-        m_dissolveMat.SetFloat("_Dissolve", 0.0f);
+        if(m_dissolveMat)
+            m_dissolveMat.SetFloat("_Dissolve", 0.0f);
+
+        if (m_barrierMat)
+            m_barrierMat.SetFloat("_Alpha", 0.0f);
+
+        if (m_heartRenderer)
+            m_heartRenderer.enabled = false;
+
+        if (m_tentrilsRenderer)
+            m_tentrilsRenderer.enabled = false;
+
         m_animator.SetBool("Spawned", false);
 
         m_fSpawnTime = m_spawnVFX.GetFloat("Lifetime Max");
         m_fCurrentSpawnTime = m_fSpawnTime;
+
+        // Disable spawn VFX until needed.
+        m_spawnVFX.gameObject.SetActive(false);
 
         // Initialize beam effect buffers.
         m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticles.Length];
@@ -337,24 +366,41 @@ public class BossBehaviour : MonoBehaviour
         m_portalAmbientsAudioLoop = new AudioLoop(m_portalAmbientsSFX, m_portal, ESpacialMode.AUDIO_SPACE_NONE);
 
         m_beamImpactAudioLoop = new AudioLoop(m_beamImpactLoopingSFX, m_beamDestinationVFX.m_particleSystems[0].gameObject, ESpacialMode.AUDIO_SPACE_WORLD);
+
+        // Disable until the player reaches the arena.
+        enabled = false;
+    }
+
+    public void OnEnable()
+    {
+        // Enable spawn VFX.
+        if (m_spawnVFX)
+            m_spawnVFX.gameObject.SetActive(true);
     }
 
     public void SpawnState()
     {
-        if (m_fCurrentSpawnTime > 0.0f)
+        if (m_fCurrentSpawnTime > 0.0f && m_dissolveMat && m_barrierMat && m_heartRenderer && m_tentrilsRenderer)
         {
             // Find and set dissolve shader value...
             m_fCurrentSpawnTime = Mathf.Max(m_fCurrentSpawnTime - Time.deltaTime, 0.0f);
-            float fDissolveLevel = Mathf.Min((1.0f - (m_fCurrentSpawnTime / m_fSpawnTime) * 2.0f), 1.0f);
+            float fDissolveLevel = Mathf.Max(Mathf.Min((1.0f - (m_fCurrentSpawnTime / m_fSpawnTime) * 2.0f), 1.0f), 0.0f);
 
-            m_dissolveMat.SetFloat("_Dissolve", Mathf.Max(fDissolveLevel, 0.0f));
+            m_dissolveMat.SetFloat("_Dissolve", fDissolveLevel);
+            m_barrierMat.SetFloat("_Alpha", fDissolveLevel);
 
             // Begin spawn animation when dissolve level reaches zero.
             if (fDissolveLevel > 0.0f)
+            {
                 m_animator.SetBool("Spawned", true);
 
-            if(fDissolveLevel > -0.5f)
-            {
+                // Show heart and tenrils at this point.
+                if(!m_heartRenderer.enabled)
+                    m_heartRenderer.enabled = true;
+
+                if (!m_tentrilsRenderer.enabled)
+                    m_tentrilsRenderer.enabled = true;
+
                 // Play spawn voice line.
                 m_spawnSFX.PlayRandom(m_fBossVolume);
             }
@@ -433,7 +479,7 @@ public class BossBehaviour : MonoBehaviour
             enabled = false;
     }
 
-    void Update()
+    void LateUpdate()
     {
         // Run current state function.
         m_state();

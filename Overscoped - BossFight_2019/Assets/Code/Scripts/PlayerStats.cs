@@ -82,7 +82,7 @@ public class PlayerStats : MonoBehaviour
 
     // -------------------------------------------------------------------------------------------------
     [Space(10)]
-    [Header("GUI References")]
+    [Header("GUI")]
     [Space(10)]
 
     [SerializeField]
@@ -98,13 +98,11 @@ public class PlayerStats : MonoBehaviour
     private RectTransform m_reticleOuterTransform = null;
 
     [SerializeField]
-    private Material m_armHealthMat = null;
-
-    [SerializeField]
-    private Material m_armManaMat = null;
-
-    [SerializeField]
     private Text m_speedText = null;
+
+    [Tooltip("Size multipler of the reticle outer sprite when the player can grapple.")]
+    [SerializeField]
+    private float m_fReticleSizeMultiplier = 1.2f;
 
     // -------------------------------------------------------------------------------------------------
     [Header("SFX")]
@@ -238,7 +236,7 @@ public class PlayerStats : MonoBehaviour
 
         AudioSource windSource = m_windAudioLoop.GetSource();
 
-        // Wind effect.
+        // Wind effects.
         if (!m_controller.IsGrounded())
         {
             // Adjust wind volume based off of velocity.
@@ -246,6 +244,10 @@ public class PlayerStats : MonoBehaviour
 
             if (!m_windAudioLoop.IsPlaying())
                 m_windAudioLoop.Play(m_fPlayerVolume);
+
+            // Apply camera wind effects...
+            m_camEffects.ApplyShake(0.1f, windSource.volume * 0.15f);
+            m_camEffects.ApplyChromAbbShake(0.1f, windSource.volume * 0.1f, windSource.volume * 0.2f);
         }
         else if(m_windAudioLoop.IsPlaying())
         {
@@ -295,6 +297,9 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    /*
+    Description: Update function when the player is alive.
+    */
     private void AliveUpdate()
     {
         // Apply velocity-based FX.
@@ -310,6 +315,9 @@ public class PlayerStats : MonoBehaviour
 
             // Lose mana whilst the hook is active.
             m_fMana -= m_fManaLossRate * Time.deltaTime;
+
+            // Update mana GUI fill.
+            m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
         }
         else
         {
@@ -354,15 +362,13 @@ public class PlayerStats : MonoBehaviour
         m_fHealth = Mathf.Clamp(m_fHealth, 0.0f, m_fMaxHealth);
         m_fMana = Mathf.Clamp(m_fMana, 0.0f, m_fMaxMana);
 
-        m_armHealthMat.SetFloat("_Mana", 1.0f - (m_fHealth / m_fMaxHealth));
-        m_armManaMat.SetFloat("_Mana", 1.0f - (m_fMana / m_fMaxMana));
-
+        // Highlight reticle when the player can grapple an object.
         if (m_hookScript.InGrappleRange())
         {
             m_reticleMats[0].SetInt("_InRange", 1);
             m_reticleMats[1].SetInt("_InRange", 1);
 
-            m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f) * 1.2f;
+            m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f) * m_fReticleSizeMultiplier;
         } 
         else
         {
@@ -374,19 +380,20 @@ public class PlayerStats : MonoBehaviour
 
         if (m_speedText)
             m_speedText.text = m_controller.GetVelocity().magnitude.ToString("n2") + "m/s";
-
-        m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
-        m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
     }
 
+    /*
+    Description: Reset time scale and reload the active scene.
+    */
     private void RestartScene()
     {
         Time.timeScale = 1.0f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-
-
+    /*
+    Description: Update function during the player's death state.
+    */
     private void DeathUpdate()
     {
         m_camEffects.ApplyChromAbbShake(0.1f, m_fSplineProgress * 1.5f, m_fSplineProgress * 2.0f);
@@ -512,8 +519,15 @@ public class PlayerStats : MonoBehaviour
     {
         m_fHealth -= fDamage;
 
-        // Hurt SFX
+        // Set GUI value.
+        m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
+
+        // Play Hurt SFX...
         m_hurtSFX.PlayRandom();
+
+        // Play camera effects...
+        m_camEffects.ApplyShake(0.1f, 0.8f, true);
+        m_camEffects.ApplyChromAbbShake(0.1f, 0.6f, 0.8f);
 
         if(m_fHealth <= 0.0f)
         {
@@ -528,9 +542,6 @@ public class PlayerStats : MonoBehaviour
     private void KillPlayer()
     {
         m_fHealth = 0.0f;
-
-        // Set health bar value to zero.
-        m_armHealthMat.SetFloat("_Mana", 0.0f);
 
         // Begin fade effect.
         m_fadeScript.SetFadeRate(0.0f);

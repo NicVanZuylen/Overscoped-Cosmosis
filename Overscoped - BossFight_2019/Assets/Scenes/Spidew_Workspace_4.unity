@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.061417833, g: 0.07427355, b: 0.11543029, a: 1}
+  m_IndirectSpecularColor: {r: 0.1458271, g: 0.04640487, b: 0.22022216, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -11598,7 +11598,7 @@ PrefabInstance:
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
       propertyPath: m_RootOrder
-      value: 12
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
@@ -15226,7 +15226,7 @@ PrefabInstance:
     - target: {fileID: 8176933855311526725, guid: aca41039d7a01644cba21a281f1bedd0,
         type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8176933855311526725, guid: aca41039d7a01644cba21a281f1bedd0,
         type: 3}
@@ -19972,6 +19972,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 695777877}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &319405943 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6055518448237033351, guid: 08267407a60da1046ac8f6f1de23b161,
+    type: 3}
+  m_PrefabInstance: {fileID: 629796985}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &320965408
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20850,6 +20856,8 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_and_Pull_Origin.prefab
   - _gameObject: {fileID: 1453764986}
     _prefab: Assets/Prefabs/Player/Player.prefab
+  - _gameObject: {fileID: 943786802}
+    _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_Destination.prefab
   - _gameObject: {fileID: 1432772320}
     _prefab: Assets/Prefabs/Player/Player.prefab
   - _gameObject: {fileID: 1045355395}
@@ -20860,6 +20868,8 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_and_Pull_Origin.prefab
   - _gameObject: {fileID: 1432772320}
     _prefab: Assets/Prefabs/Player/Player.prefab
+  - _gameObject: {fileID: 809915900}
+    _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_Destination.prefab
   - _gameObject: {fileID: 1669987488}
     _prefab: Assets/Prefabs/Environment/Pillars/Pillar.prefab
   - _gameObject: {fileID: 54210585}
@@ -20878,6 +20888,8 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_and_Pull_Origin.prefab
   - _gameObject: {fileID: 385450628}
     _prefab: Assets/Prefabs/Player/Player.prefab
+  - _gameObject: {fileID: 2003565709}
+    _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_Destination.prefab
   - _gameObject: {fileID: 1984895154}
     _prefab: Assets/Prefabs/Environment/Pillars/Pillar.prefab
   - _gameObject: {fileID: 534902671}
@@ -20926,6 +20938,30 @@ MonoBehaviour:
     _prefab: Assets/Meshes/Environment/Rocks/SM_Void_Rock_Pillar_001.fbx
   - _gameObject: {fileID: 559646157}
     _prefab: Assets/Prefabs/MeteorTargetVolume.prefab
+  - _gameObject: {fileID: 57677088}
+    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 400220099}
+    _prefab: Assets/Meshes/Boss/SK_Boss_2.fbx
+  - _gameObject: {fileID: 57677088}
+    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 167397266}
+    _prefab: Assets/Prefabs/VFX/PS_Boss_Laser_Origin.prefab
+  - _gameObject: {fileID: 1452456331}
+    _prefab: Assets/VFX/Particle Systems/PS_Boss_Beam_Destination.prefab
+  - _gameObject: {fileID: 57677088}
+    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
+  - _gameObject: {fileID: 454113094}
+    _prefab: Assets/Prefabs/Boss/Meteor.prefab
+  - _gameObject: {fileID: 882981194}
+    _prefab: Assets/Prefabs/Boss/Meteor.prefab
+  - _gameObject: {fileID: 1950210092}
+    _prefab: Assets/Prefabs/Boss/Meteor.prefab
+  - _gameObject: {fileID: 304244306}
+    _prefab: Assets/Prefabs/Boss/Portal.prefab
+  - _gameObject: {fileID: 784252356}
+    _prefab: Assets/Meshes/Boss/SM_Arm.fbx
+  - _gameObject: {fileID: 644164149}
+    _prefab: Assets/VFX/VFX Graphs/VFX_G_Boss_Spawn.prefab
   - _gameObject: {fileID: 848805992}
     _prefab: Assets/Prefabs/Chains_Hinged.prefab
   - _gameObject: {fileID: 2010238874}
@@ -20968,32 +21004,10 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/Environment/Arena/SM_Arena_Base_001.prefab
   - _gameObject: {fileID: 390058607}
     _prefab: Assets/Meshes/Environment/Arena/SM_Arena_Base_001.fbx
-  - _gameObject: {fileID: 57677088}
-    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
-  - _gameObject: {fileID: 400220099}
-    _prefab: Assets/Meshes/Boss/SK_Boss_2.fbx
-  - _gameObject: {fileID: 57677088}
-    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
-  - _gameObject: {fileID: 167397266}
-    _prefab: Assets/Prefabs/VFX/PS_Boss_Laser_Origin.prefab
-  - _gameObject: {fileID: 1452456331}
-    _prefab: Assets/VFX/Particle Systems/PS_Boss_Beam_Destination.prefab
-  - _gameObject: {fileID: 57677088}
-    _prefab: Assets/Prefabs/Boss/MidlifeCrisisMan.prefab
-  - _gameObject: {fileID: 454113094}
-    _prefab: Assets/Prefabs/Boss/Meteor.prefab
-  - _gameObject: {fileID: 882981194}
-    _prefab: Assets/Prefabs/Boss/Meteor.prefab
-  - _gameObject: {fileID: 1950210092}
-    _prefab: Assets/Prefabs/Boss/Meteor.prefab
-  - _gameObject: {fileID: 304244306}
-    _prefab: Assets/Prefabs/Boss/Portal.prefab
-  - _gameObject: {fileID: 784252356}
-    _prefab: Assets/Meshes/Boss/SM_Arm.fbx
-  - _gameObject: {fileID: 644164149}
-    _prefab: Assets/VFX/VFX Graphs/VFX_G_Boss_Spawn.prefab
   - _gameObject: {fileID: 1987841943}
     _prefab: Assets/Prefabs/GameManager.prefab
+  - _gameObject: {fileID: 1751965203}
+    _prefab: Assets/Prefabs/End Portal.prefab
   - _gameObject: {fileID: 686038719}
     _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
   - _gameObject: {fileID: 1434641567}
@@ -21004,17 +21018,23 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_and_Pull_Origin.prefab
   - _gameObject: {fileID: 686038719}
     _prefab: Assets/Prefabs/Player/Player_Nic_Test Variant.prefab
+  - _gameObject: {fileID: 319405943}
+    _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_Destination.prefab
   - _gameObject: {fileID: 1758388724}
     _prefab: Assets/Prefabs/GUI/GameMenuCanvas.prefab
   - _gameObject: {fileID: 1823388946}
     _prefab: Assets/Prefabs/GUI/HUDCanvas.prefab
-  - _gameObject: {fileID: 1751965203}
-    _prefab: Assets/Prefabs/End Portal.prefab
   - _gameObject: {fileID: 136037253}
     _prefab: Assets/Prefabs/PS_Crystal.prefab
   - _gameObject: {fileID: 136037254}
     _prefab: Assets/Meshes/Crystal.fbx
   - _gameObject: {fileID: 136037253}
+    _prefab: Assets/Prefabs/PS_Crystal.prefab
+  - _gameObject: {fileID: 971783381}
+    _prefab: Assets/Prefabs/PS_Crystal.prefab
+  - _gameObject: {fileID: 971783382}
+    _prefab: Assets/Meshes/Crystal.fbx
+  - _gameObject: {fileID: 971783381}
     _prefab: Assets/Prefabs/PS_Crystal.prefab
   - _gameObject: {fileID: 1939285247}
     _prefab: Assets/Prefabs/MeteorTargetVolume.prefab
@@ -21048,12 +21068,6 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/MeteorTargetVolume.prefab
   - _gameObject: {fileID: 1349629591}
     _prefab: Assets/Prefabs/MeteorTargetVolume.prefab
-  - _gameObject: {fileID: 971783381}
-    _prefab: Assets/Prefabs/PS_Crystal.prefab
-  - _gameObject: {fileID: 971783382}
-    _prefab: Assets/Meshes/Crystal.fbx
-  - _gameObject: {fileID: 971783381}
-    _prefab: Assets/Prefabs/PS_Crystal.prefab
   - _gameObject: {fileID: 1097435395}
     _prefab: Assets/Prefabs/PS_Crystal.prefab
   - _gameObject: {fileID: 1097435396}
@@ -21756,7 +21770,7 @@ Transform:
   - {fileID: 686038720}
   - {fileID: 1603796747}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &343181899
 PrefabInstance:
@@ -34731,7 +34745,7 @@ Transform:
   m_LocalScale: {x: 10.06538, y: 10.06538, z: 10.06538}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &705792494
 Mesh:
@@ -36471,6 +36485,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 26147246398459800, guid: 02ebce200fe8e3d4ba487fdf75f0ac42,
     type: 3}
   m_PrefabInstance: {fileID: 1713980283527277476}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &809915900 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1779953371063787956, guid: ed16ca3417fe22f478cf87da9d692428,
+    type: 3}
+  m_PrefabInstance: {fileID: 1082369034}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &814097715 stripped
 GameObject:
@@ -40123,6 +40143,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 955617960}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &943786802 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1779953371063787956, guid: ed16ca3417fe22f478cf87da9d692428,
+    type: 3}
+  m_PrefabInstance: {fileID: 1714043715}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &944837397
 GameObject:
   m_ObjectHideFlags: 0
@@ -42851,7 +42877,7 @@ PrefabInstance:
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
       propertyPath: m_RootOrder
-      value: 14
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
@@ -53193,7 +53219,7 @@ PrefabInstance:
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
       propertyPath: m_RootOrder
-      value: 16
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 6851692997330779747, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
         type: 3}
@@ -59579,7 +59605,7 @@ Transform:
   - {fileID: 976276624}
   - {fileID: 688912380}
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1254939441 stripped
 GameObject:
@@ -64125,7 +64151,7 @@ Transform:
   - {fileID: 1003837626}
   - {fileID: 951187142}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1349629591 stripped
 GameObject:
@@ -67461,7 +67487,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1413523232
 PrefabInstance:
@@ -79988,7 +80014,7 @@ PrefabInstance:
     - target: {fileID: 6784897559113473245, guid: abcedfbe29c62424bba0494e4f2c3b14,
         type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6784897559113473245, guid: abcedfbe29c62424bba0494e4f2c3b14,
         type: 3}
@@ -81303,7 +81329,7 @@ PrefabInstance:
     - target: {fileID: 1052553494790951508, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1052553494790951508, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
@@ -97547,7 +97573,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: -91.245995, y: 0, z: 0}
 --- !u!1 &1923702628 stripped
 GameObject:
@@ -103258,6 +103284,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2388719966722871948, guid: a7ad2c228eefcee48b0e44692d13a8b6,
     type: 3}
   m_PrefabInstance: {fileID: 1999785325}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2003565709 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1779953371063787956, guid: ed16ca3417fe22f478cf87da9d692428,
+    type: 3}
+  m_PrefabInstance: {fileID: 1896455136}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2004183893
 PrefabInstance:

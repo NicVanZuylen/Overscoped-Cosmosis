@@ -337,6 +337,9 @@ public class PlayerStats : MonoBehaviour
                         m_fMana = Mathf.Lerp(m_fMana, m_fMaxMana, m_fManaRegenRateLerp);
                         break;
                 }
+
+                // Update mana GUI fill.
+                m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
             }
         }
 

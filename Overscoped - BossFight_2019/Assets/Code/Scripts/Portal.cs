@@ -84,6 +84,15 @@ public class Portal : MonoBehaviour
     }
 
     /*
+    Description: Get the length of the arm exiting the portal.
+    Return Type: float
+    */
+    public float GetArmLength()
+    {
+        return m_fArmLength;
+    }
+
+    /*
     Description: Force the wait between opening and the arm coming out to end.
     */
     public void SetArmEnterStage()

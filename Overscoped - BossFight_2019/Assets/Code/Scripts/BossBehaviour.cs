@@ -785,6 +785,8 @@ public class BossBehaviour : MonoBehaviour
         {
             Debug.Log("Attack Index: " + m_nChosenAttackIndex + ", " + nAvailableCount + " Attacks available.");
 
+            m_nChosenAttackIndex = 1;
+
             if(!m_bAttackPending)
             {
                 // Set delay and flag as pending attack.
@@ -1037,16 +1039,23 @@ public class BossBehaviour : MonoBehaviour
         // Get the player's flat forward vector.
         Vector3 v3PlayerForward = m_cameraTransform.forward;
         Vector3 v3PlayerRight = m_cameraTransform.right;
-            
+
         // Create random unit vector.
         Vector3 v3PortalOffset = v3PlayerForward;
-    
+
         v3PortalOffset += v3PlayerRight * Random.Range(-0.2f, 0.2f);
 
         v3PortalOffset.Normalize();
 
         // Position the portal at the potential player position with a random offset.
         Vector3 v3PlayerTrackPos = m_player.transform.position + (m_playerController.GetVelocity() * m_portalScript.OpenTime());
+
+        // Remove Y component if the player is too close to the ground and that component is negative.
+        if ((m_playerController.IsGrounded() || m_playerController.HeightAboveGround() < m_portalScript.GetArmLength()) && v3PlayerForward.y < 0.0f)
+        {
+            v3PortalOffset.y = 0.0f;
+        }
+
         m_portal.transform.position = v3PlayerTrackPos + (v3PortalOffset * 50.0f);
 
         // Look at predicted player location.

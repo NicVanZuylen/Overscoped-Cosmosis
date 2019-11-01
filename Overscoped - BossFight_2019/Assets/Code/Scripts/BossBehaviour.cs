@@ -104,6 +104,10 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private VisualEffect m_spawnVFX = null;
 
+    [Tooltip("Death GPU particlesystem.")]
+    [SerializeField]
+    private GameObject m_deathVFX = null;
+
     [Tooltip("Spawn/Death dissolve material")]
     [SerializeField]
     private Material m_dissolveMat = null;
@@ -484,9 +488,13 @@ public class BossBehaviour : MonoBehaviour
             float fDissolveLevel = m_fCurrentDeathTime / m_fDeathTime;
 
             m_dissolveMat.SetFloat("_Dissolve", fDissolveLevel);
+
+            // Play death VFX particles.
+            if (m_deathVFX && m_fCurrentDeathTime <= 2.5f)
+                m_deathVFX.SetActive(true);
         }
-        else // Disable script once death state is complete.
-            enabled = false;
+        else // Disable boss once death state is complete.
+            gameObject.SetActive(false);
     }
 
     void LateUpdate()
@@ -784,8 +792,6 @@ public class BossBehaviour : MonoBehaviour
         if (m_nChosenAttackIndex > -1)
         {
             Debug.Log("Attack Index: " + m_nChosenAttackIndex + ", " + nAvailableCount + " Attacks available.");
-
-            m_nChosenAttackIndex = 1;
 
             if(!m_bAttackPending)
             {

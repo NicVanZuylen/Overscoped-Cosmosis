@@ -56,11 +56,14 @@ public class PauseMenu : MonoBehaviour
 
     /*
     Description: Pause the game.
+    Param:
+        bool bShowMenu: Whether or not to show the pause menu.
     */
-    public void PauseGame()
+    public void PauseGame(bool bShowMenu = true)
     {
         // Show pause menu.
-        m_pauseMenu.SetActive(true);
+        if(bShowMenu)
+            m_pauseMenu.SetActive(true);
 
         // Unlock cursor.
         m_playerController.SetPaused(true);
@@ -102,7 +105,7 @@ public class PauseMenu : MonoBehaviour
     */
     public void ShowCreditsScreen()
     {
-        PauseGame();
+        PauseGame(false);
 
         // Show credits UI.
         m_creditsScreen.SetActive(true);

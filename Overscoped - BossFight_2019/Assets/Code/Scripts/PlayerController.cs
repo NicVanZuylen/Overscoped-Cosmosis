@@ -149,7 +149,8 @@ public class PlayerController : MonoBehaviour
             m_landCallbacks = new List<PlayerControllerCallback>();
 
         // Set intitial camrera look rotation.
-        SetLookRotation(m_cameraTransform.localRotation);
+        SetLookRotation(m_cameraTransform.rotation);
+        m_fLookEulerX = 0.0f;
 
         m_v3SurfaceUp = transform.up;
         m_v3SurfaceForward = transform.forward;

@@ -271,6 +271,9 @@ public class PlayerController : MonoBehaviour
         if (nMoveDirectionCount >= 2)
             v3Direction = v3Direction.normalized;
 
+        // Play running animation...
+        m_animController.SetBool("isRunning", nMoveDirectionCount > 0);
+
         return v3Direction;
     }
 
@@ -603,11 +606,6 @@ public class PlayerController : MonoBehaviour
                 m_cameraEffects.SetBobbingEnabled(true);
                     
                 // ------------------------------------------------------------------------------------------------------
-                // Play animation...
-
-                m_animController.SetBool("isRunning", true);
-
-                // ------------------------------------------------------------------------------------------------------
                 // Movement lateral tolerance.
 
                 // Component magnitude of the current velocity in the direction of movement.
@@ -653,8 +651,6 @@ public class PlayerController : MonoBehaviour
                     // Slide drag.
                     v3NetForce -= m_v3Velocity * m_fMomentumDrag * fDeltaTime;
                 }
-
-                m_animController.SetBool("isRunning", false);
             }
         }
         else
@@ -663,6 +659,7 @@ public class PlayerController : MonoBehaviour
 
             // ------------------------------------------------------------------------------------------------------
             // Play flying animation...
+
             m_animController.SetBool("isRunning", false);
 
             // ------------------------------------------------------------------------------------------------------

@@ -378,6 +378,12 @@ public class BossBehaviour : MonoBehaviour
             m_spawnVFX.gameObject.SetActive(true);
     }
 
+    public void OnDestroy()
+    {
+        // Reset dissolve shader value.
+        m_dissolveMat.SetFloat("_Dissolve", 1.0f);
+    }
+
     public void SpawnState()
     {
         if (m_fCurrentSpawnTime > 0.0f && m_dissolveMat && m_barrierMat && m_heartRenderer && m_tentrilsRenderer)
@@ -466,6 +472,10 @@ public class BossBehaviour : MonoBehaviour
 
     public void DeathState()
     {
+        // Make sure death animation is playing first.
+        if (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("Death"))
+            return;
+
         // Death dissolve effect.
         if (m_fCurrentDeathTime > 0.0f)
         {
@@ -553,6 +563,9 @@ public class BossBehaviour : MonoBehaviour
 
         // Play voice line.
         m_bossDeathSFX.PlayRandom(m_fBossVolume);
+
+        // Disable tentrils.
+        m_tentrilsRenderer.enabled = false;
 
         // Cancel attacks.
         m_animator.SetInteger("AttackID", 0);
@@ -924,7 +937,7 @@ public class BossBehaviour : MonoBehaviour
             m_beamImpactAudioLoop.Stop();
 
         // Stop VFX.
-        m_beamOriginVFX.Stop();
+        m_beamOriginVFX.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
 
         if(m_beamDestinationVFX.IsPlaying())
             m_beamDestinationVFX.Stop();

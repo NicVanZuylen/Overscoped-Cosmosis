@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: MAT_Portal
-  m_Shader: {fileID: 4800000, guid: 31420581a6e89ee46bf9c606a1dd1571, type: 3}
+  m_Shader: {fileID: 4800000, guid: a4665a7b17314ec4b8405ee1e36c614a, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -21,8 +21,16 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _Albedo:
+        m_Texture: {fileID: 2800000, guid: 4e5f38b4b873cd14c9d7005ff9f54166, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Circle:
+        m_Texture: {fileID: 2800000, guid: 5228a04ef529d2641937cab585cc1a02, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -37,6 +45,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Noise:
+        m_Texture: {fileID: 2800000, guid: cd460ee4ac5c1e746b7a734cc7cc64dd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -49,8 +61,13 @@ Material:
         m_Texture: {fileID: 2800000, guid: b9000c6a16bbb934da38aa6c3de3dc72, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AlphaClip: 0
+    - _AlphaClipThreshold: 0
     - _Blend: 0
     - _BumpScale: 1
     - _Cull: 2
@@ -61,6 +78,7 @@ Material:
     - _GlossyReflections: 1
     - _Metallic: 0
     - _OcclusionStrength: 1
+    - _Opacity: 1
     - _ReceiveShadows: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -70,5 +88,9 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _EdgeColour: {r: 36.75834, g: 0, b: 21.33426, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _NoisePanning: {r: 0.225, g: -0.5, b: 0, a: 0}
+    - _NoiseTiling: {r: 2, g: 1, b: 0, a: 0}
+    - _PanningSpeed: {r: 1, g: 1, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}

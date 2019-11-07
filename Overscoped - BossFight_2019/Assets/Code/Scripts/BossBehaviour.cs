@@ -158,26 +158,35 @@ public class BossBehaviour : MonoBehaviour
 
     [Header("Beam SFX")]
     [SerializeField]
-    private AudioClip m_beamChargeLoopingSFX = null;    //needs setting up
+    private AudioClip m_beamChargeSFX = null;
 
     [SerializeField]                         
     private AudioClip m_beamFireLoopingSFX = null;  
                                              
     [SerializeField]                         
-    private AudioClip m_beamImpactLoopingSFX = null;    //needs setting up
-
-    private AudioLoop m_beamChargeAudioLoop;   
+    private AudioClip m_beamImpactLoopingSFX = null;
 
     private AudioLoop m_beamFireAudioLoop;
 
-    private AudioLoop m_beamImpactAudioLoop;   
+    private AudioLoop m_beamImpactAudioLoop;
+
+    [SerializeField]
+    private AudioSource m_SFXSource = null;
 
     // -------------------------------------------------------------------------------------------------
     [Header("Misc")]
 
     [Tooltip("Minimum delay before any kind of attack is performed.")]
+    private float m_fTimeBetweenAttacks;
+    [Tooltip("Time between attacks while health is between 50% and 100%")]
     [SerializeField]
-    private float m_fTimeBetweenAttacks = 5.0f;
+    private float m_fTimeBetweenAttacksFull = 5.0f;
+    [Tooltip("Time between attacks while health is between 25% and 50%")]
+    [SerializeField]
+    private float m_fTimeBetweenAttacksHalf = 2.5f;
+    [Tooltip("Time between attacks while health below 25%")]
+    [SerializeField]
+    private float m_fTimeBetweenAttacksQuarter = 0f;
 
     [Tooltip("Length of the boss death effects.")]
     [SerializeField]
@@ -194,6 +203,7 @@ public class BossBehaviour : MonoBehaviour
     private float m_fTimeSinceHit; // Time since the boss was hit by the beam.
     private float m_fSpawnTime;
     private bool m_bUnderAttack;
+    private ChestPlate m_chestPlate;
 
     // State delegate.
     public delegate void StateFunc();
@@ -235,12 +245,13 @@ public class BossBehaviour : MonoBehaviour
 
     private AttackFunc[] m_attacks;
     private AudioSelection[] m_attackVoices;
+    [SerializeField]
     private float[] m_fAttackDelays;
     private float m_fCurrentAttackDelay;
     private bool m_bAttackPending;
 
     // Audio
-    private static float m_fBossVolume = 1.0f;
+    private static float m_fBossVolume = 10.0f;
 
     void Awake()
     {
@@ -250,6 +261,7 @@ public class BossBehaviour : MonoBehaviour
         m_grappleScript = m_player.GetComponent<GrappleHook>();
         m_animator = GetComponent<Animator>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+        m_chestPlate = GetComponentInChildren<ChestPlate>();
 
         m_endPortal = GameObject.FindGameObjectWithTag("EndPortal");
         m_endPortal.SetActive(false);
@@ -335,10 +347,10 @@ public class BossBehaviour : MonoBehaviour
         m_attackVoices[1] = m_punchVoiceSelection;
         m_attackVoices[2] = m_beamVoiceSelection;
 
-        m_fAttackDelays = new float[3];
-        m_fAttackDelays[0] = 1.0f;
-        m_fAttackDelays[1] = 2.0f;
-        m_fAttackDelays[2] = 1.0f;
+        //m_fAttackDelays = new float[3];
+        //m_fAttackDelays[0] = 1.0f;
+        //m_fAttackDelays[1] = 2.0f;
+        //m_fAttackDelays[2] = 1.0f;
         m_fCurrentAttackDelay = 0.0f;
         m_bAttackPending = false;
 
@@ -360,8 +372,6 @@ public class BossBehaviour : MonoBehaviour
         m_nAttackIndex = 0;
 
         m_beamFireAudioLoop = new AudioLoop(m_beamFireLoopingSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
-
-        m_beamChargeAudioLoop = new AudioLoop(m_beamChargeLoopingSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
 
         m_portalAmbientsAudioLoop = new AudioLoop(m_portalAmbientsSFX, m_portal, ESpacialMode.AUDIO_SPACE_NONE);
 
@@ -468,6 +478,19 @@ public class BossBehaviour : MonoBehaviour
         m_fPortalPunchCDTimer -= Time.deltaTime;
         m_fMeteorCDTimer -= Time.deltaTime;
         m_fBeamAttackCDTimer -= Time.deltaTime;
+
+        if(m_chestPlate.m_fHealth < m_chestPlate.m_fMaxHealth / 2)
+        {
+            m_fTimeBetweenAttacks = m_fTimeBetweenAttacksHalf;
+        }
+        else if(m_chestPlate.m_fHealth < m_chestPlate.m_fMaxHealth / 4)
+        {
+            m_fTimeBetweenAttacks = m_fTimeBetweenAttacksQuarter;
+        }
+        else
+        {
+            m_fTimeBetweenAttacks = m_fTimeBetweenAttacksFull;
+        }
     }
 
     public void DeathState()
@@ -837,6 +860,9 @@ public class BossBehaviour : MonoBehaviour
     {
         m_animator.SetInteger("AttackID", 3);
 
+        if (m_beamChargeSFX)
+            m_SFXSource.PlayOneShot(m_beamChargeSFX, m_fBossVolume);
+
         return ENodeResult.NODE_SUCCESS;
     }
 
@@ -1057,7 +1083,7 @@ public class BossBehaviour : MonoBehaviour
         m_portalScript.Activate();
 
         m_portalAmbientsAudioLoop.GetSource().spatialBlend = 1;
-        m_portalAmbientsAudioLoop.GetSource().minDistance = 10;
+        m_portalAmbientsAudioLoop.GetSource().minDistance = 50;
 
         if (!m_portalAmbientsAudioLoop.IsPlaying())
             m_portalAmbientsAudioLoop.Play(m_fBossVolume);
@@ -1108,9 +1134,13 @@ public class BossBehaviour : MonoBehaviour
         //m_punchVoiceSelection.PlayRandom();
     }
 
+    public static void SetVolume(float fVolume, float master)
+    {
+        m_fBossVolume = fVolume * master;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.DrawSphere(m_v3BeamEnd, 1.0f);
     }
-
 }

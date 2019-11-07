@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     private MusicManager m_musicManager;
     private bool m_once;
     private bool m_BossDeadOnce;
+    private Settings m_settings;
+    private SettingsIO m_settingLoader;
+
     private void Awake()
     {
         m_player = GameObject.FindGameObjectWithTag("Player");
@@ -25,6 +28,22 @@ public class GameManager : MonoBehaviour
 
         // Plane is no longer needed.
         Destroy(worldPlane);
+
+        // Create instance of SettingsIO
+        m_settingLoader = new SettingsIO();
+
+        // Reads the folder
+        m_settingLoader.ReadFile();
+
+        // Sets settings to the values in the file
+        m_settings = m_settingLoader.GetData();
+
+        // Sets the volume
+        BossBehaviour.SetVolume(m_settings.m_fBossVolume, m_settings.m_fMasterVolume);
+        PlayerStats.SetVolume(m_settings.m_fPlayerVolume,m_settings.m_fWindVolume, m_settings.m_fMasterVolume);
+        GrappleHook.SetVolume(m_settings.m_fGrappleVolume, m_settings.m_fMasterVolume);
+
+
     }
 
     // Update is called once per frame

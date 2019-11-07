@@ -240,10 +240,10 @@ public class PlayerStats : MonoBehaviour
         if (!m_controller.IsGrounded())
         {
             // Adjust wind volume based off of velocity.
-            windSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed, 0.0f);
+            windSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed);
 
             if (!m_windAudioLoop.IsPlaying())
-                m_windAudioLoop.Play(m_fPlayerVolume);
+                m_windAudioLoop.Play(m_fPlayerVolume * windSource.volume);
 
             // Apply camera wind effects...
             m_camEffects.ApplyShake(0.1f, windSource.volume * 0.15f);

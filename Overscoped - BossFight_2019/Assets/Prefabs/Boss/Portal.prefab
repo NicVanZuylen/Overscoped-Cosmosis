@@ -48,10 +48,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_playerCollider: {fileID: 0}
   m_arm: {fileID: 0}
+  m_bossAnimator: {fileID: 0}
+  m_armMaterials:
+  - {fileID: 2100000, guid: 807c2a8f08da37846a00f1cf40827511, type: 2}
+  - {fileID: 2100000, guid: f47b72ba23e82f942bbc818f3092098d, type: 2}
+  m_fArmLength: 10
   m_fOpenTime: 1
-  m_fArmTime: 3
+  m_fArmEnterTime: 0.2
+  m_fArmExitTime: 1
   m_fCloseTime: 1
-  m_fCollisionFreeTime: 0
 --- !u!54 &712468161514190660
 Rigidbody:
   m_ObjectHideFlags: 0

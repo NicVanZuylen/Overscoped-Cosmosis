@@ -5745,8 +5745,8 @@ MonoBehaviour:
   m_reticleOuterTransform: {fileID: 0}
   m_speedText: {fileID: 0}
   m_fReticleSizeMultiplier: 1.2
-  m_fWindMaxVolSpeed: 50
-  m_fWindMinVolSpeed: 15
+  m_fWindMaxVolSpeed: 100
+  m_fWindMinVolSpeed: 50
   m_fWindDecayRate: 2
   m_windLoopSFX: {fileID: 8300000, guid: 8f76351209a11904995acf41534fb35d, type: 3}
   m_hurtSFX:
@@ -5905,11 +5905,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_footStepSFX:
     m_clips:
-    - {fileID: 8300000, guid: 262e840e5f6bff84ebbd76eb041d1028, type: 3}
-    - {fileID: 8300000, guid: e40e589414c83334c9a465a08416c82b, type: 3}
-    - {fileID: 8300000, guid: c5f615bae8048fd4994ef8c2124b3835, type: 3}
-    - {fileID: 8300000, guid: 570aef2fb022fc84b87f8aa58cea0454, type: 3}
-    - {fileID: 8300000, guid: 969b32faa2e190b49a24ef2604a01846, type: 3}
+    - {fileID: 8300000, guid: 2f6c868b32c397645896c268fccc12a3, type: 3}
+    - {fileID: 8300000, guid: 9e7b38c289d7f9d47a4ef0a32dbf7628, type: 3}
+    - {fileID: 8300000, guid: d5cbc9043c520f84f92d197d460fb8ed, type: 3}
+    - {fileID: 8300000, guid: b42fe0dfe2e796e4886818d12c2bb2ca, type: 3}
+    - {fileID: 8300000, guid: 65766116a12c9234cac28fb012e7c186, type: 3}
     m_source: {fileID: 5776164776765894452}
     m_fCooldown: 0
 --- !u!1001 &388085425974646570
@@ -6298,6 +6298,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 101956286138558622}
     m_Modifications:
+    - target: {fileID: 4844925331090585789, guid: da2cd13a173260b45becf3fe595f395d,
+        type: 3}
+      propertyPath: m_Name
+      value: PS_Player_Grapple_Destination
+      objectReference: {fileID: 0}
     - target: {fileID: 4844925331090585790, guid: da2cd13a173260b45becf3fe595f395d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6352,11 +6357,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4844925331090585789, guid: da2cd13a173260b45becf3fe595f395d,
-        type: 3}
-      propertyPath: m_Name
-      value: PS_Player_Grapple_Destination
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: da2cd13a173260b45becf3fe595f395d, type: 3}

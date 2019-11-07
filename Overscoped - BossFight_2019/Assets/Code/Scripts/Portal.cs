@@ -188,13 +188,12 @@ public class Portal : MonoBehaviour
 
         m_portalMat.SetFloat("_Opacity", fOpenProgress);
 
-        
         // Set arm material properties.
-        m_armMaterials[0].SetVector("_PlaneOrigin", transform.position);
-        m_armMaterials[1].SetVector("_PlaneOrigin", transform.position);
-
-        m_armMaterials[0].SetVector("_PlaneNormal", -m_v3PunchDirection);
-        m_armMaterials[1].SetVector("_PlaneNormal", -m_v3PunchDirection);
+        for(int i = 0; i < m_armMaterials.Length; ++i)
+        {
+            m_armMaterials[i].SetVector("_PlaneOrigin", transform.position);
+            m_armMaterials[i].SetVector("_PlaneNormal", -m_v3PunchDirection);
+        }
     }
 
     /*

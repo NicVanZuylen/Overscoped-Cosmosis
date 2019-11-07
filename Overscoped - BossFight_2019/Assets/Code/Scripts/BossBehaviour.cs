@@ -1017,7 +1017,7 @@ public class BossBehaviour : MonoBehaviour
 
     public void EvSetArmEnterStage()
     {
-        if (m_portalScript.IsActive())
+        if (m_portalScript.IsActive() && m_state != DeathState)
             m_portalScript.SetArmEnterStage();
     }
 

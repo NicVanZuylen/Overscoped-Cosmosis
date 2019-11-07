@@ -9,8 +9,10 @@ public class GameManager : MonoBehaviour
     private BossBehaviour m_bossScript;
     private Plane m_worldSplitPlane; // Separates the arena and tutorial areas.
     private MusicManager m_musicManager;
-    private bool m_once;
-    private bool m_bBossDeadOnce;
+    private bool m_BossDeadOnce;
+    private Settings m_settings;
+    private SettingsIO m_settingLoader;
+
     private void Awake()
     {
         m_player = GameObject.FindGameObjectWithTag("Player");
@@ -18,7 +20,6 @@ public class GameManager : MonoBehaviour
         GameObject worldPlane = transform.GetChild(0).gameObject;
         m_musicManager = GetComponent<MusicManager>();
 
-        // Play random tutorial track.
         m_musicManager.PlayRandomTrack();
 
         // Construct plane structure using plane gameobject.
@@ -26,6 +27,20 @@ public class GameManager : MonoBehaviour
 
         // Plane is no longer needed.
         Destroy(worldPlane);
+
+        // Create instance of SettingsIO
+        m_settingLoader = new SettingsIO();
+
+        // Reads the folder
+        m_settingLoader.ReadFile();
+
+        // Sets settings to the values in the file
+        m_settings = m_settingLoader.GetData();
+
+        // Sets the volume
+        BossBehaviour.SetVolume(m_settings.m_fBossVolume, m_settings.m_fMasterVolume);
+        PlayerStats.SetVolume(m_settings.m_fPlayerVolume,m_settings.m_fWindVolume, m_settings.m_fMasterVolume);
+        GrappleHook.SetVolume(m_settings.m_fGrappleVolume, m_settings.m_fMasterVolume);
     }
 
     // Update is called once per frame
@@ -34,24 +49,22 @@ public class GameManager : MonoBehaviour
         // Boss will begin to attack the player once they are on the arena side of the plane.
         if (m_worldSplitPlane.GetSide(m_player.transform.position) && !m_bossScript.enabled)
         {
-            // Play combat track.
             m_musicManager.PlayTrackIndex(0, 1);
 
             Debug.Log("Good people of Cyrodiil. WELCOME, to the Arena!");
 
             // Enable boss AI and disable game manager script for updates.
             m_bossScript.enabled = true;
-            m_once = true;
         }
 
-        if (!m_bBossDeadOnce)
+        if (!m_BossDeadOnce)
         {
             if (!m_bossScript.gameObject.activeInHierarchy)
             {
                 Debug.Log("Boss dead");
                 //Play music once boss is dead
                 m_musicManager.PlayTrackIndex(0);
-                m_bBossDeadOnce = true;
+                m_BossDeadOnce = true;
             }
         }
     }

@@ -16,6 +16,7 @@ public class MeteorTarget : MonoBehaviour
     [SerializeField]
     private float m_fAOEDamagePerSec = 10.0f;
 
+    private GameObject m_indicator;
     private Queue<MeteorTarget> m_targetPool;
     private PlayerStats m_playerStats;
     private BoxCollider m_collider;
@@ -23,6 +24,7 @@ public class MeteorTarget : MonoBehaviour
 
     public void Init(GameObject player, Queue<MeteorTarget> targetPool)
     {
+        m_indicator = transform.GetChild(2).gameObject;
         m_playerStats = player.GetComponent<PlayerStats>();
         m_collider = GetComponent<BoxCollider>();
         m_targetPool = targetPool;
@@ -47,8 +49,9 @@ public class MeteorTarget : MonoBehaviour
 
     public void SummonMeteor(Meteor meteor, Vector3 v3Origin)
     {
+        m_indicator.SetActive(true);
         // Reset explosion.
-        if(m_explosionEffect && m_explosionEffect.isPlaying)
+        if (m_explosionEffect && m_explosionEffect.isPlaying)
             m_explosionEffect.Stop();
 
         meteor.Summon(v3Origin, this);
@@ -56,6 +59,7 @@ public class MeteorTarget : MonoBehaviour
 
     public void StartAOE()
     {
+        m_indicator.SetActive(false);
         // Begin and reset AOE time.
         enabled = true;
         m_fAOETime = m_fAOEDuration;

@@ -61,7 +61,10 @@ public class PlayerBeam : MonoBehaviour
     [Header("Audio")]
 
     [SerializeField]
-    private AudioClip m_chargeLoopSFX = null;
+    private AudioSelection m_chargeSFX = new AudioSelection();
+
+    [SerializeField]
+    private AudioSelection m_stopSFX = new AudioSelection();
 
     [SerializeField]
     private AudioClip m_fireLoopSFX = null;
@@ -69,7 +72,6 @@ public class PlayerBeam : MonoBehaviour
     [SerializeField]
     private AudioClip m_impactLoopSFX = null;
 
-    private AudioLoop m_chargeAudioLoop;
     private AudioLoop m_fireAudioLoop;
     private AudioLoop m_impactAudioLoop;
 
@@ -85,7 +87,7 @@ public class PlayerBeam : MonoBehaviour
     private float m_fBeamCharge; // Actual current charge value.
     private float m_fCurrentMeterLevel; // Current charge as displayed on the HUD.
     private int m_nDissolveBracerIndex;
-    private const int m_nRayMask = ~(1 << 2); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple.
+    private const int m_nRayMask = ~(1 << 2 | 1 << 9); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple, Player.
     private bool m_bBeamUnlocked;
     private bool m_bCanCast;
     private bool m_bCasting;
@@ -96,9 +98,6 @@ public class PlayerBeam : MonoBehaviour
     private ParticleSystemRenderer[] m_beamParticleRenderers;
     private ParticleSystem.Particle[] m_particles;
     private float m_fMeshLength;
-
-    // Impact particle effects.
-    private ParticleSystem m_impactEffect;
 
     void Awake()
     {
@@ -127,6 +126,7 @@ public class PlayerBeam : MonoBehaviour
             // Set origin and length in shader.
             m_beamParticleRenderers[i].material.SetVector("_LineOrigin", m_beamOrigin.position);
             m_beamParticleRenderers[i].material.SetFloat("_LineLength", 0.0f);
+            m_beamParticleRenderers[i].enabled = false;
         }
 
         m_particles = new ParticleSystem.Particle[m_nBeamLength / 2];
@@ -144,7 +144,6 @@ public class PlayerBeam : MonoBehaviour
 
         m_bossChestScript = GameObject.FindGameObjectWithTag("BossChest").GetComponentInChildren<ChestPlate>();
 
-        m_chargeAudioLoop = new AudioLoop(m_chargeLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
         m_fireAudioLoop = new AudioLoop(m_fireLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
         m_impactAudioLoop = new AudioLoop(m_impactLoopSFX, m_endObj, ESpacialMode.AUDIO_SPACE_WORLD, (m_nBeamLength * m_fMeshLength) + 10.0f);
     }
@@ -210,6 +209,9 @@ public class PlayerBeam : MonoBehaviour
 
         if(m_impactAudioLoop.IsPlaying())
             m_impactAudioLoop.Stop();
+
+        // Stop SFX.
+        m_stopSFX.PlayIndex(0);
 
         // Stop animations.
         m_animator.SetBool("isBeamCasting", false);
@@ -280,8 +282,8 @@ public class PlayerBeam : MonoBehaviour
                 if (bRayHit)
                 {
                     // Play impact particle effects.
-                    if (m_impactEffect && !m_impactEffect.isPlaying)
-                        m_impactEffect.Play();
+                    if (!m_impactParticles.IsPlaying())
+                        m_impactParticles.Play();
 
                     // Update volumetric beam particle positions.
                     UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, m_beamOrigin.position, Mathf.Max(m_beamHit.distance, 2.0f), m_fMeshLength, true);
@@ -301,9 +303,9 @@ public class PlayerBeam : MonoBehaviour
                 }
                 else
                 {
-                    // Stop impact effect.
-                    if (m_impactEffect && m_impactEffect.isPlaying)
-                        m_impactEffect.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+                    // Stop impact effects.
+                    if (m_impactParticles.IsPlaying())
+                        m_impactParticles.Stop(ParticleSystemStopBehavior.StopEmitting);
                     
                     // Update volumetric beam particle positions.
                     UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, m_beamOrigin.position, m_nBeamLength, m_fMeshLength, false);
@@ -358,6 +360,15 @@ public class PlayerBeam : MonoBehaviour
         m_bBeamEnabled = true;
 
         m_animator.SetBool("beamActive", true);
+    }
+
+    /*
+    Description: Start beam charge.
+    */
+    public void StartBeamCharge()
+    {
+        // Play SFX.
+        m_chargeSFX.PlayIndex(0);
     }
 
     /*

@@ -5888,8 +5888,17 @@ MonoBehaviour:
   m_impactParticles:
     m_particleSystems: []
     m_objects: []
-  m_chargeLoopSFX: {fileID: 8300000, guid: f94c690828087774d9b41e35f6de576d, type: 3}
-  m_fireLoopSFX: {fileID: 8300000, guid: 4131f89574269d74d8dbd5811c5cc899, type: 3}
+  m_chargeSFX:
+    m_clips:
+    - {fileID: 8300000, guid: 4a2ce9cc009b51f498c174543d22df86, type: 3}
+    m_source: {fileID: 433884948602025523}
+    m_fCooldown: 0
+  m_stopSFX:
+    m_clips:
+    - {fileID: 8300000, guid: 8d61c6e7c371875438fc2486055a5530, type: 3}
+    m_source: {fileID: 433884948602025523}
+    m_fCooldown: 0
+  m_fireLoopSFX: {fileID: 8300000, guid: 6f7952f6b9e5d124baea971cae042152, type: 3}
   m_impactLoopSFX: {fileID: 8300000, guid: 4131f89574269d74d8dbd5811c5cc899, type: 3}
 --- !u!114 &4564622220735488809
 MonoBehaviour:

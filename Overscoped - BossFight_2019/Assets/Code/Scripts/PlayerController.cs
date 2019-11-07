@@ -556,25 +556,28 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
-    Description: Respawn's the player on the last-walkable checkpoint surface if their Y falls below a constant value.
+    Description: Respawn's the player on the last-walkable checkpoint surface.
     */
-    private void RespawnBelowMinY()
+    private void RespawnLastCheckpoint()
     {
-        if (transform.position.y < m_fKillZoneHeight)
-        {
-            // Get velocity and remove x and z components.
-            Vector3 v3BodyVelocity = m_controller.velocity;
-            v3BodyVelocity.x = 0.0f;
-            v3BodyVelocity.z = 0.0f;
+        // Get velocity and remove x and z components.
+        Vector3 v3BodyVelocity = m_controller.velocity;
+        v3BodyVelocity.x = 0.0f;
+        v3BodyVelocity.z = 0.0f;
 
-            // Apply new velocity.
-            m_v3Velocity = v3BodyVelocity;
+        // Apply new velocity.
+        m_v3Velocity = v3BodyVelocity;
 
-            // Teleport to spawn point.
-            m_controller.enabled = false;
-            transform.position = m_v3RespawnPosition;
-            m_controller.enabled = true;
-        }
+        // Teleport to spawn point.
+        m_controller.enabled = false;
+        transform.position = m_v3RespawnPosition;
+        m_controller.enabled = true;
+
+        // Reset screen fade.
+        ScreenFade screenFade = m_cameraEffects.GetScreenFade();
+
+        screenFade.SetCallback(null);
+        screenFade.BeginFade(ScreenFade.EFadeMode.FADE_OUT);
     }
 
     private void UpdateMovement(float fDeltaTime)
@@ -591,9 +594,6 @@ public class PlayerController : MonoBehaviour
 
             // Run override behaviour and use it's velocity output.
             m_v3Velocity = m_overrideFunction(this, fDeltaTime);
-
-            // Respawn they player if they fall too far.
-            RespawnBelowMinY();
 
             return;
         }
@@ -721,9 +721,6 @@ public class PlayerController : MonoBehaviour
 
         // Add net force.
         m_v3Velocity += v3NetForce;
-
-        // Respawn the player if they fall too far.
-        RespawnBelowMinY();
     }
 
     private void Update()
@@ -787,8 +784,13 @@ public class PlayerController : MonoBehaviour
             // Reset gravity.
             m_fCurrentGravity = m_fJumpGravity;
 
-            if (m_groundHit.collider.tag == "CheckPoint") // Set respawn checkpoint.
+            // Set respawn checkpoint.
+            if (m_groundHit.collider.tag == "CheckPoint")
+            {
+                Debug.Log(m_groundHit.collider.bounds.extents.y);
+                
                 m_v3RespawnPosition = m_groundHit.collider.bounds.center + new Vector3(0.0f, (m_groundHit.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
+            }
         }
 
 #if UNITY_EDITOR
@@ -865,12 +867,17 @@ public class PlayerController : MonoBehaviour
             m_bJustResumed = false;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if(collision.collider.tag == "CheckPoint")
+        // Killbox detection.
+        if(other.tag == "Killbox")
         {
-            // Set respawn collision to the centre + half its height + 10.
-            m_v3RespawnPosition = collision.collider.bounds.center + new Vector3(0.0f, (collision.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
+            // Begin screen fade and respawn once the screen is black.
+            ScreenFade camScreenFade = m_cameraEffects.GetScreenFade();
+
+            camScreenFade.SetCallback(RespawnLastCheckpoint);
+            camScreenFade.SetFadeRate(3.5f);
+            camScreenFade.BeginFade(ScreenFade.EFadeMode.FADE_IN);
         }
     }
 }

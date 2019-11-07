@@ -53,6 +53,10 @@ public class CameraEffects : MonoBehaviour
     [SerializeField]
     private float m_fBobbingPosMagnitude = 0.07f;
 
+    [Tooltip("Screen fade effect.")]
+    [SerializeField]
+    private ScreenFade m_screenFade = null;
+
     private Camera m_camera;
     private List<CameraSplineState> m_camSpline;
     private Quaternion m_startCamRot;
@@ -368,6 +372,15 @@ public class CameraEffects : MonoBehaviour
     public Vector3 HeadBobbingEuler()
     {
         return m_v3BobbingEuler;
+    }
+
+    /*
+    Description: Get the screen fade script for the HUD.
+    Return Type: ScreenFade
+    */
+    public ScreenFade GetScreenFade()
+    {
+        return m_screenFade;
     }
 
     /*

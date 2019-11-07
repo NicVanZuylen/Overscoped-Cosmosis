@@ -7,6 +7,11 @@ struct TrackGroup
 {
     public AudioClip[] m_tracks;
 
+    public TrackGroup(int nTrackCount)
+    {
+        m_tracks = new AudioClip[nTrackCount];
+    }
+
     public AudioClip this[int nIndex]
     {
         get => m_tracks[nIndex];
@@ -54,6 +59,9 @@ public class MusicManager : MonoBehaviour
 
         m_currentSource = m_firstSource;
         m_lastSource = m_secondSource;
+
+        m_fCrossFadeProgress = 0.0f;
+        m_nLastRandIndex = -1;
 
         enabled = false;
     }
@@ -143,6 +151,9 @@ public class MusicManager : MonoBehaviour
                     break;
             }
         }
+
+        // Remember last random song index.
+        m_nLastRandIndex = nRandSongIndex;
 
         SetTrack(m_tracks[nGroup][nRandSongIndex]);
     }

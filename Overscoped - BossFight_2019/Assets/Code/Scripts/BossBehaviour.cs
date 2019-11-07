@@ -532,9 +532,11 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetBool("PortalPunchComplete", true);
 
         m_bossHitSFX.PlayRandom(m_fBossVolume);
-
+        
         DeactivateBeam();
-        m_portalScript.SetPortalCloseStage();
+
+        if(m_portalScript.IsActive())
+            m_portalScript.SetPortalCloseStage();
     }
 
     /*
@@ -940,6 +942,10 @@ public class BossBehaviour : MonoBehaviour
     */
     public void DeactivateBeam()
     {
+        // Do nothing if the beam is already deactivated.
+        if (!m_bBeamActive)
+            return;
+
         for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
             m_beamParticleRenderers[i].enabled = false;
 

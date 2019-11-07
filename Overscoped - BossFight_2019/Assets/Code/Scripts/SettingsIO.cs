@@ -23,6 +23,13 @@ public class SettingsIO
     public SettingsIO()
     {
         m_data = new Settings();
+
+        m_data.m_fBossVolume = 1.0f;
+        m_data.m_fGrappleVolume = 1.0f;
+        m_data.m_fMasterVolume = 1.0f;
+        m_data.m_fPlayerVolume = 1.0f;
+        m_data.m_fWindVolume = 1.0f;
+
         m_path = Application.dataPath + "/Settings.dat";
     }
 

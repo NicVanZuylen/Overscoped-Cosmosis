@@ -12,7 +12,7 @@ public class ChestPlate : MonoBehaviour
 {
     [Tooltip("Amount of health for the chestplate. (beam does 1 damage per second)")]
     [SerializeField]
-    private float m_fMaxHealth = 5.0f;
+    public float m_fMaxHealth = 5.0f;
 
     [Tooltip("Amount of time for the field to pop when destroyed.")]
     [SerializeField]
@@ -34,7 +34,7 @@ public class ChestPlate : MonoBehaviour
     private CameraEffects m_camEffects;
     private BossBehaviour m_bossScript;
     private Material m_material;
-    private float m_fHealth;
+    public float m_fHealth;
 
     private void Awake()
     {

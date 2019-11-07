@@ -165,8 +165,16 @@ public class BossBehaviour : MonoBehaviour
     [Header("Misc")]
 
     [Tooltip("Minimum delay before any kind of attack is performed.")]
+    private float m_fTimeBetweenAttacks;
+    [Tooltip("Time between attacks while health is between 50% and 100%")]
     [SerializeField]
-    private float m_fTimeBetweenAttacks = 5.0f;
+    private float m_fTimeBetweenAttacksFull = 5.0f;
+    [Tooltip("Time between attacks while health is between 25% and 50%")]
+    [SerializeField]
+    private float m_fTimeBetweenAttacksHalf = 2.5f;
+    [Tooltip("Time between attacks while health below 25%")]
+    [SerializeField]
+    private float m_fTimeBetweenAttacksQuarter = 0f;
 
     [Tooltip("Length of the boss death effects.")]
     [SerializeField]
@@ -183,6 +191,7 @@ public class BossBehaviour : MonoBehaviour
     private float m_fTimeSinceHit; // Time since the boss was hit by the beam.
     private float m_fSpawnTime;
     private bool m_bUnderAttack;
+    private ChestPlate m_chestPlate;
 
     // State delegate.
     public delegate void StateFunc();
@@ -240,6 +249,7 @@ public class BossBehaviour : MonoBehaviour
         m_grappleScript = m_player.GetComponent<GrappleHook>();
         m_animator = GetComponent<Animator>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
+        m_chestPlate = GetComponentInChildren<ChestPlate>();
 
         m_endPortal = GameObject.FindGameObjectWithTag("EndPortal");
         m_endPortal.SetActive(false);
@@ -416,6 +426,19 @@ public class BossBehaviour : MonoBehaviour
         m_fPortalPunchCDTimer -= Time.deltaTime;
         m_fMeteorCDTimer -= Time.deltaTime;
         m_fBeamAttackCDTimer -= Time.deltaTime;
+
+        if(m_chestPlate.m_fHealth < m_chestPlate.m_fMaxHealth / 2)
+        {
+            m_fTimeBetweenAttacks = m_fTimeBetweenAttacksHalf;
+        }
+        else if(m_chestPlate.m_fHealth < m_chestPlate.m_fMaxHealth / 4)
+        {
+            m_fTimeBetweenAttacks = m_fTimeBetweenAttacksQuarter;
+        }
+        else
+        {
+            m_fTimeBetweenAttacks = m_fTimeBetweenAttacksFull;
+        }
     }
 
     public void DeathState()

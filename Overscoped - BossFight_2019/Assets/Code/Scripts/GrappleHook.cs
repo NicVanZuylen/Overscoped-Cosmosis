@@ -469,8 +469,7 @@ public class GrappleHook : MonoBehaviour
         if (v3GrappleDif.sqrMagnitude <= m_fDestinationRadius * m_fDestinationRadius)
         {
             // Disable grapple.
-            m_bGrappleHookActive = false;
-            m_fGrappleLineProgress = 0.0f;
+            ReleaseGrapple();
 
             // Stop looping SFX.
             m_grappleLoopAudio.Stop();
@@ -625,6 +624,7 @@ public class GrappleHook : MonoBehaviour
 
         m_bArmExtending = false;
         m_bGrappleHookActive = false;
+        m_bGrappleLocked = false;
         m_fGrappleLineProgress = 0.0f;
 
         m_animController.SetBool("isCasting", false);

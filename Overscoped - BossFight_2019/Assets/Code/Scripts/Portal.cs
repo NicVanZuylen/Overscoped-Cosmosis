@@ -43,6 +43,20 @@ public class Portal : MonoBehaviour
     [SerializeField]
     private float m_fCloseTime = 1.0f;
 
+    [Header("Stages")]
+
+    [Tooltip("SFX played when the portal opens.")]
+    [SerializeField]
+    private AudioClip m_openSFX = null;
+
+    [Tooltip("SFX played when the portal closes.")]
+    [SerializeField]
+    private AudioClip m_closeSFX = null;
+
+    [Tooltip("Impact sound of the boss fist.")]
+    [SerializeField]
+    private AudioSelection m_punchImpactSFX = new AudioSelection();
+
     delegate void StageFunc();
 
     StageFunc m_stage;
@@ -52,6 +66,7 @@ public class Portal : MonoBehaviour
     private Material m_portalMat;
     private Collider m_armCollider;
     private Vector3 m_v3PunchDirection;
+    private AudioSource m_audioSource;
     private float m_fCurrentTime;
     private float m_fCurrentExitTime;
 
@@ -84,10 +99,22 @@ public class Portal : MonoBehaviour
     }
 
     /*
+    Description: Get the length of the arm exiting the portal.
+    Return Type: float
+    */
+    public float GetArmLength()
+    {
+        return m_fArmLength;
+    }
+
+    /*
     Description: Force the wait between opening and the arm coming out to end.
     */
     public void SetArmEnterStage()
     {
+        // Reset SFX cooldown.
+        m_punchImpactSFX.SetCooldown(0.0f);
+
         m_stage = ArmEnterStage;
         m_fCurrentTime = 0.0f;
     }
@@ -99,6 +126,9 @@ public class Portal : MonoBehaviour
     {
         m_fCurrentExitTime = 0.0f;
         m_stage = ArmExitStage;
+
+        // Play SFX.
+        m_audioSource.PlayOneShot(m_closeSFX, BossBehaviour.GetVolume());
     }
 
     /*
@@ -124,6 +154,9 @@ public class Portal : MonoBehaviour
         m_stage = OpenStage;
         m_bActive = true;
         m_fCurrentTime = 0.0f;
+
+        // Play open effect.
+        m_audioSource.PlayOneShot(m_openSFX, BossBehaviour.GetVolume());
 
         m_bossAnimator.SetBool("PortalPunchComplete", false);
 
@@ -156,6 +189,8 @@ public class Portal : MonoBehaviour
 
         m_portalMat = transform.GetChild(0).GetComponent<MeshRenderer>().material;
 
+        m_audioSource = GetComponent<AudioSource>();
+
         // Set initial opacity.
         m_portalMat.SetFloat("_Opacity", 0.0f);
 
@@ -179,13 +214,12 @@ public class Portal : MonoBehaviour
 
         m_portalMat.SetFloat("_Opacity", fOpenProgress);
 
-        
         // Set arm material properties.
-        m_armMaterials[0].SetVector("_PlaneOrigin", transform.position);
-        m_armMaterials[1].SetVector("_PlaneOrigin", transform.position);
-
-        m_armMaterials[0].SetVector("_PlaneNormal", -m_v3PunchDirection);
-        m_armMaterials[1].SetVector("_PlaneNormal", -m_v3PunchDirection);
+        for(int i = 0; i < m_armMaterials.Length; ++i)
+        {
+            m_armMaterials[i].SetVector("_PlaneOrigin", transform.position);
+            m_armMaterials[i].SetVector("_PlaneNormal", -m_v3PunchDirection);
+        }
     }
 
     /*
@@ -203,10 +237,18 @@ public class Portal : MonoBehaviour
         m_fCurrentTime += Time.deltaTime;
         m_fCurrentTime = Mathf.Min(m_fCurrentTime, m_fArmEnterTime);
 
-        float fArmOut = (m_fCurrentTime / m_fArmEnterTime) * m_fArmLength;
+        // Arm extension math...
+        float fArmNorm = m_fCurrentTime / m_fArmEnterTime;
+        float fArmOut = fArmNorm * m_fArmLength;
         fArmOut -= m_fArmLength;
 
         m_arm.transform.position = transform.position + (m_v3PunchDirection * fArmOut);
+
+        // Play impact SFX once fully extended.
+        if(fArmNorm >= 1.0f)
+        {
+            m_punchImpactSFX.PlayIndex(0, BossBehaviour.GetVolume());
+        }
     }
 
     /*

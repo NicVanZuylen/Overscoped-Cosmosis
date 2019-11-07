@@ -108,6 +108,7 @@ public class PlayerController : MonoBehaviour
     private float m_fJumpDuration; // Jump time duration.
     private float m_fJumpInitialVelocity; // Initial impulse applied when jumping.
     private float m_fCurrentGravity;
+    private float m_fHeightAboveGround;
     private int m_nJumpFrame;
     private bool m_bJumping;
 
@@ -148,7 +149,8 @@ public class PlayerController : MonoBehaviour
             m_landCallbacks = new List<PlayerControllerCallback>();
 
         // Set intitial camrera look rotation.
-        SetLookRotation(m_cameraTransform.localRotation);
+        SetLookRotation(m_cameraTransform.rotation);
+        m_fLookEulerX = 0.0f;
 
         m_v3SurfaceUp = transform.up;
         m_v3SurfaceForward = transform.forward;
@@ -436,6 +438,14 @@ public class PlayerController : MonoBehaviour
     public float JumpGravity()
     {
         return m_fJumpGravity;
+    }
+
+    /*
+    Description: Get the player's height above the ground surface below.
+    */
+    public float HeightAboveGround()
+    {
+        return m_fHeightAboveGround;
     }
 
     /*
@@ -765,7 +775,8 @@ public class PlayerController : MonoBehaviour
         bool bSphereCastHit = Physics.SphereCast(sphereRay, m_controller.radius, out m_groundHit, Mathf.Infinity, nGroundMask, QueryTriggerInteraction.Ignore);
 
         // The hit must be within the capsule height bounds.
-        m_bOnGround = bSphereCastHit && m_groundHit.distance < (m_controller.height * 0.5f) - (m_controller.radius * 0.7f);
+        m_fHeightAboveGround = m_groundHit.distance;
+        m_bOnGround = bSphereCastHit && m_fHeightAboveGround < (m_controller.height * 0.5f) - (m_controller.radius * 0.7f);
 
         // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
         // So to be sure its updated we update it using the sphere case hit.

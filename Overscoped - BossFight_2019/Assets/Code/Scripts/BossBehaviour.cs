@@ -158,7 +158,7 @@ public class BossBehaviour : MonoBehaviour
 
     private AudioLoop m_beamImpactAudioLoop;
 
-
+    [SerializeField]
     private AudioSource m_SFXSource = null;
 
     // -------------------------------------------------------------------------------------------------
@@ -224,6 +224,7 @@ public class BossBehaviour : MonoBehaviour
 
     private AttackFunc[] m_attacks;
     private AudioSelection[] m_attackVoices;
+    [SerializeField]
     private float[] m_fAttackDelays;
     private float m_fCurrentAttackDelay;
     private bool m_bAttackPending;
@@ -307,10 +308,10 @@ public class BossBehaviour : MonoBehaviour
         m_attackVoices[1] = m_punchVoiceSelection;
         m_attackVoices[2] = m_beamVoiceSelection;
 
-        m_fAttackDelays = new float[3];
-        m_fAttackDelays[0] = 1.0f;
-        m_fAttackDelays[1] = 2.0f;
-        m_fAttackDelays[2] = 1.0f;
+        //m_fAttackDelays = new float[3];
+        //m_fAttackDelays[0] = 1.0f;
+        //m_fAttackDelays[1] = 2.0f;
+        //m_fAttackDelays[2] = 1.0f;
         m_fCurrentAttackDelay = 0.0f;
         m_bAttackPending = false;
 

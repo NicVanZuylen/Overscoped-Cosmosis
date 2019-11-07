@@ -30,10 +30,10 @@ public class MainMenu : MonoBehaviour
         // Sets the volume 
         m_settings.m_fMasterVolume = 1.0f;
 
-        m_settings.m_fBossVolume = 1.1f;
-        m_settings.m_fGrappleVolume = 1.4f;
-        m_settings.m_fPlayerVolume = 3.5f;
-        m_settings.m_fWindVolume = 0.3f;
+        m_settings.m_fBossVolume = 1.0f;
+        m_settings.m_fGrappleVolume = 1.0f;
+        m_settings.m_fPlayerVolume = 1.0f;
+        m_settings.m_fWindVolume = 1.0f;
 
         // Sets the data to the settings values
         m_settingSaver.SetData(m_settings);

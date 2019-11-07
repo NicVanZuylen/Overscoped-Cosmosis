@@ -81652,6 +81652,11 @@ PrefabInstance:
       objectReference: {fileID: 387062381}
     - target: {fileID: 5833311084224785052, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
+      propertyPath: m_fAttackDelays.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833311084224785052, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
       propertyPath: m_player
       value: 
       objectReference: {fileID: 387062374}
@@ -81669,7 +81674,17 @@ PrefabInstance:
         type: 3}
       propertyPath: m_bossHitSFX
       value: 
-      objectReference: {fileID: 8300000, guid: 4bc59eb5f7d01dc4aabfc720372e8bb8, type: 3}
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833311084224785052, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_fTimeBetweenAttacks
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833311084224785052, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_SFXSource
+      value: 
+      objectReference: {fileID: 400220101}
     - target: {fileID: 3909467931615195922, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_Radius

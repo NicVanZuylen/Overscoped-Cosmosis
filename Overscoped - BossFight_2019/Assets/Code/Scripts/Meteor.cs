@@ -72,6 +72,8 @@ public class Meteor : MonoBehaviour
     {
         gameObject.SetActive(true);
 
+        gameObject.GetComponent<ParticleSystem>().Play();
+
         m_targetScript = targetScript;
 
         m_v3Target = targetScript.transform.position;
@@ -82,10 +84,8 @@ public class Meteor : MonoBehaviour
 
         // Direction of travel.
         m_v3TravelDirection = (m_v3Target - transform.position).normalized;
+        Quaternion.LookRotation(m_v3TravelDirection);
     }
-
-
-
 
     void OnTriggerEnter(Collider collider)
     {

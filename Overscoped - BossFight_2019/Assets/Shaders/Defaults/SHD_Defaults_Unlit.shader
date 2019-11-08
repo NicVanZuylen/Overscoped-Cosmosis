@@ -8,7 +8,7 @@ Shader "Cosmosis/Default_Unlit"
 		[HDR]_Colour("Colour", Color) = (1,1,1,0)
 		_Tiling("Tiling", Vector) = (1,1,0,0)
 		_Offset("Offset", Vector) = (0,0,0,0)
-		_AlphaAdjust("Alpha Adjust", Float) = 0
+		_Alpha("Alpha", Range( 0 , 1)) = 0
 		_ColourMultiplier("Colour Multiplier", Float) = 1
     }
 
@@ -88,7 +88,7 @@ Shader "Cosmosis/Default_Unlit"
 				sampler2D _Texture;
 				float2 _Tiling;
 				float2 _Offset;
-				float _AlphaAdjust;
+				float _Alpha;
 				
 				                
                 struct SurfaceDescription
@@ -171,7 +171,7 @@ Shader "Cosmosis/Default_Unlit"
 					float2 uv09 = packedInput.ase_texcoord.xy * _Tiling + ( _Time.y * _Offset );
 					float4 tex2DNode5 = tex2D( _Texture, uv09 );
 					
-					surfaceDescription.Alpha = ( tex2DNode5.r + _AlphaAdjust );
+					surfaceDescription.Alpha = ( tex2DNode5.r + (0.0 + (_Alpha - 0.0) * (0.3 - 0.0) / (1.0 - 0.0)) );
 					surfaceDescription.AlphaClipThreshold =  0;
 
 					GetSurfaceAndBuiltinData(surfaceDescription, input, V, posInput, surfaceData, builtinData);
@@ -261,7 +261,7 @@ Shader "Cosmosis/Default_Unlit"
 				sampler2D _Texture;
 				float2 _Tiling;
 				float2 _Offset;
-				float _AlphaAdjust;
+				float _Alpha;
 				
 				                
 		            
@@ -335,7 +335,7 @@ Shader "Cosmosis/Default_Unlit"
 					float4 tex2DNode5 = tex2D( _Texture, uv09 );
 					
 					surfaceDescription.Color =  ( _Colour * _ColourMultiplier * tex2DNode5.r ).rgb;
-					surfaceDescription.Alpha = ( tex2DNode5.r + _AlphaAdjust );
+					surfaceDescription.Alpha = ( tex2DNode5.r + (0.0 + (_Alpha - 0.0) * (0.3 - 0.0) / (1.0 - 0.0)) );
 					surfaceDescription.AlphaClipThreshold =  0;
 
 					GetSurfaceAndBuiltinData(surfaceDescription, input, V, posInput, surfaceData, builtinData);
@@ -415,7 +415,7 @@ Shader "Cosmosis/Default_Unlit"
 				sampler2D _Texture;
 				float2 _Tiling;
 				float2 _Offset;
-				float _AlphaAdjust;
+				float _Alpha;
 				
 				                
 			    
@@ -533,7 +533,7 @@ Shader "Cosmosis/Default_Unlit"
 						float2 uv09 = packedInput.ase_texcoord.xy * _Tiling + ( _Time.y * _Offset );
 						float4 tex2DNode5 = tex2D( _Texture, uv09 );
 						
-						surfaceDescription.Alpha = ( tex2DNode5.r + _AlphaAdjust );
+						surfaceDescription.Alpha = ( tex2DNode5.r + (0.0 + (_Alpha - 0.0) * (0.3 - 0.0) / (1.0 - 0.0)) );
 						surfaceDescription.AlphaClipThreshold = 0;
 
 						GetSurfaceAndBuiltinData(surfaceDescription,input, V, posInput, surfaceData, builtinData);
@@ -632,7 +632,7 @@ Shader "Cosmosis/Default_Unlit"
 				sampler2D _Texture;
 				float2 _Tiling;
 				float2 _Offset;
-				float _AlphaAdjust;
+				float _Alpha;
 				
 				                
                 struct SurfaceDescription
@@ -724,7 +724,7 @@ Shader "Cosmosis/Default_Unlit"
 					float4 tex2DNode5 = tex2D( _Texture, uv09 );
 					
 					surfaceDescription.Color =  ( _Colour * _ColourMultiplier * tex2DNode5.r ).rgb;
-					surfaceDescription.Alpha = ( tex2DNode5.r + _AlphaAdjust );
+					surfaceDescription.Alpha = ( tex2DNode5.r + (0.0 + (_Alpha - 0.0) * (0.3 - 0.0) / (1.0 - 0.0)) );
 					surfaceDescription.AlphaClipThreshold =  0;
 
 					GetSurfaceAndBuiltinData(surfaceDescription,input, V, posInput, surfaceData, builtinData);
@@ -754,16 +754,17 @@ Shader "Cosmosis/Default_Unlit"
 }
 /*ASEBEGIN
 Version=16900
-7;20;1906;999;1774.068;407.3165;1;True;False
-Node;AmplifyShaderEditor.SimpleTimeNode;12;-1418,148;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
-Node;AmplifyShaderEditor.Vector2Node;11;-1409,222;Float;False;Property;_Offset;Offset;3;0;Create;True;0;0;False;0;0,0;-0.15,0.2;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
+1;1;1918;1017;2139.068;130.3165;1;True;False
+Node;AmplifyShaderEditor.Vector2Node;11;-1438,225;Float;False;Property;_Offset;Offset;3;0;Create;True;0;0;False;0;0,0;0.8,-0.7;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
+Node;AmplifyShaderEditor.SimpleTimeNode;12;-1435,148;Float;False;1;0;FLOAT;1;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;13;-1249,168;Float;False;2;2;0;FLOAT;0;False;1;FLOAT2;0,0;False;1;FLOAT2;0
-Node;AmplifyShaderEditor.Vector2Node;10;-1269,39;Float;False;Property;_Tiling;Tiling;2;0;Create;True;0;0;False;0;1,1;2,0.2;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
+Node;AmplifyShaderEditor.Vector2Node;10;-1269,39;Float;False;Property;_Tiling;Tiling;2;0;Create;True;0;0;False;0;1,1;3,0.75;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
 Node;AmplifyShaderEditor.TextureCoordinatesNode;9;-1098,80;Float;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.ColorNode;4;-781,-215;Float;False;Property;_Colour;Colour;1;1;[HDR];Create;True;0;0;False;0;1,1,1,0;0.3476173,0,0.9221513,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;7;-1045,233;Float;False;Property;_Alpha;Alpha;4;0;Create;True;0;0;False;0;0;0.3;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.ColorNode;4;-781,-215;Float;False;Property;_Colour;Colour;1;1;[HDR];Create;True;0;0;False;0;1,1,1,0;1.580418,0,5.992157,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.RangedFloatNode;14;-776.0682,-45.3165;Float;False;Property;_ColourMultiplier;Colour Multiplier;5;0;Create;True;0;0;False;0;1;1;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;7;-747,220;Float;False;Property;_AlphaAdjust;Alpha Adjust;4;0;Create;True;0;0;False;0;0;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.SamplerNode;5;-862,32;Float;True;Property;_Texture;Texture;0;0;Create;True;0;0;False;0;None;e451e4a7415133e499b571c26159bd98;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.TFHCRemapNode;15;-752.0679,226.6835;Float;False;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;0;False;4;FLOAT;0.3;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleAddOpNode;6;-561,152;Float;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;8;-550,-46;Float;False;3;3;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;1;COLOR;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;-266,56;Float;False;True;2;Float;ASEMaterialInspector;0;4;Cosmosis/Default_Unlit;dfe2f27ac20b08c469b2f95c236be0c3;True;Forward Unlit;0;1;Forward Unlit;5;True;2;5;False;-1;10;False;-1;2;5;False;-1;10;False;-1;False;False;True;2;False;-1;False;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;3;RenderPipeline=HDRenderPipeline;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;True;5;0;False;False;False;False;True;True;True;True;True;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;False;False;True;1;LightMode=ForwardOnly;False;0;Hidden/InternalErrorShader;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;4;True;True;True;True;False;5;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;0
@@ -775,12 +776,13 @@ WireConnection;13;1;11;0
 WireConnection;9;0;10;0
 WireConnection;9;1;13;0
 WireConnection;5;1;9;0
+WireConnection;15;0;7;0
 WireConnection;6;0;5;1
-WireConnection;6;1;7;0
+WireConnection;6;1;15;0
 WireConnection;8;0;4;0
 WireConnection;8;1;14;0
 WireConnection;8;2;5;1
 WireConnection;1;0;8;0
 WireConnection;1;1;6;0
 ASEEND*/
-//CHKSM=B537778D1CE534B770810976250642FB4D4DDC26
+//CHKSM=FFEC906EB1218780558EAE7D4B6BB09C7F9E1E80

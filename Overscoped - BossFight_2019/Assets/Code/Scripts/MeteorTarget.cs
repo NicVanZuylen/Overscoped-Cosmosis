@@ -22,6 +22,9 @@ public class MeteorTarget : MonoBehaviour
     private BoxCollider m_collider;
     private float m_fAOETime;
 
+    [SerializeField]
+    private Renderer[] m_particlesToFade;
+
     public void Init(GameObject player, Queue<MeteorTarget> targetPool)
     {
         m_indicator = transform.GetChild(2).gameObject;
@@ -39,11 +42,20 @@ public class MeteorTarget : MonoBehaviour
             // Make this target available in the pool again.
             m_targetPool.Enqueue(this);
 
-            // Stop particle effects and script updates.
-            if(m_aoeParticles.IsPlaying())
+            if (m_particlesToFade[0].material.GetFloat("_Alpha") > 0)
+                m_particlesToFade[0].material.SetFloat("_Alpha", m_particlesToFade[0].material.GetFloat("_Alpha") - Time.deltaTime);
+            else if (m_particlesToFade[1].material.GetFloat("_Alpha") > 0)
+                m_particlesToFade[1].material.SetFloat("_Alpha", m_particlesToFade[1].material.GetFloat("_Alpha") - Time.deltaTime);
+            else if (m_particlesToFade[2].material.GetFloat("_Alpha") > 0)
+                m_particlesToFade[2].material.SetFloat("_Alpha", m_particlesToFade[2].material.GetFloat("_Alpha") - Time.deltaTime);
+            else if (m_particlesToFade[0].material.GetFloat("_Alpha") <= 0 && m_particlesToFade[1].material.GetFloat("_Alpha") <= 0 && m_particlesToFade[2].material.GetFloat("_Alpha") <= 0 && m_aoeParticles.IsPlaying())
                 m_aoeParticles.Stop();
-
-            enabled = false;
+        }
+        else
+        {
+            m_particlesToFade[0].material.SetFloat("_Alpha", 0.3f);
+            m_particlesToFade[1].material.SetFloat("_Alpha", 0.5f);
+            m_particlesToFade[2].material.SetFloat("_Alpha", 1);
         }
     }
 

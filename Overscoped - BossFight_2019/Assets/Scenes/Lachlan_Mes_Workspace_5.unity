@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.061417833, g: 0.07427355, b: 0.11543029, a: 1}
+  m_IndirectSpecularColor: {r: 0.1458271, g: 0.04640487, b: 0.22022216, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -21038,12 +21038,6 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/Boss/PS_Boss_Meteor.prefab
   - _gameObject: {fileID: 910597358}
     _prefab: Assets/Prefabs/Boss/PS_Boss_Meteor.prefab
-  - _gameObject: {fileID: 454113094}
-    _prefab: Assets/Prefabs/Boss/Meteor.prefab
-  - _gameObject: {fileID: 882981194}
-    _prefab: Assets/Prefabs/Boss/Meteor.prefab
-  - _gameObject: {fileID: 1950210092}
-    _prefab: Assets/Prefabs/Boss/Meteor.prefab
   - _gameObject: {fileID: 304244306}
     _prefab: Assets/Prefabs/Boss/Portal.prefab
   - _gameObject: {fileID: 784252356}
@@ -26327,12 +26321,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1460165696}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &454113094 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3909467931615195923, guid: 15224bf2b194e9c47af1aa65c1964291,
-    type: 3}
-  m_PrefabInstance: {fileID: 1590795150}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &458685062 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4029677331846486784, guid: 02ebce200fe8e3d4ba487fdf75f0ac42,
@@ -26585,6 +26573,12 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &471584004 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2095119775125311334, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1722805790}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &472137368
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37673,12 +37667,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3186287307878496422, guid: eb4da5f596b89ff49bcbcbb1879fc3e6,
     type: 3}
   m_PrefabInstance: {fileID: 874679713}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &882981194 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3909467931900955505, guid: 15224bf2b194e9c47af1aa65c1964291,
-    type: 3}
-  m_PrefabInstance: {fileID: 1590795150}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &886073794
 GameObject:
@@ -81777,6 +81765,11 @@ PrefabInstance:
       propertyPath: m_player
       value: 
       objectReference: {fileID: 686038719}
+    - target: {fileID: 3729592265509758162, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_PropertySheet.m_Vector3f.m_Array.Array.data[1].m_Value.y
+      value: 27.949999
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15224bf2b194e9c47af1aa65c1964291, type: 3}
 --- !u!1 &1590887790 stripped
@@ -87117,6 +87110,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeteorTargetVolume (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 9158341367325311, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9158341367325298, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 46.189774
@@ -87166,6 +87163,11 @@ PrefabInstance:
       propertyPath: m_explosion.m_objects.Array.data[0]
       value: 
       objectReference: {fileID: 329412940}
+    - target: {fileID: 2461039284643796382, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
+        type: 3}
+      propertyPath: m_particles.Array.data[0]
+      value: 
+      objectReference: {fileID: 471584004}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d, type: 3}
 --- !u!4 &1722805791 stripped
@@ -99474,12 +99476,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 9158341367325311, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
     type: 3}
   m_PrefabInstance: {fileID: 1068534192}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1950210092 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6294010468835972593, guid: 15224bf2b194e9c47af1aa65c1964291,
-    type: 3}
-  m_PrefabInstance: {fileID: 1590795150}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1953034177
 PrefabInstance:

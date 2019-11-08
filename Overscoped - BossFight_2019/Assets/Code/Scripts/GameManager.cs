@@ -64,7 +64,8 @@ public class GameManager : MonoBehaviour
             if (!m_bossScript.gameObject.activeInHierarchy)
             {
                 Debug.Log("Boss dead");
-                //Play music once boss is dead
+
+                // Change music track when boss is killed.
                 m_musicManager.PlayTrackIndex(0);
                 m_bBossDeadOnce = true;
             }

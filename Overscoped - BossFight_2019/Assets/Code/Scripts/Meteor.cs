@@ -34,8 +34,6 @@ public class Meteor : MonoBehaviour
     {
         m_player = player;
 
-        //Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_player.GetComponent<Collider>(), true);
-
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_rigidBody = GetComponent<Rigidbody>();
 
@@ -50,15 +48,7 @@ public class Meteor : MonoBehaviour
         m_v3Target = m_player.transform.position;
 
         GameObject[] m_targetObjects = GameObject.FindGameObjectsWithTag("MeteorSpawn");
-        
-        // Ignore collisions with spawn volumes.
-        //SphereCollider thisCollider = GetComponent<SphereCollider>();
-        //for (int i = 0; i < m_targetObjects.Length; ++i)
-        //{
-        //    Physics.IgnoreCollision(m_targetObjects[i].GetComponentInChildren<Collider>(), thisCollider, true);
-        //    Physics.IgnoreCollision(m_targetObjects[i].GetComponent<Collider>(), thisCollider, true);
-        //}
-    }   //
+    }   
 
     void Update()
     {

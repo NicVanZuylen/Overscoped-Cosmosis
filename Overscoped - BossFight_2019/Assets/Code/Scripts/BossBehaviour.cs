@@ -338,8 +338,12 @@ public class BossBehaviour : MonoBehaviour
             m_availableTargets.Enqueue(targetScript);
         }
 
+        // Initialize and disable meteors until needed.
         for (int i = 0; i < m_meteors.Length; ++i)
+        {
             m_meteors[i].Init(m_player);
+            m_meteors[i].gameObject.SetActive(false);
+        }
 
         // Portal punch
         m_portalScript = m_portal.GetComponent<Portal>();
@@ -488,11 +492,11 @@ public class BossBehaviour : MonoBehaviour
         m_fMeteorCDTimer -= Time.deltaTime;
         m_fBeamAttackCDTimer -= Time.deltaTime;
 
-        if(m_chestPlate.m_fHealth < m_chestPlate.m_fMaxHealth / 2)
+        if(m_chestPlate.m_fHealth < m_chestPlate.m_fMaxHealth * 0.5f)
         {
             m_fTimeBetweenAttacks = m_fTimeBetweenAttacksHalf;
         }
-        else if(m_chestPlate.m_fHealth < m_chestPlate.m_fMaxHealth / 4)
+        else if(m_chestPlate.m_fHealth < m_chestPlate.m_fMaxHealth * 0.25f)
         {
             m_fTimeBetweenAttacks = m_fTimeBetweenAttacksQuarter;
         }

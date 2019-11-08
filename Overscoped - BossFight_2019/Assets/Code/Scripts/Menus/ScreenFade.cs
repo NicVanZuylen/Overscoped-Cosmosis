@@ -41,8 +41,10 @@ public class ScreenFade : MonoBehaviour
 
         m_fadeImage.color = newColor;
 
+        // Initial fade level.
         m_fFadeLevel = 1.0f;
 
+        // Begin fading to game.
         BeginFade(EFadeMode.FADE_OUT);
     }
 

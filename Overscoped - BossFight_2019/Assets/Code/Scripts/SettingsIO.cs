@@ -24,22 +24,26 @@ public class SettingsIO
 
     public SettingsIO()
     {
-        m_data = new Settings();
-
-        m_data.m_fBossVolume = 1.0f;
-        m_data.m_fGrappleVolume = 1.0f;
-        m_data.m_fMasterVolume = 1.0f;
-        m_data.m_fPlayerVolume = 1.0f;
-        m_data.m_fWindVolume = 1.0f;
+        // Use default settings.
+        m_data = GetDefaults();
 
         m_path = Application.dataPath + "/Settings.dat";
     }
 
+    /*
+    Description: Get the cached settings data.
+    Return Type: Settings
+    */
     public Settings GetData()
     {
         return m_data;
     }
 
+    /*
+    Description: Set the cached settings data, will be saved when WriteFile() is called.
+    Param:
+        Settings data: The new data to store.
+    */
     public void SetData(Settings data)
     {
         m_data = data;

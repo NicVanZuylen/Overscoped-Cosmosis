@@ -63,8 +63,8 @@ public class CameraEffects : MonoBehaviour
     private ClampedFloatParameter m_chromAbb;
 
     // Head bobbing.
-    private Vector3 m_v3BobbingEuler;
-    private Vector3 m_v3BobbingOffset;
+    private Vector3 m_v3BobbingEuler; // Head bobbing camera angle offset.
+    private Vector3 m_v3BobbingOffset; // Head bobbing camera position offset.
     private float m_fVertBobbingLevel; // Range between 0 and 1.
     private float m_fSideBobbingLevel; // Range between -1 and 1.
     private float m_fLandingBobbingLevel; // Range between 0 and 1.
@@ -74,32 +74,32 @@ public class CameraEffects : MonoBehaviour
     private bool m_bBobbing; // Whether or not to enable head bobbing from walking or running.
 
     // Chromatic Abberation shake
-    private float m_fChromAbbShakeDuration;
-    private float m_fChromAbbMinMagnitude;
-    private float m_fChromAbbMaxMagnitude;
-    private float m_fCurrentCAShakeDelay;
-    private float m_fChromAbbTarget;
+    private float m_fChromAbbShakeDuration; // Remaining time on chrom abb shake.
+    private float m_fChromAbbMinMagnitude; // Minimum chrom abb shake offset.
+    private float m_fChromAbbMaxMagnitude; // Maximum chrom abb shake offset.
+    private float m_fCurrentCAShakeDelay; // Delay between new chrom abb shake offsets
+    private float m_fChromAbbTarget; // Chrom abb offset target.
 
     // Screen shake.
-    private Vector3 m_v3StartPosition;
-    private Quaternion m_currentRotOffset;
-    private Quaternion m_shakeRot;
-    private float m_fShakeDuration;
+    private Vector3 m_v3StartPosition; // Initial camera offset.
+    private Quaternion m_currentRotOffset; // Current shake rotation offset.
+    private Quaternion m_shakeRot; // Camera rotation with screen shake.
+    private float m_fShakeDuration; // Remaining time of camera shake.
     private float m_fShakeReturnTime;
-    private float m_fCurrentShakeDelay;
-    private float m_fShakeMagnitude;
+    private float m_fCurrentShakeDelay; // Time between new shake offsets.
+    private float m_fShakeMagnitude; // Maximum magnitude of shake offsets.
     private bool m_bFullMag; // Whether or not to use the full shake magnitude always when shaking.
 
     // FOV
-    private float m_fStartFOV;
-    private float m_fFOVOffset;
+    private float m_fStartFOV; // Initial camera FOV.
+    private float m_fFOVOffset; // Offset on camera FOV.
 
     // Rewind
-    private CameraSplineState m_currentSplineState;
-    private CameraSplineState m_nextSplineState;
-    private const int m_nSplineSampleCount = 3;
-    private const int m_nMaxSplinePoints = 512;
-    private int m_nSplineIndex;
+    private CameraSplineState m_currentSplineState; // Current rewind spline point used for interpolation.
+    private CameraSplineState m_nextSplineState; // Next rewind spline point used for interpolation.
+    private const int m_nSplineSampleCount = 3; 
+    private const int m_nMaxSplinePoints = 512; // Maximum amount of points on the camera rewind spline.
+    private int m_nSplineIndex; // Index of the current spline point in the spline array.
 
     void Awake()
     {
@@ -107,22 +107,26 @@ public class CameraEffects : MonoBehaviour
 
         // Get player controller and add landing callback.
         PlayerController controller = transform.parent.GetComponentInParent<PlayerController>();
-
         controller.AddLandCallback(Land);
 
+        // Create spline data array.
         m_camSpline = new List<CameraSplineState>(m_nMaxSplinePoints);
 
+        // Get start transform data & FOV.
         m_v3StartPosition = transform.localPosition;
         m_startCamRot = transform.localRotation;
         m_fStartFOV = m_camera.fieldOfView;
 
+        // Get chromatic aberration intensity value reference.
         ChromaticAberration chromAbbValue = null;
         m_postProcessing.profile.TryGet<ChromaticAberration>(out chromAbbValue);
         m_chromAbb = chromAbbValue.intensity;
 
+        // Initial shake duration and magnitude values.
         m_fShakeDuration = 0.0f;
         m_fShakeMagnitude = 0.0f;
 
+        // Initial head bobbing direction values.
         m_nBobbingDirection = -1;
         m_nBobbingSideDirection = -1;
         m_nLandingBobDirection = -1;
@@ -132,18 +136,13 @@ public class CameraEffects : MonoBehaviour
     {
         m_startCamRot = transform.localRotation;
 
-        // Apply shake.
+        // Apply shake & chromatic aberration.
         Shake(m_fShakeMagnitude, m_bFullMag);
         ShakeChromAbb();
 
         // Apply FOV offset over time.
         m_camera.fieldOfView = Mathf.MoveTowards(m_camera.fieldOfView, m_fStartFOV + m_fFOVOffset, m_fFOVChangeRate * Time.deltaTime);
         m_fFOVOffset = 0.0f;
-
-#if UNITY_EDITOR
-        if (Input.GetKey(KeyCode.L))
-            Land(null);
-#endif
 
         // Update head bobbing effect.
         UpdateBobbing();
@@ -288,46 +287,12 @@ public class CameraEffects : MonoBehaviour
     }
 
     /*
-    Description: Apply a shake vector to the camera for this frame.
-    Param:
-        float fMagnitude: The magnitude of the shake vector to add.
-        bool bFullMag: Whether or not to force full shake vector magnitude.
-    */
-    private void Shake(float fMagnitude, bool bFullmag)
-    {
-        if(m_fShakeDuration > 0.0f && m_fCurrentShakeDelay <= 0.0f)
-        {
-            Vector3 camEuler = Vector3.zero;
-
-            if (!bFullmag)
-            {
-                camEuler.x = Random.Range(-fMagnitude, fMagnitude);
-                camEuler.y = Random.Range(-fMagnitude, fMagnitude);
-            }
-            else
-            {
-                camEuler.x = Random.Range(-1, 2) * fMagnitude;
-                camEuler.y = Random.Range(-1, 2) * fMagnitude;
-            }
-
-            m_shakeRot = Quaternion.Euler(camEuler);
-
-            m_fShakeReturnTime = m_fShakeReturnDuration;
-            m_fCurrentShakeDelay = m_fShakeDelay;
-        }
-
-        m_currentRotOffset = Quaternion.Slerp(m_shakeRot, Quaternion.Euler(Vector3.zero), 1.0f - (m_fShakeReturnTime / m_fShakeReturnDuration));
-
-        m_fShakeReturnTime -= Time.deltaTime;
-        m_fShakeDuration -= Time.deltaTime;
-        m_fCurrentShakeDelay -= Time.deltaTime;
-    }
-
-    /*
     Description: Apply a shake to the chromatic abberation post effect value.
     */
     public void ShakeChromAbb()
     {
+        // This uses unscaled deltatime since it needs to occur during the death sequence.
+
         if(m_fChromAbbShakeDuration <= 0.0f)
         {
             m_chromAbb.value = Mathf.MoveTowards(m_chromAbb.value, 0.0f, 5.0f * Time.unscaledDeltaTime);
@@ -458,5 +423,45 @@ public class CameraEffects : MonoBehaviour
         state.m_rotation = Quaternion.Slerp(currentSplineState.m_rotation, nextSplineState.m_rotation, fInterp);
 
         return state;
+    }
+
+    /*
+    Description: Apply a shake vector to the camera for this frame.
+    Param:
+        float fMagnitude: The magnitude of the shake vector to add.
+        bool bFullMag: Whether or not to force full shake vector magnitude.
+    */
+    private void Shake(float fMagnitude, bool bFullmag)
+    {
+        if (m_fShakeDuration > 0.0f && m_fCurrentShakeDelay <= 0.0f)
+        {
+            Vector3 camEuler = Vector3.zero;
+
+            if (!bFullmag) // Shake offset is at full magnitude every new shake.
+            {
+                camEuler.x = Random.Range(-fMagnitude, fMagnitude);
+                camEuler.y = Random.Range(-fMagnitude, fMagnitude);
+            }
+            else // Get random angle offset for this shake iteration.
+            {
+                camEuler.x = Random.Range(-1, 2) * fMagnitude;
+                camEuler.y = Random.Range(-1, 2) * fMagnitude;
+            }
+
+            // Convert shake rotation to quaternion.
+            m_shakeRot = Quaternion.Euler(camEuler);
+
+            // Reset timers.
+            m_fShakeReturnTime = m_fShakeReturnDuration;
+            m_fCurrentShakeDelay = m_fShakeDelay;
+        }
+
+        // Interpolate rotation offset between the shake offset and zero offset.
+        m_currentRotOffset = Quaternion.Slerp(m_shakeRot, Quaternion.Euler(Vector3.zero), 1.0f - (m_fShakeReturnTime / m_fShakeReturnDuration));
+
+        // Count down timers.
+        m_fShakeReturnTime -= Time.deltaTime;
+        m_fShakeDuration -= Time.deltaTime;
+        m_fCurrentShakeDelay -= Time.deltaTime;
     }
 }

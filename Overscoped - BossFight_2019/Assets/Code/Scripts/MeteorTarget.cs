@@ -4,26 +4,30 @@ using UnityEngine;
 
 public class MeteorTarget : MonoBehaviour
 {
+    [Tooltip("AOE hazard VFX")]
     [SerializeField]
     private ParticleObject m_aoeParticles;
 
+    [Tooltip("Impact explosion VFX")]
     [SerializeField]
     private ParticleObject m_explosion;
 
+    [Tooltip("Duration of the AOE hazard.")]
     [SerializeField]
     private float m_fAOEDuration = 10.0f;
 
+    [Tooltip("Damage per second of the AOE hazard when the player stands in it.")]
     [SerializeField]
     private float m_fAOEDamagePerSec = 10.0f;
 
-    private GameObject m_indicator;
-    private Queue<MeteorTarget> m_targetPool;
-    private PlayerStats m_playerStats;
-    private BoxCollider m_collider;
-    private float m_fAOETime;
-
     [SerializeField]
-    private Renderer[] m_particlesToFade;
+    private Renderer[] m_particlesToFade = null;
+
+    private GameObject m_indicator; // Indicator effect object.
+    private Queue<MeteorTarget> m_targetPool; // Object pool of all available meteor targets.
+    private PlayerStats m_playerStats; // Player stats script reference.
+    private BoxCollider m_collider; // AOE hazard collider.
+    private float m_fAOETime; // Current AOE timer value.
 
     public void Init(GameObject player, Queue<MeteorTarget> targetPool)
     {
@@ -71,19 +75,23 @@ public class MeteorTarget : MonoBehaviour
 
     public void StartAOE()
     {
+        // Disable indicator FX.
         m_indicator.SetActive(false);
+
         // Begin and reset AOE time.
         enabled = true;
         m_fAOETime = m_fAOEDuration;
 
+        // Play explosion VFX.
         m_explosion.Play();
 
+        // Play AOE VFX.
         m_aoeParticles.Play();        
     }
 
     private void OnTriggerStay(Collider other)
     {
-        // Damage player.
+        // Damage player over time.
         if (other.gameObject == m_playerStats.gameObject && m_fAOETime > 0.0f)
             m_playerStats.DealDamage(m_fAOEDamagePerSec * Time.fixedDeltaTime);
     }

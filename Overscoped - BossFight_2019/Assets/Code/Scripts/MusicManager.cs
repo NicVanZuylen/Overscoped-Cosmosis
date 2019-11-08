@@ -44,6 +44,7 @@ public class MusicManager : MonoBehaviour
 
     private AudioSource m_lastSource;
     private AudioSource m_currentSource;
+    private static float m_fMusicVolume;
     private float m_fCrossFadeProgress;
     private int m_nLastRandIndex;
 
@@ -53,8 +54,11 @@ public class MusicManager : MonoBehaviour
             m_tracks = new TrackGroup[1];
 
         m_firstSource.playOnAwake = false;
-        m_secondSource.playOnAwake = false;
+        m_firstSource.volume = m_fMusicVolume;
         m_firstSource.loop = true;
+
+        m_secondSource.playOnAwake = false;
+        m_secondSource.volume = m_fMusicVolume;
         m_secondSource.loop = true;
 
         m_currentSource = m_firstSource;
@@ -62,32 +66,28 @@ public class MusicManager : MonoBehaviour
 
         m_fCrossFadeProgress = 0.0f;
         m_nLastRandIndex = -1;
-
-        enabled = false;
     }
 
     private void Update()
     {
         m_fCrossFadeProgress += Time.unscaledDeltaTime;
 
-        float fUnitProgress = m_fCrossFadeProgress / m_fCrossFadeTime;
+        float fUnitProgress = Mathf.Min(m_fCrossFadeProgress / m_fCrossFadeTime, 1.0f);
 
         // Raise volume of current source as the last source is lowered.
-        m_currentSource.volume = fUnitProgress;
-        m_lastSource.volume = 1.0f - fUnitProgress;
+        m_currentSource.volume = fUnitProgress * m_fMusicVolume;
+        m_lastSource.volume = (1.0f - fUnitProgress) * m_fMusicVolume;
 
         // Disable when finished.
         if(m_fCrossFadeProgress >= m_fCrossFadeTime)
         {
             m_lastSource.Stop();
-            enabled = false;
         }
     }
 
     public void BeginCrossFade()
     {
         m_fCrossFadeProgress = 0.0f;
-        enabled = true;
     }
 
     public void SetTrack(AudioClip track)
@@ -195,5 +195,25 @@ public class MusicManager : MonoBehaviour
                 return;
             }
         }
+    }
+
+    /*
+    Description: Set the volume music is played at.
+    Param:
+        float fMusicVolume: The music volume value.
+        float fMaster: The master volume value, the former value is multiplied by this.
+    */
+    public static void SetVolume(float fMusicVolume, float fMaster)
+    {
+        m_fMusicVolume = fMusicVolume * fMaster;
+    }
+
+    /*
+    Description: Get the volume music is played at.
+    Return Type: float
+    */
+    public static float GetVolume()
+    {
+        return m_fMusicVolume;
     }
 }

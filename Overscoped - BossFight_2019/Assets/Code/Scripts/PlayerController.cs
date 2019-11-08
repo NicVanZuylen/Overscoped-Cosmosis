@@ -78,10 +78,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float m_fRespawnHeight = 10.0f;
 
-    [Tooltip("Height in which the player will be respawned above the last platform they stood on.")]
-    [SerializeField]
-    private float m_fKillZoneHeight = -80.0f;
-
     [Tooltip("Whether or not the player is standing on a walkable surface.")]
     [SerializeField]
     private bool m_bOnGround = false;
@@ -787,8 +783,6 @@ public class PlayerController : MonoBehaviour
             // Set respawn checkpoint.
             if (m_groundHit.collider.tag == "CheckPoint")
             {
-                Debug.Log(m_groundHit.collider.bounds.extents.y);
-                
                 m_v3RespawnPosition = m_groundHit.collider.bounds.center + new Vector3(0.0f, (m_groundHit.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
             }
         }

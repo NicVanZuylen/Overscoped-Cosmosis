@@ -5341,6 +5341,7 @@ MonoBehaviour:
   m_fBobbingXAngleMagnitude: 0.8
   m_fBobbingYAngleMagnitude: 0.5
   m_fBobbingPosMagnitude: 0.07
+  m_screenFade: {fileID: 0}
 --- !u!1 &8048166359401910706
 GameObject:
   m_ObjectHideFlags: 0
@@ -5797,7 +5798,6 @@ MonoBehaviour:
   m_fJumpDistance: 10
   m_fJumpHeight: 3
   m_fRespawnHeight: 10
-  m_fKillZoneHeight: -80
   m_bOnGround: 1
 --- !u!114 &8535114125808485297
 MonoBehaviour:
@@ -5993,6 +5993,26 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 5fddbba1a9805cc4686affcd916ec2e1, type: 2}
+    - target: {fileID: -5296942888252913892, guid: 02ed0d0d567ff434eb099ca7937e953a,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 44d729e6f7244204aa3dea410e42e8fe, type: 2}
+    - target: {fileID: -5296942888252913892, guid: 02ed0d0d567ff434eb099ca7937e953a,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: efbe565c39a1dd140936d402192c7740, type: 2}
+    - target: {fileID: -5296942888252913892, guid: 02ed0d0d567ff434eb099ca7937e953a,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5296942888252913892, guid: 02ed0d0d567ff434eb099ca7937e953a,
+        type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02ed0d0d567ff434eb099ca7937e953a, type: 3}
 --- !u!4 &7987323707810677606 stripped

@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
         BossBehaviour.SetVolume(m_settings.m_fBossVolume, m_settings.m_fMasterVolume);
         PlayerStats.SetVolume(m_settings.m_fPlayerVolume,m_settings.m_fWindVolume, m_settings.m_fMasterVolume);
         GrappleHook.SetVolume(m_settings.m_fGrappleVolume, m_settings.m_fMasterVolume);
+        MusicManager.SetVolume(m_settings.m_fMusicVolume, m_settings.m_fMasterVolume);
     }
 
     // Update is called once per frame

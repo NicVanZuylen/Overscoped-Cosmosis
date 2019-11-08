@@ -1,19 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &1650904923
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735433698997803223}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0454e2b5c15f64344b53196459dd01a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_bDisableOnStop: 0
-  m_stopBehaviour: 0
 --- !u!1 &1348784824865627014
 GameObject:
   m_ObjectHideFlags: 0
@@ -9636,8 +9622,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4551823218363787963}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0, z: 8}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalPosition: {x: 0, y: 0, z: 5.8}
+  m_LocalScale: {x: 5.7447, y: 5.7447, z: 5.7447}
   m_Children:
   - {fileID: 8752469103085457121}
   m_Father: {fileID: 3518824518076110291}
@@ -19249,7 +19235,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3988178863364041712
 Transform:
   m_ObjectHideFlags: 0
@@ -28996,6 +28982,20 @@ Animation:
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
   m_CullingType: 0
+--- !u!114 &1650904923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5735433698997803223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0454e2b5c15f64344b53196459dd01a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_bDisableOnStop: 0
+  m_stopBehaviour: 0
 --- !u!1001 &1151581550
 PrefabInstance:
   m_ObjectHideFlags: 0

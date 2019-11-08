@@ -5,7 +5,7 @@ using UnityEditor;
 
 public class MeshColliderImporter : AssetPostprocessor
 {
-    void OnPostprocessModel(GameObject obj)
+    public void ProcessMesh(GameObject obj)
     {
         // Make object static if the name starts with SM ("Static Mesh").
         if (obj.name.StartsWith("SM"))
@@ -25,6 +25,18 @@ public class MeshColliderImporter : AssetPostprocessor
             obj.GetComponent<MeshRenderer>().enabled = false;
 
             Debug.Log("Mesh: " + obj.name + " detected with '_Collider' suffix. Adding mesh collider...");
+        }
+    }
+
+    void OnPostprocessModel(GameObject obj)
+    {
+        // Check meshes for each child.
+        for(int i = 0; i < obj.transform.childCount; ++i)
+        {
+            Transform childTransform = obj.transform.GetChild(i);
+            GameObject child = childTransform.gameObject;
+
+            ProcessMesh(child);
         }
     }
 }

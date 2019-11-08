@@ -82,7 +82,7 @@ public class PlayerStats : MonoBehaviour
 
     // -------------------------------------------------------------------------------------------------
     [Space(10)]
-    [Header("GUI References")]
+    [Header("GUI")]
     [Space(10)]
 
     [SerializeField]
@@ -98,13 +98,11 @@ public class PlayerStats : MonoBehaviour
     private RectTransform m_reticleOuterTransform = null;
 
     [SerializeField]
-    private Material m_armHealthMat = null;
-
-    [SerializeField]
-    private Material m_armManaMat = null;
-
-    [SerializeField]
     private Text m_speedText = null;
+
+    [Tooltip("Size multipler of the reticle outer sprite when the player can grapple.")]
+    [SerializeField]
+    private float m_fReticleSizeMultiplier = 1.2f;
 
     // -------------------------------------------------------------------------------------------------
     [Header("SFX")]
@@ -140,25 +138,30 @@ public class PlayerStats : MonoBehaviour
 
     // Private:
 
-    private GrappleHook m_hookScript;
-    private PlayerController m_controller;
-    private PlayerBeam m_beamScript;
-    private CameraEffects m_camEffects;
-    private Transform m_camPivot;
-    private ScreenFade m_fadeScript;
-    private AudioLoop m_windAudioLoop;
-    private static float m_fWindVolume = 1.0f;
-    private static float m_fPlayerVolume = 1.0f;
-    private static bool m_bCheckpointReached = false;
-    private bool m_bNearPickup = false;
+    private GrappleHook m_hookScript; // Grapple hook controller script reference.
+    private PlayerController m_controller; // Player controller script reference.
+    private PlayerBeam m_beamScript; // Player beam controller script reference.
+    private CameraEffects m_camEffects; // Camera FX script.
+    private Transform m_camPivot; // Pivot in which the player camera is parented to.
+    private ScreenFade m_fadeScript; // Script controller screen fade effects.
+    private AudioLoop m_windAudioLoop; // Wind audio loop object.
+    private Material[] m_materials; // Material references on the player.
+    private static float m_fPlayerVolume = 1.0f; // Player audio volume.
+    private static float m_fWindVolume = 1.0f; // Wind audio volume.
+    private float m_fCurrentWindVolume; // Current wind volume based off of player velocity.
+    private static bool m_bCheckpointReached = false; // Whether or not the respawn (on death) checkpoint has been reached.
+    private bool m_bNearPickup = false; // Whether or not the player is near a crystal pickup.
 
     // Resources
-    private float m_fHealth;
-    private float m_fMana;
-    private float m_fCurrentRegenDelay;
-    private bool m_bIsAlive;
+    private float m_fHealth; // Everyone knows what this does.
+    private float m_fMana; // Resource used up while grappling.
+    private float m_fCurrentRegenDelay; // Current timer value of the mana regen.
+    private bool m_bIsAlive; // Whether or not the player lives.
 
-    // Camera backtracking
+    // Respawn
+    private float m_fRespawnDissolve; // Dissolve level after respawning.
+
+    // Camera backtracking / Death
     private float m_fSplineInterval;
     private float m_fCurrentSplineTime;
     private float m_fSplineProgress;
@@ -171,6 +174,7 @@ public class PlayerStats : MonoBehaviour
         m_camEffects = GetComponentInChildren<CameraEffects>(false);
         m_camPivot = transform.Find("CameraPivot");
         m_fadeScript = FindObjectOfType<ScreenFade>();
+        m_materials = m_camEffects.GetComponentInChildren<SkinnedMeshRenderer>().materials;
 
         m_controller.AddJumpCallback(OnJump);
         m_controller.AddLandCallback(OnLand);
@@ -188,9 +192,17 @@ public class PlayerStats : MonoBehaviour
         m_fSplineInterval = m_fDeathRecordTime / m_camEffects.MaxSplineCount();
         m_fCurrentSplineTime = 0.0f;
 
+        // Initial dissolve level when respawning.
+        m_fRespawnDissolve = 1.0f;
+
+        // Set dissolve shader values back to fully dissolved.
+        for (int i = 0; i < m_materials.Length; ++i)
+            m_materials[i].SetFloat("_Dissolve", m_fRespawnDissolve);
+
         // Spawn at checkpoint if it has been reached.
-        if(m_bCheckpointReached && m_checkpoint)
+        if (m_bCheckpointReached && m_checkpoint)
         {
+
             transform.position = m_checkpoint.position;
             m_controller.SetLookRotation(m_checkpoint.rotation);
         }
@@ -239,24 +251,30 @@ public class PlayerStats : MonoBehaviour
 
         AudioSource windSource = m_windAudioLoop.GetSource();
 
-        // Wind effect.
+        // Wind effects.
         if (!m_controller.IsGrounded())
         {
             // Adjust wind volume based off of velocity.
-            windSource.volume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed, 0.0f);
+            m_fCurrentWindVolume = Mathf.Max((m_controller.GetVelocity().magnitude - m_fWindMinVolSpeed) / m_fWindMaxVolSpeed);
 
             if (!m_windAudioLoop.IsPlaying())
-                m_windAudioLoop.Play(m_fWindVolume);
+                m_windAudioLoop.Play(m_fCurrentWindVolume * m_fWindVolume);
+
+            // Apply camera wind effects...
+            m_camEffects.ApplyShake(0.1f, m_fCurrentWindVolume * 0.15f);
+            m_camEffects.ApplyChromAbbShake(0.1f, m_fCurrentWindVolume * 0.1f, m_fCurrentWindVolume * 0.2f);
         }
         else if(m_windAudioLoop.IsPlaying())
         {
             // Decay volume when landing.
-            windSource.volume = Mathf.MoveTowards(windSource.volume, 0.0f, m_fWindDecayRate * Time.deltaTime);
+            m_fCurrentWindVolume = Mathf.MoveTowards(m_fCurrentWindVolume, 0.0f, m_fWindDecayRate * Time.deltaTime);
 
             // Stop audio when volume reaches silence.
             if (windSource.volume <= 0.01f)
                 m_windAudioLoop.Stop();
         }
+
+        windSource.volume = m_fCurrentWindVolume * m_fWindVolume;
     }
 
     /*
@@ -280,6 +298,13 @@ public class PlayerStats : MonoBehaviour
         m_landSFX.PlayRandom(m_fPlayerVolume);
     }
 
+    private void OnDestroy()
+    {
+        // Reset shader values.
+        for (int i = 0; i < m_materials.Length; ++i)
+            m_materials[i].SetFloat("_Dissolve", 0.0f);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -296,6 +321,9 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    /*
+    Description: Update function when the player is alive.
+    */
     private void AliveUpdate()
     {
         // Apply velocity-based FX.
@@ -304,6 +332,16 @@ public class PlayerStats : MonoBehaviour
         // Reduce hurt cooldown.
         m_hurtSFX.CountCooldown();
 
+        // Reverse dissolve from death.
+        if(m_fRespawnDissolve > 0.0f)
+        {
+            // Count down dissolve level and update shader.
+            m_fRespawnDissolve = Mathf.Max(m_fRespawnDissolve - Time.deltaTime, 0.0f);
+
+            for (int i = 0; i < m_materials.Length; ++i)
+                m_materials[i].SetFloat("_Dissolve", m_fRespawnDissolve);
+        }
+
         if (m_hookScript.GrappleActive())
         {
             // Reset mana regen delay.
@@ -311,6 +349,9 @@ public class PlayerStats : MonoBehaviour
 
             // Lose mana whilst the hook is active.
             m_fMana -= m_fManaLossRate * Time.deltaTime;
+
+            // Update mana GUI fill.
+            m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
         }
         else
         {
@@ -330,6 +371,9 @@ public class PlayerStats : MonoBehaviour
                         m_fMana = Mathf.Lerp(m_fMana, m_fMaxMana, m_fManaRegenRateLerp);
                         break;
                 }
+
+                // Update mana GUI fill.
+                m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
             }
         }
 
@@ -355,15 +399,13 @@ public class PlayerStats : MonoBehaviour
         m_fHealth = Mathf.Clamp(m_fHealth, 0.0f, m_fMaxHealth);
         m_fMana = Mathf.Clamp(m_fMana, 0.0f, m_fMaxMana);
 
-        m_armHealthMat.SetFloat("_Mana", 1.0f - (m_fHealth / m_fMaxHealth));
-        m_armManaMat.SetFloat("_Mana", 1.0f - (m_fMana / m_fMaxMana));
-
+        // Highlight reticle when the player can grapple an object.
         if (m_hookScript.InGrappleRange())
         {
             m_reticleMats[0].SetInt("_InRange", 1);
             m_reticleMats[1].SetInt("_InRange", 1);
 
-            m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f) * 1.2f;
+            m_reticleOuterTransform.sizeDelta = new Vector2(50.0f, 50.0f) * m_fReticleSizeMultiplier;
         } 
         else
         {
@@ -375,19 +417,20 @@ public class PlayerStats : MonoBehaviour
 
         if (m_speedText)
             m_speedText.text = m_controller.GetVelocity().magnitude.ToString("n2") + "m/s";
-
-        m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
-        m_manaFillMat.SetFloat("_Resource", m_fMana / m_fMaxMana);
     }
 
+    /*
+    Description: Reset time scale and reload the active scene.
+    */
     private void RestartScene()
     {
         Time.timeScale = 1.0f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-
-
+    /*
+    Description: Update function during the player's death state.
+    */
     private void DeathUpdate()
     {
         m_camEffects.ApplyChromAbbShake(0.1f, m_fSplineProgress * 1.5f, m_fSplineProgress * 2.0f);
@@ -425,12 +468,16 @@ public class PlayerStats : MonoBehaviour
 
         m_fSplineProgress += m_rewindCurve.Evaluate(m_fSplineProgress) * Time.unscaledDeltaTime;
 
+        // Set screen fade level as rewind progresses.
         m_fadeScript.SetFade(m_fSplineProgress);
 
-        m_camEffects.transform.localRotation = Quaternion.identity;
+        // Dissolve player as rewind progresses.
+        for (int i = 0; i < m_materials.Length; ++i)
+            m_materials[i].SetFloat("_Dissolve", m_fSplineProgress);
 
-        m_camPivot.transform.position = splineState.m_v4Position;
-        m_camPivot.transform.rotation = splineState.m_rotation;
+        m_camEffects.transform.localRotation = Quaternion.identity;
+        m_camPivot.position = splineState.m_v4Position;
+        m_camPivot.rotation = splineState.m_rotation;
 
         // Resurrect player.
         if (Input.GetKeyDown(KeyCode.K))
@@ -513,8 +560,15 @@ public class PlayerStats : MonoBehaviour
     {
         m_fHealth -= fDamage;
 
-        // Hurt SFX
-        m_hurtSFX.PlayRandom(m_fPlayerVolume);
+        // Set GUI value.
+        m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
+
+        // Play Hurt SFX...
+        m_hurtSFX.PlayRandom();
+
+        // Play camera effects...
+        m_camEffects.ApplyShake(0.1f, 0.8f, true);
+        m_camEffects.ApplyChromAbbShake(0.1f, 0.6f, 0.8f);
 
         if(m_fHealth <= 0.0f)
         {
@@ -529,9 +583,6 @@ public class PlayerStats : MonoBehaviour
     private void KillPlayer()
     {
         m_fHealth = 0.0f;
-
-        // Set health bar value to zero.
-        m_armHealthMat.SetFloat("_Mana", 0.0f);
 
         // Begin fade effect.
         m_fadeScript.SetFadeRate(0.0f);

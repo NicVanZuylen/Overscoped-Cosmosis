@@ -115,9 +115,25 @@ public class BossBehaviour : MonoBehaviour
     [SerializeField]
     private VisualEffect m_spawnVFX = null;
 
+    [Tooltip("Death GPU particlesystem.")]
+    [SerializeField]
+    private GameObject m_deathVFX = null;
+
     [Tooltip("Spawn/Death dissolve material")]
     [SerializeField]
     private Material m_dissolveMat = null;
+
+    [Tooltip("Chest barrier material for spawn effects.")]
+    [SerializeField]
+    private Material m_barrierMat = null;
+
+    [Tooltip("Heart mesh renderer.")]
+    [SerializeField]
+    private MeshRenderer m_heartRenderer = null;
+
+    [Tooltip("Heart tendrils mesh renderer.")]
+    [SerializeField]
+    private MeshRenderer m_tentrilsRenderer = null;
 
     // -------------------------------------------------------------------------------------------------
     [Header("SpawnSFX")]
@@ -156,8 +172,12 @@ public class BossBehaviour : MonoBehaviour
     private AudioLoop m_portalAmbientsAudioLoop;
 
     [Header("Beam SFX")]
+
     [SerializeField]
     private AudioClip m_beamChargeSFX = null;
+
+    [SerializeField]
+    private AudioClip m_beamStopSFX = null;
 
     [SerializeField]                         
     private AudioClip m_beamFireLoopingSFX = null;  
@@ -269,12 +289,29 @@ public class BossBehaviour : MonoBehaviour
 
         // VFX
 
+        // Stop beam origin vfx.
+        m_beamOriginVFX.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
+
         // Spawn/Death
-        m_dissolveMat.SetFloat("_Dissolve", 0.0f);
+        if(m_dissolveMat)
+            m_dissolveMat.SetFloat("_Dissolve", 0.0f);
+
+        if (m_barrierMat)
+            m_barrierMat.SetFloat("_Alpha", 0.0f);
+
+        if (m_heartRenderer)
+            m_heartRenderer.enabled = false;
+
+        if (m_tentrilsRenderer)
+            m_tentrilsRenderer.enabled = false;
+
         m_animator.SetBool("Spawned", false);
 
         m_fSpawnTime = m_spawnVFX.GetFloat("Lifetime Max");
         m_fCurrentSpawnTime = m_fSpawnTime;
+
+        // Disable spawn VFX until needed.
+        m_spawnVFX.gameObject.SetActive(false);
 
         // Initialize beam effect buffers.
         m_beamParticleRenderers = new ParticleSystemRenderer[m_beamParticles.Length];
@@ -319,10 +356,10 @@ public class BossBehaviour : MonoBehaviour
         m_attackVoices[1] = m_punchVoiceSelection;
         m_attackVoices[2] = m_beamVoiceSelection;
 
-        //m_fAttackDelays = new float[3];
-        //m_fAttackDelays[0] = 1.0f;
-        //m_fAttackDelays[1] = 2.0f;
-        //m_fAttackDelays[2] = 1.0f;
+        m_fAttackDelays = new float[3];
+        m_fAttackDelays[0] = 1.0f;
+        m_fAttackDelays[1] = 2.0f;
+        m_fAttackDelays[2] = 1.0f;
         m_fCurrentAttackDelay = 0.0f;
         m_bAttackPending = false;
 
@@ -348,24 +385,47 @@ public class BossBehaviour : MonoBehaviour
         m_portalAmbientsAudioLoop = new AudioLoop(m_portalAmbientsSFX, m_portal, ESpacialMode.AUDIO_SPACE_NONE);
 
         m_beamImpactAudioLoop = new AudioLoop(m_beamImpactLoopingSFX, m_beamDestinationVFX.m_particleSystems[0].gameObject, ESpacialMode.AUDIO_SPACE_WORLD);
+
+        // Disable until the player reaches the arena.
+        enabled = false;
+    }
+
+    public void OnEnable()
+    {
+        // Enable spawn VFX.
+        if (m_spawnVFX)
+            m_spawnVFX.gameObject.SetActive(true);
+    }
+
+    public void OnDestroy()
+    {
+        // Reset dissolve shader value.
+        m_dissolveMat.SetFloat("_Dissolve", 1.0f);
     }
 
     public void SpawnState()
     {
-        if (m_fCurrentSpawnTime > 0.0f)
+        if (m_fCurrentSpawnTime > 0.0f && m_dissolveMat && m_barrierMat && m_heartRenderer && m_tentrilsRenderer)
         {
             // Find and set dissolve shader value...
             m_fCurrentSpawnTime = Mathf.Max(m_fCurrentSpawnTime - Time.deltaTime, 0.0f);
-            float fDissolveLevel = Mathf.Min((1.0f - (m_fCurrentSpawnTime / m_fSpawnTime) * 2.0f), 1.0f);
+            float fDissolveLevel = Mathf.Max(Mathf.Min((1.0f - (m_fCurrentSpawnTime / m_fSpawnTime) * 2.0f), 1.0f), 0.0f);
 
-            m_dissolveMat.SetFloat("_Dissolve", Mathf.Max(fDissolveLevel, 0.0f));
+            m_dissolveMat.SetFloat("_Dissolve", fDissolveLevel);
+            m_barrierMat.SetFloat("_Alpha", fDissolveLevel);
 
             // Begin spawn animation when dissolve level reaches zero.
             if (fDissolveLevel > 0.0f)
+            {
                 m_animator.SetBool("Spawned", true);
 
-            if(fDissolveLevel > -0.5f)
-            {
+                // Show heart and tenrils at this point.
+                if(!m_heartRenderer.enabled)
+                    m_heartRenderer.enabled = true;
+
+                if (!m_tentrilsRenderer.enabled)
+                    m_tentrilsRenderer.enabled = true;
+
                 // Play spawn voice line.
                 m_spawnSFX.PlayRandom(m_fBossVolume);
             }
@@ -444,6 +504,10 @@ public class BossBehaviour : MonoBehaviour
 
     public void DeathState()
     {
+        // Make sure death animation is playing first.
+        if (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("Death"))
+            return;
+
         // Death dissolve effect.
         if (m_fCurrentDeathTime > 0.0f)
         {
@@ -452,12 +516,16 @@ public class BossBehaviour : MonoBehaviour
             float fDissolveLevel = m_fCurrentDeathTime / m_fDeathTime;
 
             m_dissolveMat.SetFloat("_Dissolve", fDissolveLevel);
+
+            // Play death VFX particles.
+            if (m_deathVFX && m_fCurrentDeathTime <= 2.5f)
+                m_deathVFX.SetActive(true);
         }
-        else // Disable script once death state is complete.
-            enabled = false;
+        else // Disable boss once death state is complete.
+            gameObject.SetActive(false);
     }
 
-    void Update()
+    void LateUpdate()
     {
         // Run current state function.
         m_state();
@@ -488,9 +556,11 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetBool("PortalPunchComplete", true);
 
         m_bossHitSFX.PlayRandom(m_fBossVolume);
-
+        
         DeactivateBeam();
-        m_portalScript.SetPortalCloseStage();
+
+        if(m_portalScript.IsActive())
+            m_portalScript.SetPortalCloseStage();
     }
 
     /*
@@ -531,6 +601,9 @@ public class BossBehaviour : MonoBehaviour
 
         // Play voice line.
         m_bossDeathSFX.PlayRandom(m_fBossVolume);
+
+        // Disable tentrils.
+        m_tentrilsRenderer.enabled = false;
 
         // Cancel attacks.
         m_animator.SetInteger("AttackID", 0);
@@ -802,6 +875,7 @@ public class BossBehaviour : MonoBehaviour
     {
         m_animator.SetInteger("AttackID", 3);
 
+        // Play charge SFX.
         if (m_beamChargeSFX)
             m_SFXSource.PlayOneShot(m_beamChargeSFX, m_fBossVolume);
 
@@ -892,6 +966,10 @@ public class BossBehaviour : MonoBehaviour
     */
     public void DeactivateBeam()
     {
+        // Do nothing if the beam is already deactivated.
+        if (!m_bBeamActive)
+            return;
+
         for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
             m_beamParticleRenderers[i].enabled = false;
 
@@ -905,7 +983,11 @@ public class BossBehaviour : MonoBehaviour
             m_beamImpactAudioLoop.Stop();
 
         // Stop VFX.
-        m_beamOriginVFX.Stop();
+        m_beamOriginVFX.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
+
+        // Stop SFX.
+        if (m_beamStopSFX)
+            m_SFXSource.PlayOneShot(m_beamStopSFX, m_fBossVolume);
 
         if(m_beamDestinationVFX.IsPlaying())
             m_beamDestinationVFX.Stop();
@@ -977,7 +1059,7 @@ public class BossBehaviour : MonoBehaviour
 
     public void EvSetArmEnterStage()
     {
-        if (m_portalScript.IsActive())
+        if (m_portalScript.IsActive() && m_state != DeathState)
             m_portalScript.SetArmEnterStage();
     }
 
@@ -1005,16 +1087,23 @@ public class BossBehaviour : MonoBehaviour
         // Get the player's flat forward vector.
         Vector3 v3PlayerForward = m_cameraTransform.forward;
         Vector3 v3PlayerRight = m_cameraTransform.right;
-            
+
         // Create random unit vector.
         Vector3 v3PortalOffset = v3PlayerForward;
-    
+
         v3PortalOffset += v3PlayerRight * Random.Range(-0.2f, 0.2f);
 
         v3PortalOffset.Normalize();
 
         // Position the portal at the potential player position with a random offset.
         Vector3 v3PlayerTrackPos = m_player.transform.position + (m_playerController.GetVelocity() * m_portalScript.OpenTime());
+
+        // Remove Y component if the player is too close to the ground and that component is negative.
+        if ((m_playerController.IsGrounded() || m_playerController.HeightAboveGround() < m_portalScript.GetArmLength()) && v3PlayerForward.y < 0.0f)
+        {
+            v3PortalOffset.y = 0.0f;
+        }
+
         m_portal.transform.position = v3PlayerTrackPos + (v3PortalOffset * 50.0f);
 
         // Look at predicted player location.
@@ -1076,9 +1165,14 @@ public class BossBehaviour : MonoBehaviour
         //m_punchVoiceSelection.PlayRandom();
     }
 
-    public static void SetVolume(float fVolume, float master)
+    public static void SetVolume(float fVolume, float fMaster)
     {
-        m_fBossVolume = fVolume * master;
+        m_fBossVolume = fVolume * fMaster;
+    }
+
+    public static float GetVolume()
+    {
+        return m_fBossVolume;
     }
 
     private void OnDrawGizmosSelected()

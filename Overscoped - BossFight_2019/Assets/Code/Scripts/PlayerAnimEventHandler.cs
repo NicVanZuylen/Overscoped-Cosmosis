@@ -40,14 +40,17 @@ public class PlayerAnimEventHandler : MonoBehaviour
         // Play random footstep noise.
         m_footStepSFX.PlayRandom(PlayerStats.GetPlayerVolume());
 
-        Debug.Log("Bob!");
-
         m_camEffects.Step();
     }
 
     public void EvStartGrapple() // Event to tell the grapple script to begin the spell.
     {
         m_grappleScript.BeginGrapple();
+    }
+
+    public void EvStartBeamCharge() // Event to tell the beam script to start the beam charge FX.
+    {
+        m_beamScript.StartBeamCharge();
     }
 
     public void EvStartBeam() // Event to tell the beam script to start the beam.

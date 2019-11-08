@@ -31,6 +31,25 @@ public struct AudioSelection
     }
 
     /*
+    Description: Set cooldown value.
+    Param:
+        float fValue: The new cooldown value to use.
+    */
+    public void SetCooldown(float fValue)
+    {
+        m_fCurrentCD = fValue;
+    }
+
+    /*
+    Description: Returns if the audio cooldown has expired.
+    Return Type: bool
+    */
+    public bool CooldownExpired()
+    {
+        return m_fCurrentCD <= 0.0f;
+    }
+
+    /*
     Description: Play an audio clip at the given index.
     Param:
         int nIndex: The index of the clip to play. If the index is out of range play the final clip.

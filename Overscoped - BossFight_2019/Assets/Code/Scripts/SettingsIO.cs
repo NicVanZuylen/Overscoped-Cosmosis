@@ -13,12 +13,14 @@ public struct Settings
     public float m_fPlayerVolume;
     public float m_fGrappleVolume;
     public float m_fWindVolume;
+    public float m_fMusicVolume;
+    public float m_fGamma;
 }
 
 public class SettingsIO
 {
     private Settings m_data;
-    private string m_path = "";
+    private string m_path;
 
     public SettingsIO()
     {
@@ -43,6 +45,25 @@ public class SettingsIO
         m_data = data;
     }
 
+    /*
+    Description: Gets the default settings values.
+    Return Type: Settings
+    */
+    public Settings GetDefaults()
+    {
+        // Default setting values.
+        Settings defaultSettings = new Settings();
+        defaultSettings.m_fMasterVolume = 1.0f;
+        defaultSettings.m_fBossVolume = 1.0f;
+        defaultSettings.m_fPlayerVolume = 1.0f;
+        defaultSettings.m_fGrappleVolume = 1.0f;
+        defaultSettings.m_fWindVolume = 1.0f;
+        defaultSettings.m_fMusicVolume = 1.0f;
+        defaultSettings.m_fGamma = 0.5f;
+
+        return defaultSettings;
+    }
+
     public void WriteFile()
     {
         try
@@ -61,6 +82,9 @@ public class SettingsIO
         }
         catch(Exception e)
         {
+            // Use default settings on failure.
+            m_data = GetDefaults();
+
             Debug.LogError(e.Message);
         }
     }

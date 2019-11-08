@@ -188,7 +188,6 @@ public class GrappleHook : MonoBehaviour
     private RaycastHit m_fireHit;
     private AudioSource m_impactAudioSource;
     private AudioLoop m_grappleLoopAudio;
-    private Vector3 m_v3GrappleNormal;
     private Vector3 m_v3GrappleBoost;
     private float m_fGrapLineLength; // Distance from casting point to destination, (linear unlike the rope itself).
     private float m_fGrappleLineProgress; // Distance along the linear rope distance currently covered by the rope while casting.
@@ -281,9 +280,13 @@ public class GrappleHook : MonoBehaviour
             // Cancel movement override while casting.
             m_controller.FreeOverride();
 
-            m_grapplePoint.transform.position = m_fireHit.point;
-            m_grapplePoint.transform.parent = m_fireHit.collider.transform;
-            m_v3GrappleNormal = m_fireHit.normal;
+            Transform grapplePointTransform = m_grapplePoint.transform;
+
+            // Set grapple point position and rotation to target facing player.
+            grapplePointTransform.position = m_fireHit.point;
+            grapplePointTransform.rotation = Quaternion.LookRotation(m_fireHit.normal, Vector3.up);
+            grapplePointTransform.parent = null;
+
             m_fGrapLineLength = m_fireHit.distance;
 
             m_animController.SetBool("isCasting", true);
@@ -291,9 +294,6 @@ public class GrappleHook : MonoBehaviour
 
             if (m_grappleFireSFX)
                 m_sfxSource.PlayOneShot(m_grappleFireSFX, m_fGrappleVolume);
-
-            // Stop targeting VFX.
-            m_targetVFX.Stop();
         }
 
         // ------------------------------------------------------------------------------------------------------------------------------
@@ -307,6 +307,8 @@ public class GrappleHook : MonoBehaviour
             if (!m_targetVFX.IsPlaying())
                 m_targetVFX.Play();
         }
+        else if (m_targetVFX.IsPlaying()) // Stop target VFX when grapple is not available.
+            m_targetVFX.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
 
         bool bImpacted = m_bGrappleLocked && m_bGrappleHookActive;
 
@@ -387,6 +389,10 @@ public class GrappleHook : MonoBehaviour
                     }
                 }
             }
+            else if (!Input.GetMouseButton(0)) // Cancel if the left mouse button is released.
+            {
+                ReleaseGrapple();
+            }
         }
     }
 
@@ -463,8 +469,7 @@ public class GrappleHook : MonoBehaviour
         if (v3GrappleDif.sqrMagnitude <= m_fDestinationRadius * m_fDestinationRadius)
         {
             // Disable grapple.
-            m_bGrappleHookActive = false;
-            m_fGrappleLineProgress = 0.0f;
+            ReleaseGrapple();
 
             // Stop looping SFX.
             m_grappleLoopAudio.Stop();
@@ -619,6 +624,7 @@ public class GrappleHook : MonoBehaviour
 
         m_bArmExtending = false;
         m_bGrappleHookActive = false;
+        m_bGrappleLocked = false;
         m_fGrappleLineProgress = 0.0f;
 
         m_animController.SetBool("isCasting", false);
@@ -629,7 +635,7 @@ public class GrappleHook : MonoBehaviour
 
         // Stop VFX.
         m_grappleHandVFX.Stop();
-        m_grappleImpactVFX.Stop();
+        m_grappleImpactVFX.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     /*

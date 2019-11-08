@@ -37,7 +37,9 @@ public struct ParticleObject
         for (int i = 0; i < m_objects.Length; ++i)
             m_objects[i].SetActive(true);
         for (int i = 0; i < m_particleSystems.Length; ++i)
+        {
             m_particleSystems[i].Play(true);
+        }
 
 
         m_bPlaying = true;
@@ -46,10 +48,10 @@ public struct ParticleObject
     /*
     Description: Stop all included particlesystems.
     */
-    public void Stop()
+    public void Stop(ParticleSystemStopBehavior stopBehaviour = ParticleSystemStopBehavior.StopEmitting)
     {
         for (int i = 0; i < m_particleSystems.Length; ++i)
-            m_particleSystems[i].Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            m_particleSystems[i].Stop(true, stopBehaviour);
 
         for (int i = 0; i < m_objects.Length; ++i)
             m_objects[i].SetActive(false);

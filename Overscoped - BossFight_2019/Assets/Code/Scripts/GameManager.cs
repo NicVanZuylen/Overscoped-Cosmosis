@@ -9,10 +9,9 @@ public class GameManager : MonoBehaviour
     private BossBehaviour m_bossScript;
     private Plane m_worldSplitPlane; // Separates the arena and tutorial areas.
     private MusicManager m_musicManager;
-    private bool m_once;
-    private bool m_BossDeadOnce;
     private Settings m_settings;
     private SettingsIO m_settingLoader;
+    private bool m_bBossDeadOnce;
 
     private void Awake()
     {
@@ -21,7 +20,8 @@ public class GameManager : MonoBehaviour
         GameObject worldPlane = transform.GetChild(0).gameObject;
         m_musicManager = GetComponent<MusicManager>();
 
-        m_musicManager.PlayTrackIndex(0);
+        // Play random track out of the first group to start.
+        m_musicManager.PlayRandomTrack();
 
         // Construct plane structure using plane gameobject.
         m_worldSplitPlane = new Plane(worldPlane.transform.up, worldPlane.transform.position);
@@ -42,39 +42,31 @@ public class GameManager : MonoBehaviour
         BossBehaviour.SetVolume(m_settings.m_fBossVolume, m_settings.m_fMasterVolume);
         PlayerStats.SetVolume(m_settings.m_fPlayerVolume,m_settings.m_fWindVolume, m_settings.m_fMasterVolume);
         GrappleHook.SetVolume(m_settings.m_fGrappleVolume, m_settings.m_fMasterVolume);
-
-
+        MusicManager.SetVolume(m_settings.m_fMusicVolume, m_settings.m_fMasterVolume);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
-            m_musicManager.PlayTrackIndex(1);
-        //ensure that the music is only played once
-        if (!m_once)
+        // Boss will begin to attack the player once they are on the arena side of the plane.
+        if (m_worldSplitPlane.GetSide(m_player.transform.position) && !m_bossScript.enabled)
         {
-            // Boss will begin to attack the player once they are on the arena side of the plane.
-            if (m_worldSplitPlane.GetSide(m_player.transform.position))
-            {
-                m_musicManager.PlayTrackIndex(1);
+            m_musicManager.PlayTrackIndex(0, 1);
 
-                Debug.Log("Good people of Cyrodiil. WELCOME, to the Arena!");
+            Debug.Log("Good people of Cyrodiil. WELCOME, to the Arena!");
 
-                // Enable boss AI and disable game manager script for updates.
-                m_bossScript.enabled = true;
-                //enabled = false;
-                m_once = true;
-            }
+            // Enable boss AI and disable game manager script for updates.
+            m_bossScript.enabled = true;
         }
-        if (!m_BossDeadOnce)
+
+        if (!m_bBossDeadOnce)
         {
             if (!m_bossScript.gameObject.activeInHierarchy)
             {
                 Debug.Log("Boss dead");
                 //Play music once boss is dead
                 m_musicManager.PlayTrackIndex(0);
-                m_BossDeadOnce = true;
+                m_bBossDeadOnce = true;
             }
         }
     }

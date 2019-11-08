@@ -8,7 +8,7 @@ ModelImporter:
     second: Take 001
   externalObjects: {}
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -59,22 +59,15 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.7069892
-        functionName: EvSummonMeteors
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.7688172
+      - time: 0.85532993
         functionName: ResetAnimToIdle
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.69623655
-        functionName: EvMeteorVoice
+      - time: 0.822335
+        functionName: EvSummonMeteors
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

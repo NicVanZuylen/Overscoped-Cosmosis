@@ -78,10 +78,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float m_fRespawnHeight = 10.0f;
 
-    [Tooltip("Height in which the player will be respawned above the last platform they stood on.")]
-    [SerializeField]
-    private float m_fKillZoneHeight = -80.0f;
-
     [Tooltip("Whether or not the player is standing on a walkable surface.")]
     [SerializeField]
     private bool m_bOnGround = false;
@@ -108,6 +104,7 @@ public class PlayerController : MonoBehaviour
     private float m_fJumpDuration; // Jump time duration.
     private float m_fJumpInitialVelocity; // Initial impulse applied when jumping.
     private float m_fCurrentGravity;
+    private float m_fHeightAboveGround;
     private int m_nJumpFrame;
     private bool m_bJumping;
 
@@ -148,7 +145,8 @@ public class PlayerController : MonoBehaviour
             m_landCallbacks = new List<PlayerControllerCallback>();
 
         // Set intitial camrera look rotation.
-        SetLookRotation(m_cameraTransform.localRotation);
+        SetLookRotation(m_cameraTransform.rotation);
+        m_fLookEulerX = 0.0f;
 
         m_v3SurfaceUp = transform.up;
         m_v3SurfaceForward = transform.forward;
@@ -270,6 +268,9 @@ public class PlayerController : MonoBehaviour
         // Cancel diagonal movement speed boost.
         if (nMoveDirectionCount >= 2)
             v3Direction = v3Direction.normalized;
+
+        // Play running animation...
+        m_animController.SetBool("isRunning", nMoveDirectionCount > 0);
 
         return v3Direction;
     }
@@ -436,6 +437,14 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
+    Description: Get the player's height above the ground surface below.
+    */
+    public float HeightAboveGround()
+    {
+        return m_fHeightAboveGround;
+    }
+
+    /*
     Description: Get the forward look vector of the player.
     Return Type: Vector3
     */
@@ -543,25 +552,28 @@ public class PlayerController : MonoBehaviour
     }
 
     /*
-    Description: Respawn's the player on the last-walkable checkpoint surface if their Y falls below a constant value.
+    Description: Respawn's the player on the last-walkable checkpoint surface.
     */
-    private void RespawnBelowMinY()
+    private void RespawnLastCheckpoint()
     {
-        if (transform.position.y < m_fKillZoneHeight)
-        {
-            // Get velocity and remove x and z components.
-            Vector3 v3BodyVelocity = m_controller.velocity;
-            v3BodyVelocity.x = 0.0f;
-            v3BodyVelocity.z = 0.0f;
+        // Get velocity and remove x and z components.
+        Vector3 v3BodyVelocity = m_controller.velocity;
+        v3BodyVelocity.x = 0.0f;
+        v3BodyVelocity.z = 0.0f;
 
-            // Apply new velocity.
-            m_v3Velocity = v3BodyVelocity;
+        // Apply new velocity.
+        m_v3Velocity = v3BodyVelocity;
 
-            // Teleport to spawn point.
-            m_controller.enabled = false;
-            transform.position = m_v3RespawnPosition;
-            m_controller.enabled = true;
-        }
+        // Teleport to spawn point.
+        m_controller.enabled = false;
+        transform.position = m_v3RespawnPosition;
+        m_controller.enabled = true;
+
+        // Reset screen fade.
+        ScreenFade screenFade = m_cameraEffects.GetScreenFade();
+
+        screenFade.SetCallback(null);
+        screenFade.BeginFade(ScreenFade.EFadeMode.FADE_OUT);
     }
 
     private void UpdateMovement(float fDeltaTime)
@@ -578,9 +590,6 @@ public class PlayerController : MonoBehaviour
 
             // Run override behaviour and use it's velocity output.
             m_v3Velocity = m_overrideFunction(this, fDeltaTime);
-
-            // Respawn they player if they fall too far.
-            RespawnBelowMinY();
 
             return;
         }
@@ -602,11 +611,6 @@ public class PlayerController : MonoBehaviour
             {
                 m_cameraEffects.SetBobbingEnabled(true);
                     
-                // ------------------------------------------------------------------------------------------------------
-                // Play animation...
-
-                m_animController.SetBool("isRunning", true);
-
                 // ------------------------------------------------------------------------------------------------------
                 // Movement lateral tolerance.
 
@@ -653,8 +657,6 @@ public class PlayerController : MonoBehaviour
                     // Slide drag.
                     v3NetForce -= m_v3Velocity * m_fMomentumDrag * fDeltaTime;
                 }
-
-                m_animController.SetBool("isRunning", false);
             }
         }
         else
@@ -663,6 +665,7 @@ public class PlayerController : MonoBehaviour
 
             // ------------------------------------------------------------------------------------------------------
             // Play flying animation...
+
             m_animController.SetBool("isRunning", false);
 
             // ------------------------------------------------------------------------------------------------------
@@ -714,9 +717,6 @@ public class PlayerController : MonoBehaviour
 
         // Add net force.
         m_v3Velocity += v3NetForce;
-
-        // Respawn the player if they fall too far.
-        RespawnBelowMinY();
     }
 
     private void Update()
@@ -768,7 +768,8 @@ public class PlayerController : MonoBehaviour
         bool bSphereCastHit = Physics.SphereCast(sphereRay, m_controller.radius, out m_groundHit, Mathf.Infinity, nGroundMask, QueryTriggerInteraction.Ignore);
 
         // The hit must be within the capsule height bounds.
-        m_bOnGround = bSphereCastHit && m_groundHit.distance < (m_controller.height * 0.5f) - (m_controller.radius * 0.7f);
+        m_fHeightAboveGround = m_groundHit.distance;
+        m_bOnGround = bSphereCastHit && m_fHeightAboveGround < (m_controller.height * 0.5f) - (m_controller.radius * 0.7f);
 
         // Sometimes the character controller does not detect collisions with the ground and update the surface transform...
         // So to be sure its updated we update it using the sphere case hit.
@@ -779,8 +780,11 @@ public class PlayerController : MonoBehaviour
             // Reset gravity.
             m_fCurrentGravity = m_fJumpGravity;
 
-            if (m_groundHit.collider.tag == "CheckPoint") // Set respawn checkpoint.
+            // Set respawn checkpoint.
+            if (m_groundHit.collider.tag == "CheckPoint")
+            {
                 m_v3RespawnPosition = m_groundHit.collider.bounds.center + new Vector3(0.0f, (m_groundHit.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
+            }
         }
 
 #if UNITY_EDITOR
@@ -857,12 +861,17 @@ public class PlayerController : MonoBehaviour
             m_bJustResumed = false;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if(collision.collider.tag == "CheckPoint")
+        // Killbox detection.
+        if(other.tag == "Killbox")
         {
-            // Set respawn collision to the centre + half its height + 10.
-            m_v3RespawnPosition = collision.collider.bounds.center + new Vector3(0.0f, (collision.collider.bounds.extents.y * 0.5f) + m_fRespawnHeight, 0.0f);
+            // Begin screen fade and respawn once the screen is black.
+            ScreenFade camScreenFade = m_cameraEffects.GetScreenFade();
+
+            camScreenFade.SetCallback(RespawnLastCheckpoint);
+            camScreenFade.SetFadeRate(3.5f);
+            camScreenFade.BeginFade(ScreenFade.EFadeMode.FADE_IN);
         }
     }
 }

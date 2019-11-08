@@ -5341,6 +5341,7 @@ MonoBehaviour:
   m_fBobbingXAngleMagnitude: 0.8
   m_fBobbingYAngleMagnitude: 0.5
   m_fBobbingPosMagnitude: 0.07
+  m_screenFade: {fileID: 0}
 --- !u!1 &8048166359401910706
 GameObject:
   m_ObjectHideFlags: 0
@@ -5797,7 +5798,6 @@ MonoBehaviour:
   m_fJumpDistance: 10
   m_fJumpHeight: 3
   m_fRespawnHeight: 10
-  m_fKillZoneHeight: -80
   m_bOnGround: 1
 --- !u!114 &8535114125808485297
 MonoBehaviour:
@@ -5888,8 +5888,17 @@ MonoBehaviour:
   m_impactParticles:
     m_particleSystems: []
     m_objects: []
-  m_chargeLoopSFX: {fileID: 8300000, guid: f94c690828087774d9b41e35f6de576d, type: 3}
-  m_fireLoopSFX: {fileID: 8300000, guid: 4131f89574269d74d8dbd5811c5cc899, type: 3}
+  m_chargeSFX:
+    m_clips:
+    - {fileID: 8300000, guid: 4a2ce9cc009b51f498c174543d22df86, type: 3}
+    m_source: {fileID: 433884948602025523}
+    m_fCooldown: 0
+  m_stopSFX:
+    m_clips:
+    - {fileID: 8300000, guid: 8d61c6e7c371875438fc2486055a5530, type: 3}
+    m_source: {fileID: 433884948602025523}
+    m_fCooldown: 0
+  m_fireLoopSFX: {fileID: 8300000, guid: 6f7952f6b9e5d124baea971cae042152, type: 3}
   m_impactLoopSFX: {fileID: 8300000, guid: 4131f89574269d74d8dbd5811c5cc899, type: 3}
 --- !u!114 &4564622220735488809
 MonoBehaviour:
@@ -5984,6 +5993,26 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 5fddbba1a9805cc4686affcd916ec2e1, type: 2}
+    - target: {fileID: -5296942888252913892, guid: 02ed0d0d567ff434eb099ca7937e953a,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 44d729e6f7244204aa3dea410e42e8fe, type: 2}
+    - target: {fileID: -5296942888252913892, guid: 02ed0d0d567ff434eb099ca7937e953a,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: efbe565c39a1dd140936d402192c7740, type: 2}
+    - target: {fileID: -5296942888252913892, guid: 02ed0d0d567ff434eb099ca7937e953a,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5296942888252913892, guid: 02ed0d0d567ff434eb099ca7937e953a,
+        type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02ed0d0d567ff434eb099ca7937e953a, type: 3}
 --- !u!4 &7987323707810677606 stripped

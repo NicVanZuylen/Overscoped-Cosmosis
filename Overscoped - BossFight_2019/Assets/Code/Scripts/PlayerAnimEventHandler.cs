@@ -48,6 +48,11 @@ public class PlayerAnimEventHandler : MonoBehaviour
         m_grappleScript.BeginGrapple();
     }
 
+    public void EvStartBeamCharge() // Event to tell the beam script to start the beam charge FX.
+    {
+        m_beamScript.StartBeamCharge();
+    }
+
     public void EvStartBeam() // Event to tell the beam script to start the beam.
     {
         m_beamScript.StartBeam();

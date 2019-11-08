@@ -34,13 +34,13 @@ public struct ParticleObject
     */
     public void Play()
     {
+        for (int i = 0; i < m_objects.Length; ++i)
+            m_objects[i].SetActive(true);
         for (int i = 0; i < m_particleSystems.Length; ++i)
         {
             m_particleSystems[i].Play(true);
         }
 
-        for (int i = 0; i < m_objects.Length; ++i)
-            m_objects[i].SetActive(true);
 
         m_bPlaying = true;
     }

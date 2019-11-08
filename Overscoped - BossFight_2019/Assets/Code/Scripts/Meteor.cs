@@ -34,7 +34,7 @@ public class Meteor : MonoBehaviour
     {
         m_player = player;
 
-        Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_player.GetComponent<Collider>(), true);
+        //Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_player.GetComponent<Collider>(), true);
 
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_rigidBody = GetComponent<Rigidbody>();
@@ -52,13 +52,13 @@ public class Meteor : MonoBehaviour
         GameObject[] m_targetObjects = GameObject.FindGameObjectsWithTag("MeteorSpawn");
         
         // Ignore collisions with spawn volumes.
-        SphereCollider thisCollider = GetComponent<SphereCollider>();
-        for (int i = 0; i < m_targetObjects.Length; ++i)
-        {
-            Physics.IgnoreCollision(m_targetObjects[i].GetComponentInChildren<Collider>(), thisCollider, true);
-            Physics.IgnoreCollision(m_targetObjects[i].GetComponent<Collider>(), thisCollider, true);
-        }
-    }
+        //SphereCollider thisCollider = GetComponent<SphereCollider>();
+        //for (int i = 0; i < m_targetObjects.Length; ++i)
+        //{
+        //    Physics.IgnoreCollision(m_targetObjects[i].GetComponentInChildren<Collider>(), thisCollider, true);
+        //    Physics.IgnoreCollision(m_targetObjects[i].GetComponent<Collider>(), thisCollider, true);
+        //}
+    }   //
 
     void Update()
     {
@@ -66,11 +66,17 @@ public class Meteor : MonoBehaviour
         transform.position += m_v3TravelDirection * m_fSpeed * Time.deltaTime;
 
         m_rigidBody.velocity = Vector3.zero;
+
+        Quaternion rotation = Quaternion.LookRotation(m_v3TravelDirection);
+
+        transform.rotation = Quaternion.Euler(transform.rotation.x, rotation.y, transform.rotation.z); ;
     }
 
     public void Summon(Vector3 v3Origin, MeteorTarget targetScript)
     {
         gameObject.SetActive(true);
+
+        gameObject.GetComponent<ParticleSystem>().Play();
 
         m_targetScript = targetScript;
 
@@ -81,11 +87,8 @@ public class Meteor : MonoBehaviour
         transform.position = v3Origin;
 
         // Direction of travel.
-        m_v3TravelDirection = (m_v3Target - transform.position).normalized;
+        m_v3TravelDirection = (m_v3Target - transform.position).normalized;  
     }
-
-
-
 
     void OnTriggerEnter(Collider collider)
     {

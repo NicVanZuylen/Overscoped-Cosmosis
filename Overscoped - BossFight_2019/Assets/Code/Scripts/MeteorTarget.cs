@@ -5,10 +5,10 @@ using UnityEngine;
 public class MeteorTarget : MonoBehaviour
 {
     [SerializeField]
-    private ParticleSystem m_aoeParticles = null;
+    private ParticleObject m_aoeParticles;
 
     [SerializeField]
-    private ParticleSystem m_explosionEffect = null;
+    private ParticleObject m_explosion;
 
     [SerializeField]
     private float m_fAOEDuration = 10.0f;
@@ -21,6 +21,9 @@ public class MeteorTarget : MonoBehaviour
     private PlayerStats m_playerStats;
     private BoxCollider m_collider;
     private float m_fAOETime;
+
+    [SerializeField]
+    private Renderer[] m_particlesToFade;
 
     public void Init(GameObject player, Queue<MeteorTarget> targetPool)
     {
@@ -39,20 +42,29 @@ public class MeteorTarget : MonoBehaviour
             // Make this target available in the pool again.
             m_targetPool.Enqueue(this);
 
-            // Stop particle effects and script updates.
-            if(m_aoeParticles)
+            if (m_particlesToFade[0].material.GetFloat("_Alpha") > 0)
+                m_particlesToFade[0].material.SetFloat("_Alpha", m_particlesToFade[0].material.GetFloat("_Alpha") - Time.deltaTime);
+            else if (m_particlesToFade[1].material.GetFloat("_Alpha") > 0)
+                m_particlesToFade[1].material.SetFloat("_Alpha", m_particlesToFade[1].material.GetFloat("_Alpha") - Time.deltaTime);
+            else if (m_particlesToFade[2].material.GetFloat("_Alpha") > 0)
+                m_particlesToFade[2].material.SetFloat("_Alpha", m_particlesToFade[2].material.GetFloat("_Alpha") - Time.deltaTime);
+            else if (m_particlesToFade[0].material.GetFloat("_Alpha") <= 0 && m_particlesToFade[1].material.GetFloat("_Alpha") <= 0 && m_particlesToFade[2].material.GetFloat("_Alpha") <= 0 && m_aoeParticles.IsPlaying())
                 m_aoeParticles.Stop();
-
-            enabled = false;
+        }
+        else
+        {
+            m_particlesToFade[0].material.SetFloat("_Alpha", 0.3f);
+            m_particlesToFade[1].material.SetFloat("_Alpha", 0.5f);
+            m_particlesToFade[2].material.SetFloat("_Alpha", 1);
         }
     }
 
     public void SummonMeteor(Meteor meteor, Vector3 v3Origin)
     {
         m_indicator.SetActive(true);
-        // Reset explosion.
-        if (m_explosionEffect && m_explosionEffect.isPlaying)
-            m_explosionEffect.Stop();
+
+        if (m_explosion.IsPlaying())
+            m_explosion.Stop();
 
         meteor.Summon(v3Origin, this);
     }
@@ -64,20 +76,9 @@ public class MeteorTarget : MonoBehaviour
         enabled = true;
         m_fAOETime = m_fAOEDuration;
 
-        if(m_explosionEffect)
-        {
-            m_explosionEffect.Play();
-        }
+        m_explosion.Play();
 
-        // Play particle effect.
-        if(m_aoeParticles)
-        {
-            // Make emission volume match collider volume.
-            ParticleSystem.ShapeModule shape = m_aoeParticles.shape;
-            shape.scale = new Vector3(m_collider.size.x, m_collider.size.z, 1.0f);
-
-            m_aoeParticles.Play();
-        }
+        m_aoeParticles.Play();        
     }
 
     private void OnTriggerStay(Collider other)

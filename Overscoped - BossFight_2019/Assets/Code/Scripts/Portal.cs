@@ -112,6 +112,10 @@ public class Portal : MonoBehaviour
     */
     public void SetArmEnterStage()
     {
+        // Do nothing if stage is already set.
+        if (m_stage == ArmEnterStage)
+            return;
+
         // Reset SFX cooldown.
         m_punchImpactSFX.SetCooldown(0.0f);
 
@@ -124,6 +128,10 @@ public class Portal : MonoBehaviour
     */
     public void SetArmExitStage()
     {
+        // Do nothing if stage is already set.
+        if (m_stage == ArmExitStage)
+            return;
+
         m_fCurrentExitTime = 0.0f;
         m_stage = ArmExitStage;
 
@@ -136,6 +144,10 @@ public class Portal : MonoBehaviour
     */
     public void SetPortalCloseStage()
     {
+        // Do nothing if stage is already set.
+        if (m_stage == CloseStage)
+            return;
+
         m_fCurrentTime = 0.0f;
         m_stage = CloseStage;
     }
@@ -261,7 +273,6 @@ public class Portal : MonoBehaviour
             m_armCollider.enabled = false;
 
         m_fCurrentExitTime += Time.deltaTime;
-        m_fCurrentExitTime = Mathf.Min(m_fCurrentExitTime, m_fArmExitTime);
 
         float fArmOut = (1.0f - (m_fCurrentExitTime / m_fArmExitTime)) * m_fArmLength;
         fArmOut -= m_fArmLength;

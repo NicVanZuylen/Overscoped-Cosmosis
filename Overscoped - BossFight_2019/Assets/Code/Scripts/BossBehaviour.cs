@@ -43,6 +43,17 @@ public class BossBehaviour : MonoBehaviour
 
     // -------------------------------------------------------------------------------------------------
     [Header("Attacks")]
+    [Tooltip("Minimum delay before any kind of attack is performed.")]
+    private float m_fTimeBetweenAttacks;
+    [Tooltip("Time between attacks while health is between 50% and 100%")]
+    [SerializeField]
+    private float m_fTimeBetweenAttacksFull = 5.0f;
+    [Tooltip("Time between attacks while health is between 25% and 50%")]
+    [SerializeField]
+    private float m_fTimeBetweenAttacksHalf = 2.5f;
+    [Tooltip("Time between attacks while health below 25%")]
+    [SerializeField]
+    private float m_fTimeBetweenAttacksQuarter = 0f;
 
     [Header("Meteor")]
     [Tooltip("Amount of time before meteor attack can be used again.")]
@@ -184,17 +195,7 @@ public class BossBehaviour : MonoBehaviour
     // -------------------------------------------------------------------------------------------------
     [Header("Misc")]
 
-    [Tooltip("Minimum delay before any kind of attack is performed.")]
-    private float m_fTimeBetweenAttacks;
-    [Tooltip("Time between attacks while health is between 50% and 100%")]
-    [SerializeField]
-    private float m_fTimeBetweenAttacksFull = 5.0f;
-    [Tooltip("Time between attacks while health is between 25% and 50%")]
-    [SerializeField]
-    private float m_fTimeBetweenAttacksHalf = 2.5f;
-    [Tooltip("Time between attacks while health below 25%")]
-    [SerializeField]
-    private float m_fTimeBetweenAttacksQuarter = 0f;
+    
 
     [Tooltip("Length of the boss death effects.")]
     [SerializeField]
@@ -555,9 +556,11 @@ public class BossBehaviour : MonoBehaviour
         m_animator.SetBool("PortalPunchComplete", true);
 
         m_bossHitSFX.PlayRandom(m_fBossVolume);
-
+        
         DeactivateBeam();
-        m_portalScript.SetPortalCloseStage();
+
+        if(m_portalScript.IsActive())
+            m_portalScript.SetPortalCloseStage();
     }
 
     /*
@@ -963,6 +966,10 @@ public class BossBehaviour : MonoBehaviour
     */
     public void DeactivateBeam()
     {
+        // Do nothing if the beam is already deactivated.
+        if (!m_bBeamActive)
+            return;
+
         for (int i = 0; i < m_beamParticleRenderers.Length; ++i)
             m_beamParticleRenderers[i].enabled = false;
 

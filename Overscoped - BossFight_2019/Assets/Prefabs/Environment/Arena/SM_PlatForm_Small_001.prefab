@@ -1,5 +1,19 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!64 &2891897297747908074
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8220699378259661568}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Convex: 0
+  m_CookingOptions: 14
+  m_Mesh: {fileID: -9153175735838972844, guid: e14ab99e6b5a503448bb1cf798046007, type: 3}
 --- !u!1001 &6039049341245697276
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -87,11 +101,29 @@ PrefabInstance:
       propertyPath: m_TagString
       value: CheckPoint
       objectReference: {fileID: 0}
+    - target: {fileID: 248070096634941527, guid: fc56dd8bc36c42143bc4cd433a3b9e14,
+        type: 3}
+      propertyPath: m_Convex
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 248070096634941527, guid: fc56dd8bc36c42143bc4cd433a3b9e14,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -9153175735838972844, guid: e14ab99e6b5a503448bb1cf798046007,
+        type: 3}
     - target: {fileID: 2714273358374344525, guid: fc56dd8bc36c42143bc4cd433a3b9e14,
         type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 8439373319386699867, guid: e14ab99e6b5a503448bb1cf798046007,
         type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 248070096634941527, guid: fc56dd8bc36c42143bc4cd433a3b9e14, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: fc56dd8bc36c42143bc4cd433a3b9e14, type: 3}
+--- !u!1 &8220699378259661568 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2439484140680167420, guid: fc56dd8bc36c42143bc4cd433a3b9e14,
+    type: 3}
+  m_PrefabInstance: {fileID: 6039049341245697276}
+  m_PrefabAsset: {fileID: 0}

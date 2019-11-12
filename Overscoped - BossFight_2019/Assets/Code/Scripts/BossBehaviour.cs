@@ -22,14 +22,11 @@ public class BossBehaviour : MonoBehaviour
     // -------------------------------------------------------------------------------------------------
     [Header("References")]
 
-    [Tooltip("Player object reference.")]
-    [SerializeField]
-    private GameObject m_player = null;
-
     [Tooltip("Meteor object references.")]
     [SerializeField]
     private Meteor[] m_meteors = null;
 
+    [Tooltip("Portal punch portal reference.")]
     [SerializeField]
     private GameObject m_portal = null;
 
@@ -210,6 +207,7 @@ public class BossBehaviour : MonoBehaviour
     private float m_fDeathTime = 5.0f;
 
     // Global
+    private GameObject m_player;
     private PlayerController m_playerController; // Player controller script reference.
     private PlayerStats m_playerStats; // Player stats script reference.
     private Transform m_cameraTransform; // Player's camera transform.
@@ -268,6 +266,7 @@ public class BossBehaviour : MonoBehaviour
 
     void Awake()
     {
+        m_player = GameObject.FindGameObjectWithTag("Player");
         m_playerController = m_player.GetComponent<PlayerController>();
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_cameraTransform = m_player.GetComponentInChildren<Camera>().transform;

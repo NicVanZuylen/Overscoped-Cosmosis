@@ -195,24 +195,26 @@ public class BossBehaviour : MonoBehaviour
     // -------------------------------------------------------------------------------------------------
     [Header("Misc")]
 
-    
+    [Tooltip("Minimum amount of time taking damage before stun.")]
+    [SerializeField]
+    private float m_fMinStunTime = 1.0f;
 
     [Tooltip("Length of the boss death effects.")]
     [SerializeField]
     private float m_fDeathTime = 5.0f;
 
     // Global
-    private PlayerController m_playerController;
-    private PlayerStats m_playerStats;
-    private Transform m_cameraTransform;
-    private GrappleHook m_grappleScript;
-    private Animator m_animator;
-    private GameObject m_endPortal;
-    private float m_fTimeSinceGlobalAttack = 0.0f;
+    private PlayerController m_playerController; // Player controller script reference.
+    private PlayerStats m_playerStats; // Player stats script reference.
+    private Transform m_cameraTransform; // Player's camera transform.
+    private ChestPlate m_chestPlate; // Barrier script reference.
+    private Animator m_animator; 
+    private GameObject m_endPortal; // Exit portal script reference.
+    private float m_fTimeSinceGlobalAttack = 0.0f; // Amount of time since the boss's last attack.
     private float m_fTimeSinceHit; // Time since the boss was hit by the beam.
-    private float m_fSpawnTime;
-    private bool m_bUnderAttack;
-    private ChestPlate m_chestPlate;
+    private float m_fSpawnTime; // Length of the spawn sequence for the boss.
+    private float m_fAttackTime; // Amount of time the boss has been under fire from the player's beam attack.
+    private bool m_bUnderAttack; // Whether or not the boss is currently under fire from the player's beam attack.
 
     // State delegate.
     public delegate void StateFunc();
@@ -267,7 +269,6 @@ public class BossBehaviour : MonoBehaviour
         m_playerController = m_player.GetComponent<PlayerController>();
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_cameraTransform = m_player.GetComponentInChildren<Camera>().transform;
-        m_grappleScript = m_player.GetComponent<GrappleHook>();
         m_animator = GetComponent<Animator>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
         m_chestPlate = GetComponentInChildren<ChestPlate>();
@@ -464,11 +465,13 @@ public class BossBehaviour : MonoBehaviour
         else
         {
             // Hit recovery...
-
             m_fTimeSinceHit += Time.deltaTime;
 
             if (m_fTimeSinceHit >= 0.5f)
                 RecoverFromHit();
+
+            // Attack elapsed time.
+            m_fAttackTime += Time.deltaTime;
         }
 
         // Perform attack after delay.
@@ -555,16 +558,20 @@ public class BossBehaviour : MonoBehaviour
         m_fTimeSinceHit = 0.0f;
         m_bUnderAttack = true;
 
-        m_animator.SetInteger("AttackID", 0);
-        m_animator.SetBool("UnderAttack", true);
-        m_animator.SetBool("PortalPunchComplete", true);
+        // Cancel attacks and stun once enough attack time has elapsed.
+        if(m_fAttackTime >= m_fMinStunTime)
+        {
+            m_animator.SetInteger("AttackID", 0);
+            m_animator.SetBool("UnderAttack", true);
+            m_animator.SetBool("PortalPunchComplete", true);
 
-        m_bossHitSFX.PlayRandom(m_fBossVolume);
-        
-        DeactivateBeam();
+            m_bossHitSFX.PlayRandom(m_fBossVolume);
 
-        if(m_portalScript.IsActive())
-            m_portalScript.SetPortalCloseStage();
+            DeactivateBeam();
+
+            if (m_portalScript.IsActive())
+                m_portalScript.SetPortalCloseStage();
+        }
     }
 
     /*
@@ -573,6 +580,7 @@ public class BossBehaviour : MonoBehaviour
     public void RecoverFromHit()
     {
         m_bUnderAttack = false;
+        m_fAttackTime = 0.0f; // Reset elapsed time since boss was attacked.
 
         m_animator.SetBool("UnderAttack", false);
     }

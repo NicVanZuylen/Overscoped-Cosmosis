@@ -5764,11 +5764,7 @@ MonoBehaviour:
     m_fCooldown: 0
   m_landSFX:
     m_clips:
-    - {fileID: 8300000, guid: ad4d568f08d15094399831b983ed5144, type: 3}
-    - {fileID: 8300000, guid: 0a6cf6442bf3fe240a81d246bee85870, type: 3}
     - {fileID: 8300000, guid: 54cd8ddcdbccb054482f74d8539e9249, type: 3}
-    - {fileID: 8300000, guid: f219b3ed63f18c547860faa77a681058, type: 3}
-    - {fileID: 8300000, guid: 8192a0ef94c27d449bccba65481490d9, type: 3}
     m_source: {fileID: 433884948602025523}
     m_fCooldown: 0
   m_sfxSource: {fileID: 433884948602025523}
@@ -5798,6 +5794,7 @@ MonoBehaviour:
   m_fJumpDistance: 10
   m_fJumpHeight: 3
   m_fRespawnHeight: 10
+  m_fMinLandTime: 0.3
   m_bOnGround: 1
 --- !u!114 &8535114125808485297
 MonoBehaviour:
@@ -6327,11 +6324,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 101956286138558622}
     m_Modifications:
-    - target: {fileID: 4844925331090585789, guid: da2cd13a173260b45becf3fe595f395d,
-        type: 3}
-      propertyPath: m_Name
-      value: PS_Player_Grapple_Destination
-      objectReference: {fileID: 0}
     - target: {fileID: 4844925331090585790, guid: da2cd13a173260b45becf3fe595f395d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6386,6 +6378,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4844925331090585789, guid: da2cd13a173260b45becf3fe595f395d,
+        type: 3}
+      propertyPath: m_Name
+      value: PS_Player_Grapple_Destination
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: da2cd13a173260b45becf3fe595f395d, type: 3}

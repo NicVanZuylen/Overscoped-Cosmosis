@@ -82,9 +82,9 @@
               <m_children>
                 <NodeData>
                   <m_eType>NODE_CONDITION</m_eType>
-                  <m_name>Player Not Grounded</m_name>
-                  <m_funcName>CondPlayerNotGrounded</m_funcName>
-                  <m_description>Blanket the ground with meteors while flying to leave the player with a little surprise when they land.</m_description>
+                  <m_name>Player Is Grounded</m_name>
+                  <m_funcName>CondPlayerGrounded</m_funcName>
+                  <m_description>Blanket the ground with meteors while the player is grounded, to encourage the player to grapple into the air.</m_description>
                   <m_children />
                 </NodeData>
                 <NodeData>

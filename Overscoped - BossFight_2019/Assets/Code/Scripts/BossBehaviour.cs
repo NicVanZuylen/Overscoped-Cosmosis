@@ -150,6 +150,12 @@ public class BossBehaviour : MonoBehaviour
     private AudioSelection m_bossDeathSFX = new AudioSelection();
 
     // -------------------------------------------------------------------------------------------------
+    [Header("Player death mockery SFX")]
+
+    [SerializeField]
+    private AudioSelection m_playerDeathMockVoiceSelection = new AudioSelection();
+
+    // -------------------------------------------------------------------------------------------------
     [Header("Attack Noises SFX")]
 
     [SerializeField]
@@ -256,10 +262,6 @@ public class BossBehaviour : MonoBehaviour
 
     private AttackFunc[] m_attacks;
     private AudioSelection[] m_attackVoices;
-    [SerializeField]
-    private float[] m_fAttackDelays;
-    private float m_fCurrentAttackDelay;
-    private bool m_bAttackPending;
 
     // Audio
     private static float m_fBossVolume = 10.0f;
@@ -361,13 +363,6 @@ public class BossBehaviour : MonoBehaviour
         m_attackVoices[1] = m_punchVoiceSelection;
         m_attackVoices[2] = m_beamVoiceSelection;
 
-        m_fAttackDelays = new float[3];
-        m_fAttackDelays[0] = 1.0f;
-        m_fAttackDelays[1] = 2.0f;
-        m_fAttackDelays[2] = 1.0f;
-        m_fCurrentAttackDelay = 0.0f;
-        m_bAttackPending = false;
-
 #if (UNITY_EDITOR)
         string treePath = Application.dataPath + "/Code/BossBehaviours/";
 #else
@@ -419,7 +414,7 @@ public class BossBehaviour : MonoBehaviour
             m_dissolveMat.SetFloat("_Dissolve", fDissolveLevel);
             m_barrierMat.SetFloat("_Alpha", fDissolveLevel);
 
-            // Begin spawn animation when dissolve level reaches zero.
+            // Begin spawn animation when dissolve level reaches above zero.
             if (fDissolveLevel > 0.0f)
             {
                 m_animator.SetBool("Spawned", true);
@@ -474,22 +469,13 @@ public class BossBehaviour : MonoBehaviour
             m_fAttackTime += Time.deltaTime;
         }
 
-        // Perform attack after delay.
-        if (m_bAttackPending && m_fCurrentAttackDelay <= 0.0f)
-        {
-            m_attacks[m_nChosenAttackIndex]();
-
-            m_bAttackPending = false;
-        }
-
         ActBeamTrack();
 
-        // Count down audio cooldowns.
+        // Count down hit audio cooldowns.
         m_bossHitSFX.CountCooldown();
 
         // Count down attack cooldowns...
         m_fTimeSinceGlobalAttack -= Time.deltaTime;
-        m_fCurrentAttackDelay -= Time.deltaTime;
 
         m_fPortalPunchCDTimer -= Time.deltaTime;
         m_fMeteorCDTimer -= Time.deltaTime;
@@ -656,7 +642,7 @@ public class BossBehaviour : MonoBehaviour
 
     public ENodeResult CondNotGlobalAttackCD()
     {
-        if (m_fTimeSinceGlobalAttack > 0.0f && m_bAttackPending)
+        if (m_fTimeSinceGlobalAttack > 0.0f)
         {
             return ENodeResult.NODE_SUCCESS;
         }
@@ -766,14 +752,6 @@ public class BossBehaviour : MonoBehaviour
         return ENodeResult.NODE_FAILURE;
     }
 
-    public ENodeResult CondAttackNotPending()
-    {
-        if (!m_bAttackPending)
-            return ENodeResult.NODE_SUCCESS;
-
-        return ENodeResult.NODE_FAILURE;
-    }
-
     // ----------------------------------------------------------------------------------------------
     // Actions
 
@@ -835,15 +813,9 @@ public class BossBehaviour : MonoBehaviour
         {
             Debug.Log("Attack Index: " + m_nChosenAttackIndex + ", " + nAvailableCount + " Attacks available.");
 
-            if(!m_bAttackPending)
-            {
-                // Set delay and flag as pending attack.
-                m_fCurrentAttackDelay = m_fAttackDelays[m_nChosenAttackIndex];
-                m_bAttackPending = true;
-
-                // Play voice line.
-                m_attackVoices[m_nChosenAttackIndex].PlayRandom(m_fBossVolume);
-            }
+            // Play voice line & begin attack.
+            m_attackVoices[m_nChosenAttackIndex].PlayRandom(m_fBossVolume);
+            m_attacks[m_nChosenAttackIndex]();
         }
         else
             Debug.Log("No attacks available!");
@@ -1054,9 +1026,20 @@ public class BossBehaviour : MonoBehaviour
     // ----------------------------------------------------------------------------------------------
     // Misc
 
+    /*
+    Description: Reset boss animation state to idle.
+    */
     public void ResetAnimToIdle()
     {
         m_animator.SetInteger("AttackID", 0);
+    }
+
+    /*
+    Description: Play random player death mockery voice line.
+    */
+    public void PlayDeathMockVoiceLine()
+    {
+        m_playerDeathMockVoiceSelection.PlayRandom();
     }
 
     public void EvAdvancePunchAnim()

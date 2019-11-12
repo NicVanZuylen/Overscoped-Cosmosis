@@ -21,6 +21,13 @@
     </NodeData>
     <NodeData>
       <m_eType>NODE_CONDITION</m_eType>
+      <m_name>Global Attack CD</m_name>
+      <m_funcName>CondGlobalAttackCD</m_funcName>
+      <m_description>Wait for global attack cooldown.</m_description>
+      <m_children />
+    </NodeData>
+    <NodeData>
+      <m_eType>NODE_CONDITION</m_eType>
       <m_name>Portal Not Active</m_name>
       <m_funcName>CondPortalNotActive</m_funcName>
       <m_description>Make sure the portal is not still in use before using it again.</m_description>
@@ -84,7 +91,7 @@
                   <m_eType>NODE_CONDITION</m_eType>
                   <m_name>Player Is Grounded</m_name>
                   <m_funcName>CondPlayerGrounded</m_funcName>
-                  <m_description>Blanket the ground with meteors while the player is grounded, to encourage the player to grapple into the air.</m_description>
+                  <m_description>Strike the ground with meteors whilst the player is grounded to add pressure and encourage the player to grapple into the air.</m_description>
                   <m_children />
                 </NodeData>
                 <NodeData>
@@ -325,13 +332,6 @@
           </m_children>
         </NodeData>
       </m_children>
-    </NodeData>
-    <NodeData>
-      <m_eType>NODE_CONDITION</m_eType>
-      <m_name>Attack Not Pending</m_name>
-      <m_funcName>CondAttackNotPending</m_funcName>
-      <m_description>Ensure not to overwrite another pending attack.</m_description>
-      <m_children />
     </NodeData>
     <NodeData>
       <m_eType>NODE_ACTION</m_eType>

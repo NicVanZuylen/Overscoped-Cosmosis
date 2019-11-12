@@ -38301,8 +38301,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b6db3ad64e817446859a65e7399ae57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_player: {fileID: 0}
-  m_impactEffect: {fileID: 0}
+  m_impactEffect:
+    m_particleSystems:
+    - {fileID: 7390919944432021586}
+    - {fileID: 7390919943100801877}
+    - {fileID: 7390919944360553981}
+    - {fileID: 7390919943133073663}
+    - {fileID: 7390919943050954939}
+    - {fileID: 7390919942908045843}
+    - {fileID: 7390919943808453919}
+    - {fileID: 7390919943354680423}
+    m_objects: []
+  m_passiveEffect:
+    m_particleSystems:
+    - {fileID: 7390919944366436984}
+    m_objects: []
   m_fSpeed: 50
 --- !u!1 &7390919944432021585
 GameObject:

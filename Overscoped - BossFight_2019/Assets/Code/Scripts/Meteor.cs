@@ -6,26 +6,24 @@ using UnityEngine;
 
 public class Meteor : MonoBehaviour
 {
-    [Tooltip("Reference to the player.")]
-    [SerializeField]
-    private GameObject m_player = null;
-
     [Tooltip("Explosion effect on impact.")]
     [SerializeField]
-    private GameObject m_impactEffect = null;
+    private ParticleObject m_impactEffect = new ParticleObject();
+
+    [Tooltip("Passive particle effect while the meteor is active.")]
+    [SerializeField]
+    private ParticleObject m_passiveEffect = new ParticleObject();
 
     [Tooltip("Speed in which the meteor will travel.")]
     [SerializeField]
     private float m_fSpeed = 50.0f;
 
-    private PlayerStats m_playerStats;
-    private Rigidbody m_rigidBody;
-    private MeteorTarget m_targetScript;
-    private Vector3 m_v3Target;
-    private Vector3 m_v3TravelDirection;
-
-    // Impact effect object.
-    private ParticleSystem m_impactEffectParticles;
+    private GameObject m_player; // Player object reference.
+    private PlayerStats m_playerStats; // Player stats script reference.
+    private Rigidbody m_rigidBody; // Meteor rigidbody reference.
+    private MeteorTarget m_targetScript; // Target script reference.
+    private Vector3 m_v3Target; // Target position.
+    private Vector3 m_v3TravelDirection; // Direction towards target.
 
     // Meteor spawn target
     private GameObject m_targetVolume;
@@ -33,17 +31,8 @@ public class Meteor : MonoBehaviour
     public void Init(GameObject player)
     {
         m_player = player;
-
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_rigidBody = GetComponent<Rigidbody>();
-
-        // Create impact explosion object and get particlesystem.
-        if(m_impactEffect)
-        {
-            GameObject impactObj = Instantiate(m_impactEffect);
-            impactObj.SetActive(false);
-            m_impactEffectParticles = impactObj.GetComponent<ParticleSystem>();
-        }
 
         m_v3Target = m_player.transform.position;
 
@@ -66,7 +55,8 @@ public class Meteor : MonoBehaviour
     {
         gameObject.SetActive(true);
 
-        gameObject.GetComponent<ParticleSystem>().Play();
+        if(!m_passiveEffect.IsPlaying())
+            m_passiveEffect.Play();
 
         m_targetScript = targetScript;
 
@@ -84,15 +74,17 @@ public class Meteor : MonoBehaviour
     {
         if(collider.tag == "MeteorSpawn")
         {
+            // Stop passive effect.
+            if (m_passiveEffect.IsPlaying())
+                m_passiveEffect.Stop();
+
             gameObject.SetActive(false);
 
             // Play impact effect.
-            if (m_impactEffectParticles)
-            {
-                m_impactEffect.transform.position = transform.position;
-                m_impactEffect.SetActive(true);
-                m_impactEffectParticles.Play();
-            }
+            m_impactEffect.SetPosition(transform.position);
+
+            if(!m_impactEffect.IsPlaying())
+                m_impactEffect.Play();
 
             // Begin AOE hazard.
             m_targetScript.StartAOE();

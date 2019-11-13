@@ -25,7 +25,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 2800000, guid: 202921015af14e64d914fcf9b3de0d31, type: 3}
+        m_Texture: {fileID: 2800000, guid: f0385073dd07b4a46891e092a30ae0a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AnisotropyMap:
@@ -146,6 +146,7 @@ Material:
     - _DisplacementLockTilingScale: 1
     - _DisplacementMode: 0
     - _Dissolve: 0
+    - _DissolveEmissionEdge: 0.05
     - _DistortionBlendMode: 0
     - _DistortionBlurBlendMode: 0
     - _DistortionBlurDstBlend: 1
@@ -254,9 +255,10 @@ Material:
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
+    - _DissolveEmission: {r: 0, g: 0.2509804, b: 27.858824, a: 0}
     - _DissolveTiling: {r: 1, g: 1, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
-    - _Emission: {r: 0, g: 0.2509804, b: 27.858824, a: 0}
+    - _Emission: {r: 0, g: 0.99607843, b: 2, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColourMult: {r: 0, g: 0, b: 0, a: 0}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}

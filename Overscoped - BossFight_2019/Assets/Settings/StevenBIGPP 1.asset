@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29b00527f85bb3346a4d2cb710971587, type: 3}
   m_Name: VolumetricFog
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   m_AdvancedMode: 0
   colorMode:
     m_OverrideState: 1
@@ -203,14 +203,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2150ee00179b2f4418ea8b21a7e98eea, type: 3}
   m_Name: ExponentialFog
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   m_AdvancedMode: 0
   colorMode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   color:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0, b: 0, a: 1}
+    m_Value: {r: 0, g: 0.1441504, b: 3.135271, a: 1}
     hdr: 1
     showAlpha: 0
     showEyeDropper: 1
@@ -221,7 +221,7 @@ MonoBehaviour:
     max: 1
   maxFogDistance:
     m_OverrideState: 1
-    m_Value: 142
+    m_Value: 1000
     min: 0
   mipFogMaxMip:
     m_OverrideState: 0
@@ -238,14 +238,14 @@ MonoBehaviour:
     min: 0
   fogDistance:
     m_OverrideState: 1
-    m_Value: 1655.4
+    m_Value: 8000
     min: 0
   fogBaseHeight:
-    m_OverrideState: 1
-    m_Value: 121.4
+    m_OverrideState: 0
+    m_Value: 1000
   fogHeightAttenuation:
     m_OverrideState: 1
-    m_Value: 0.425
+    m_Value: 0
     min: 0
     max: 1
 --- !u!114 &11400000
@@ -357,16 +357,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b51a78e223a2e504bb88a059b55229ea, type: 3}
   m_Name: WhiteBalance
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   m_AdvancedMode: 0
   temperature:
     m_OverrideState: 1
-    m_Value: 5
+    m_Value: -5
     min: -100
     max: 100
   tint:
-    m_OverrideState: 1
-    m_Value: -13
+    m_OverrideState: 0
+    m_Value: 0
     min: -100
     max: 100
 --- !u!114 &3109681608999342120
@@ -381,7 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d08ce26990eb1a4a9177b860541e702, type: 3}
   m_Name: Exposure
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   m_AdvancedMode: 0
   mode:
     m_OverrideState: 1
@@ -457,7 +457,7 @@ MonoBehaviour:
   m_AdvancedMode: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.226
+    m_Value: 0.225
     min: 0
     max: 1
   scatter:

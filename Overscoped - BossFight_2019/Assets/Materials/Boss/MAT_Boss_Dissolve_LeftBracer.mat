@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 2800000, guid: a01471bbdcd050b48a3401f426016d70, type: 3}
+        m_Texture: {fileID: 2800000, guid: f0385073dd07b4a46891e092a30ae0a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DissolveNoise:
@@ -33,12 +33,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Dissolve: 1
+    - _DissolveEmissionEdge: 0.05
     - _EmissionEdge: 0.05
     - _FresnelOnOff: 1
     - _FresnelStrength: 3
     - _PulseSpeed: 1
     m_Colors:
-    - _AlbedoTiling: {r: 20, g: 20, b: 0, a: 0}
+    - _AlbedoTiling: {r: 1, g: 1, b: 1, a: 0}
+    - _DissolveEmission: {r: 0, g: 4.044601, b: 18.37917, a: 0}
     - _DissolveTiling: {r: 1, g: 1, b: 0, a: 0}
-    - _Emission: {r: 0, g: 12.380782, b: 63.999992, a: 0}
-    - _FresnelColour: {r: 2.3427207, g: 0, b: 2.9960785, a: 0}
+    - _Emission: {r: 0.24031349, g: 0, b: 4.5412054, a: 0}
+    - _FresnelColour: {r: 0.19475813, g: 0, b: 11.984314, a: 0}

@@ -8,8 +8,9 @@ OcclusionCullingSettings:
     smallestOccluder: 5
     smallestHole: 0.25
     backfaceThreshold: 100
-  m_SceneGUID: 00000000000000000000000000000000
-  m_OcclusionCullingData: {fileID: 0}
+  m_SceneGUID: fc066dccf77df7f42ba570dac346249f
+  m_OcclusionCullingData: {fileID: 36300000, guid: a1dc9e6f3a3cddf47a7a5aaa0591e695,
+    type: 2}
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
@@ -153,6 +154,7 @@ Transform:
   - {fileID: 1076700618}
   - {fileID: 1793119828}
   - {fileID: 807426567}
+  - {fileID: 1653684752}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -299,6 +301,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (12)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -374,6 +381,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &112707044 stripped
@@ -435,6 +447,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_01 (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
@@ -511,6 +528,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d72f16a2028b854469f56a908cec20cf, type: 3}
 --- !u!4 &197491319 stripped
@@ -641,7 +663,7 @@ MonoBehaviour:
   maxSmoothness: 1
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
   showAdditionalSettings: 0
   displayLightIntensity: 10
@@ -733,6 +755,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -808,6 +835,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!1 &215055646 stripped
@@ -833,6 +865,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -909,6 +946,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!1 &296598991 stripped
@@ -934,6 +976,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (34)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -1010,6 +1057,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &297033438 stripped
@@ -1036,20 +1088,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_01 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.2143
+      value: -0.2432
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.11853
+      value: -0.1196
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.572
+      value: 0.5947
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
@@ -1111,6 +1168,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d72f16a2028b854469f56a908cec20cf, type: 3}
 --- !u!1 &356259377 stripped
@@ -1136,6 +1198,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_02 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
@@ -1212,6 +1279,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 021f4b79e3cfd824fadc7a365b2f4a07, type: 3}
 --- !u!1 &356475122 stripped
@@ -1237,6 +1309,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_02 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
@@ -1313,6 +1390,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 021f4b79e3cfd824fadc7a365b2f4a07, type: 3}
 --- !u!1 &407630135 stripped
@@ -1430,7 +1512,7 @@ MonoBehaviour:
   maxSmoothness: 1
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
   showAdditionalSettings: 0
   displayLightIntensity: 10
@@ -1659,7 +1741,7 @@ MonoBehaviour:
   maxSmoothness: 1
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
   showAdditionalSettings: 0
   displayLightIntensity: 3
@@ -1828,6 +1910,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_01 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1903,6 +1990,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d72f16a2028b854469f56a908cec20cf, type: 3}
 --- !u!4 &454368111 stripped
@@ -2020,7 +2112,7 @@ MonoBehaviour:
   maxSmoothness: 0.99
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
   showAdditionalSettings: 0
   displayLightIntensity: 5
@@ -2145,6 +2237,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_01 (4)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2220,6 +2317,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d72f16a2028b854469f56a908cec20cf, type: 3}
 --- !u!4 &499741480 stripped
@@ -2499,6 +2601,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (30)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2574,6 +2681,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &525573811 stripped
@@ -2599,6 +2711,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_02 (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
@@ -2675,6 +2792,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 021f4b79e3cfd824fadc7a365b2f4a07, type: 3}
 --- !u!1 &549115590 stripped
@@ -2805,9 +2927,9 @@ MonoBehaviour:
   maxSmoothness: 0.99
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
-  showAdditionalSettings: 0
+  showAdditionalSettings: 8
   displayLightIntensity: 0.1
   displayAreaLightEmissiveMesh: 0
   areaLightCookie: {fileID: 0}
@@ -2842,7 +2964,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -2896,6 +3018,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (32)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -2972,6 +3099,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &584061711 stripped
@@ -3132,17 +3264,17 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.49
+      value: 1.12
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.401382
+      value: -1.4013817
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10.42
+      value: -10.17
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
@@ -3152,7 +3284,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.4235376
+      value: -0.3450234
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
@@ -3162,7 +3294,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.90587854
+      value: -0.9385941
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
@@ -3177,7 +3309,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 135
+      value: 40.366
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
@@ -3244,6 +3376,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_01
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
@@ -3320,6 +3457,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d72f16a2028b854469f56a908cec20cf, type: 3}
 --- !u!1 &624340592 stripped
@@ -3346,20 +3488,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_01 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.2551
+      value: -0.23
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.11974759
+      value: -0.117
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.3946
+      value: 0.469
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
@@ -3421,6 +3568,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d72f16a2028b854469f56a908cec20cf, type: 3}
 --- !u!1 &645077502 stripped
@@ -3619,6 +3771,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (7)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3694,6 +3851,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!1 &680951876 stripped
@@ -3719,6 +3881,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (19)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -3795,6 +3962,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &704306201 stripped
@@ -3820,6 +3992,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -3896,6 +4073,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &731743450 stripped
@@ -4026,9 +4208,9 @@ MonoBehaviour:
   maxSmoothness: 0.99
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
-  showAdditionalSettings: 0
+  showAdditionalSettings: 8
   displayLightIntensity: 0.1
   displayAreaLightEmissiveMesh: 0
   areaLightCookie: {fileID: 0}
@@ -4063,7 +4245,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -4117,6 +4299,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (31)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -4193,6 +4380,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &751542528 stripped
@@ -4493,9 +4685,9 @@ MonoBehaviour:
   maxSmoothness: 0.99
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
-  showAdditionalSettings: 0
+  showAdditionalSettings: 8
   displayLightIntensity: 0.1
   displayAreaLightEmissiveMesh: 0
   areaLightCookie: {fileID: 0}
@@ -4530,7 +4722,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -4601,7 +4793,7 @@ Transform:
   m_GameObject: {fileID: 807426566}
   m_LocalRotation: {x: -0.09389273, y: -0.68871546, z: -0.090671144, w: 0.7131858}
   m_LocalPosition: {x: 3.248, y: 0.3758, z: 1.288}
-  m_LocalScale: {x: 0.45988265, y: 0.47928697, z: 0.49776003}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 12295886}
   m_RootOrder: 3
@@ -4731,7 +4923,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 20
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -4765,7 +4957,7 @@ PrefabInstance:
     - target: {fileID: 8179654049595898029, guid: b9cd03b59b2ffbd4485f656117fdadea,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8179654049595898028, guid: b9cd03b59b2ffbd4485f656117fdadea,
         type: 3}
@@ -4942,6 +5134,41 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3475835387267421759, guid: b9cd03b59b2ffbd4485f656117fdadea,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3475835387267421759, guid: b9cd03b59b2ffbd4485f656117fdadea,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 820
+      objectReference: {fileID: 0}
+    - target: {fileID: 3475835387267421759, guid: b9cd03b59b2ffbd4485f656117fdadea,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -520
+      objectReference: {fileID: 0}
+    - target: {fileID: 3475835387267421759, guid: b9cd03b59b2ffbd4485f656117fdadea,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 760
+      objectReference: {fileID: 0}
+    - target: {fileID: 4006654028982945117, guid: b9cd03b59b2ffbd4485f656117fdadea,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -885
+      objectReference: {fileID: 0}
+    - target: {fileID: 4006654028982945117, guid: b9cd03b59b2ffbd4485f656117fdadea,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -450
+      objectReference: {fileID: 0}
+    - target: {fileID: 6186130940679002933, guid: b9cd03b59b2ffbd4485f656117fdadea,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b9cd03b59b2ffbd4485f656117fdadea, type: 3}
 --- !u!1001 &863703671
@@ -4955,6 +5182,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (20)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -5031,6 +5263,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &863703672 stripped
@@ -5062,6 +5299,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (29)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -5138,6 +5380,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &919246325 stripped
@@ -5163,6 +5410,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (16)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -5239,6 +5491,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &949504204 stripped
@@ -5264,6 +5521,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -5340,6 +5602,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!1 &967589189 stripped
@@ -5365,6 +5632,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_02
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
@@ -5441,6 +5713,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 021f4b79e3cfd824fadc7a365b2f4a07, type: 3}
 --- !u!1 &1039156668 stripped
@@ -5681,7 +5958,7 @@ MonoBehaviour:
   maxSmoothness: 0.99
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
   showAdditionalSettings: 8
   displayLightIntensity: 2
@@ -5855,6 +6132,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (18)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5930,6 +6212,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1103366084 stripped
@@ -6066,7 +6353,7 @@ MonoBehaviour:
   maxSmoothness: 1
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
   showAdditionalSettings: 0
   displayLightIntensity: 10
@@ -6235,6 +6522,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (28)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6310,6 +6602,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1161133018 stripped
@@ -6415,6 +6712,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.024
+      objectReference: {fileID: 0}
+    - target: {fileID: -2199713545849151002, guid: 7cc14a8112d38c04a810b18c7ffe002b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -2199713545849151002, guid: 7cc14a8112d38c04a810b18c7ffe002b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.064952284
+      objectReference: {fileID: 0}
+    - target: {fileID: -2199713545849151002, guid: 7cc14a8112d38c04a810b18c7ffe002b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.99788845
+      objectReference: {fileID: 0}
+    - target: {fileID: -2199713545849151002, guid: 7cc14a8112d38c04a810b18c7ffe002b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -7.4480004
       objectReference: {fileID: 0}
     - target: {fileID: 7936676412086363643, guid: 7cc14a8112d38c04a810b18c7ffe002b,
         type: 3}
@@ -6539,6 +6856,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (17)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6614,6 +6936,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1238801068 stripped
@@ -6639,6 +6966,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (24)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -6715,6 +7047,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1276286356 stripped
@@ -6740,6 +7077,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (10)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -6816,6 +7158,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1331191064 stripped
@@ -6841,6 +7188,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (14)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -6917,6 +7269,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1375618221 stripped
@@ -6942,6 +7299,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -7018,6 +7380,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!1 &1419964760 stripped
@@ -7198,6 +7565,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (27)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7273,6 +7645,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1492643773 stripped
@@ -7298,6 +7675,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (13)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -7374,6 +7756,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1511155940 stripped
@@ -7399,6 +7786,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -7475,6 +7867,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!1 &1525211109 stripped
@@ -7500,6 +7897,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (33)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -7576,6 +7978,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1539102857 stripped
@@ -7601,6 +8008,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_02 (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
@@ -7677,6 +8089,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 021f4b79e3cfd824fadc7a365b2f4a07, type: 3}
 --- !u!1 &1539974230 stripped
@@ -7909,6 +8326,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (8)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7984,6 +8406,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1567004777 stripped
@@ -8009,6 +8436,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (21)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -8085,6 +8517,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1582840489 stripped
@@ -8110,6 +8547,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (23)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -8186,6 +8628,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1617746751 stripped
@@ -8326,6 +8773,48 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1639579067}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1653684750
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1653684752}
+  - component: {fileID: 1653684751}
+  m_Layer: 0
+  m_Name: Occlusion Area
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!192 &1653684751
+OcclusionArea:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653684750}
+  serializedVersion: 2
+  m_Size: {x: 5.253051, y: 3.8348408, z: 5.217854}
+  m_Center: {x: -0.44036448, y: 1.4174204, z: -0.21484518}
+  m_IsViewVolume: 1
+--- !u!4 &1653684752
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653684750}
+  m_LocalRotation: {x: -0, y: 0.23252909, z: -0, w: 0.9725895}
+  m_LocalPosition: {x: 2.648808, y: 0.28375328, z: 1.6261282}
+  m_LocalScale: {x: 0.4729221, y: 0.4729221, z: 0.4729221}
+  m_Children: []
+  m_Father: {fileID: 12295886}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1738683157
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8337,6 +8826,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -8413,6 +8907,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1738683158 stripped
@@ -8516,6 +9015,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (22)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -8591,6 +9095,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1826296476 stripped
@@ -8616,6 +9125,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (25)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -8692,6 +9206,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1834428928 stripped
@@ -9034,6 +9553,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (15)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -9109,6 +9633,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1873587793 stripped
@@ -9134,6 +9663,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -9210,6 +9744,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!1 &1889832033 stripped
@@ -9340,9 +9879,9 @@ MonoBehaviour:
   maxSmoothness: 0.99
   applyRangeAttenuation: 1
   useOldInspector: 0
-  useVolumetric: 1
+  useVolumetric: 0
   featuresFoldout: 1
-  showAdditionalSettings: 0
+  showAdditionalSettings: 8
   displayLightIntensity: 0.1
   displayAreaLightEmissiveMesh: 0
   areaLightCookie: {fileID: 0}
@@ -9377,7 +9916,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -9431,6 +9970,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brick_03 (26)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
@@ -9507,6 +10051,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!4 &1988067732 stripped
@@ -9654,6 +10203,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_03 (6)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -9729,6 +10283,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: ea4a82154c8f84f4ba81fd6ec6287d46,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea4a82154c8f84f4ba81fd6ec6287d46, type: 3}
 --- !u!1 &2104228215 stripped
@@ -9755,40 +10314,45 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_01 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.0356
+      value: -0.12899995
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.12114759
+      value: -0.12199998
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.0221
+      value: 0.014000058
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.024433928
+      value: 0.02422081
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.97847915
+      value: -0.96994466
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.00511488
+      value: 0.0060441103
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.20483012
+      value: 0.24204205
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
@@ -9798,22 +10362,22 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 1.1470001
+      value: 1.3440001
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -156.38
+      value: -152.007
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -2.621
+      value: -2.526
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.073401764
+      value: 0.0461954
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: d72f16a2028b854469f56a908cec20cf,
         type: 3}
@@ -9830,6 +10394,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: d72f16a2028b854469f56a908cec20cf,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d72f16a2028b854469f56a908cec20cf, type: 3}
 --- !u!1 &2114013727 stripped
@@ -9933,20 +10502,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brick_02 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.1408
+      value: -0.1601
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.121
+      value: -0.1209
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.4294
+      value: 0.4007
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
         type: 3}
@@ -10008,6 +10582,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: be019b5881ac33345842da0ff6febb98, type: 2}
+    - target: {fileID: -1504981713932161579, guid: 021f4b79e3cfd824fadc7a365b2f4a07,
+        type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 021f4b79e3cfd824fadc7a365b2f4a07, type: 3}
 --- !u!1 &2127006127 stripped
@@ -10043,7 +10622,7 @@ PrefabInstance:
     - target: {fileID: 5998926607009900518, guid: 0ebfbc8c0c6d599499413002eed86b99,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5998926607009900519, guid: 0ebfbc8c0c6d599499413002eed86b99,
         type: 3}
@@ -10163,7 +10742,7 @@ PrefabInstance:
     - target: {fileID: 7687583814149784322, guid: 0ebfbc8c0c6d599499413002eed86b99,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1885573496695933851, guid: 0ebfbc8c0c6d599499413002eed86b99,
         type: 3}

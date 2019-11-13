@@ -17,7 +17,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 19
   m_IsActive: 1
 --- !u!4 &1046103005141784542
 Transform:
@@ -101,12 +101,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8870066567126713064}
+  - component: {fileID: 6425150786686436771}
   m_Layer: 0
   m_Name: PF_BrokenPillar_Top_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 19
   m_IsActive: 1
 --- !u!4 &8870066567126713064
 Transform:
@@ -124,6 +125,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6425150786686436771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5567459955625095419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f84f0c3517050ad4395ceb9a2e6a9ad4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_fBobbingHeight: 5
+  m_fBobFrequency: 1
+  m_bEnableAngularBobbing: 1
+  m_fXBobbingAngle: 5
+  m_fZBobbingAngle: 5
 --- !u!1 &5993373131300256907
 GameObject:
   m_ObjectHideFlags: 0
@@ -140,7 +158,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 19
   m_IsActive: 1
 --- !u!4 &3543409589585479432
 Transform:

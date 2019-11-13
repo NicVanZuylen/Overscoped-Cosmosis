@@ -211,6 +211,7 @@ public class BossBehaviour : MonoBehaviour
     private PlayerController m_playerController; // Player controller script reference.
     private PlayerStats m_playerStats; // Player stats script reference.
     private Transform m_cameraTransform; // Player's camera transform.
+    private CameraEffects m_camEffects; // Camera effects script reference.
     private ChestPlate m_chestPlate; // Barrier script reference.
     private Animator m_animator; 
     private GameObject m_endPortal; // Exit portal script reference.
@@ -270,6 +271,7 @@ public class BossBehaviour : MonoBehaviour
         m_playerController = m_player.GetComponent<PlayerController>();
         m_playerStats = m_player.GetComponent<PlayerStats>();
         m_cameraTransform = m_player.GetComponentInChildren<Camera>().transform;
+        m_camEffects = m_cameraTransform.GetComponent<CameraEffects>();
         m_animator = GetComponent<Animator>();
         m_fTimeSinceGlobalAttack = m_fTimeBetweenAttacks;
         m_chestPlate = GetComponentInChildren<ChestPlate>();
@@ -416,14 +418,20 @@ public class BossBehaviour : MonoBehaviour
             // Begin spawn animation when dissolve level reaches above zero.
             if (fDissolveLevel > 0.0f)
             {
+                // Camera shake.
+                m_camEffects.ApplyShake(0.1f, 0.3f, false);
+
                 m_animator.SetBool("Spawned", true);
 
                 // Show heart and tenrils at this point.
                 if(!m_heartRenderer.enabled)
-                    m_heartRenderer.enabled = true;
+                {
+                    // Apply initial camera shake.
+                    m_camEffects.ApplyShake(0.5f, 1.0f, true);
 
-                if (!m_tentrilsRenderer.enabled)
+                    m_heartRenderer.enabled = true;
                     m_tentrilsRenderer.enabled = true;
+                }
 
                 // Play spawn voice line.
                 m_spawnSFX.PlayRandom(m_fBossVolume);
@@ -503,6 +511,9 @@ public class BossBehaviour : MonoBehaviour
         // Death dissolve effect.
         if (m_fCurrentDeathTime > 0.0f)
         {
+            // Camera shake.
+            m_camEffects.ApplyShake(0.1f, 0.3f, false);
+
             m_fCurrentDeathTime -= Time.deltaTime;
 
             float fDissolveLevel = m_fCurrentDeathTime / m_fDeathTime;

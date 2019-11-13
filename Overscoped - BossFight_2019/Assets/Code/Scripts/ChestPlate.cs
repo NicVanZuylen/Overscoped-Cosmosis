@@ -30,26 +30,27 @@ public class ChestPlate : MonoBehaviour
     [SerializeField]
     private GameObject m_heart = null;
 
-    private PlayerBeam m_playerBeamScript;
-    private CameraEffects m_camEffects;
-    private BossBehaviour m_bossScript;
-    private Material m_material;
-    public float m_fHealth;
+    private PlayerBeam m_playerBeamScript; // Reference to the player beam controller script.
+    private CameraEffects m_camEffects; // Reference to the camera FX controller script.
+    private BossBehaviour m_bossScript; // Reference to the Boss AI script.
+    private Material m_material; // Reference to the barrier material.
+    public float m_fHealth; // Current health of the barrier.
 
     private void Awake()
     {
         m_playerBeamScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBeam>();
         m_bossScript = GetComponentInParent<BossBehaviour>();
-
-        m_heart.layer = LayerMask.NameToLayer("NoGrapple");
-
         m_material = GetComponent<MeshRenderer>().sharedMaterial;
 
+        // Heart is initially impossible to grapple.
+        m_heart.layer = LayerMask.NameToLayer("NoGrapple");
+
+        // Set initial material values.
         m_material.SetFloat("_Pop", 0.0f);
-
-        m_fHealth = m_fMaxHealth;
-
         m_material.SetFloat("_IsHit", 0.0f);
+
+        // Initial health.
+        m_fHealth = m_fMaxHealth;
 
         // Disable script to prevent premature popping.
         enabled = false;

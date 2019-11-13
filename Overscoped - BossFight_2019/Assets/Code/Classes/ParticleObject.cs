@@ -25,6 +25,7 @@ public struct ParticleObject
     */
     public void SetPosition(Vector3 v3Position)
     {
+        // Move all particle systems to the new location.
         for (int i = 0; i < m_particleSystems.Length; ++i)
             m_particleSystems[i].transform.position = v3Position;
     }
@@ -34,13 +35,13 @@ public struct ParticleObject
     */
     public void Play()
     {
+        // Enable all objects.
         for (int i = 0; i < m_objects.Length; ++i)
             m_objects[i].SetActive(true);
-        for (int i = 0; i < m_particleSystems.Length; ++i)
-        {
-            m_particleSystems[i].Play(true);
-        }
 
+        // Start all particle effects.
+        for (int i = 0; i < m_particleSystems.Length; ++i)
+            m_particleSystems[i].Play(true);
 
         m_bPlaying = true;
     }
@@ -50,9 +51,11 @@ public struct ParticleObject
     */
     public void Stop(ParticleSystemStopBehavior stopBehaviour = ParticleSystemStopBehavior.StopEmitting)
     {
+        // Stop all particlesystems.
         for (int i = 0; i < m_particleSystems.Length; ++i)
             m_particleSystems[i].Stop(true, stopBehaviour);
 
+        // Stop all particle objects.
         for (int i = 0; i < m_objects.Length; ++i)
             m_objects[i].SetActive(false);
 

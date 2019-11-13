@@ -11,11 +11,11 @@ using UnityEngine;
 
 public class PlayerAnimEventHandler : MonoBehaviour
 {
-    private Animator m_animator;
-    private CameraEffects m_camEffects;
-    private PlayerController m_controller;
-    private GrappleHook m_grappleScript;
-    private PlayerBeam m_beamScript;
+    private Animator m_animator; // Animator reference.
+    private CameraEffects m_camEffects; // Camera effects controller script reference.
+    private PlayerController m_controller; // Player controller script reference.
+    private GrappleHook m_grappleScript; // Grapple controller script reference.
+    private PlayerBeam m_beamScript; // Player beam controller script reference.
 
     [Header("Footstep sound FX")]
 
@@ -31,7 +31,10 @@ public class PlayerAnimEventHandler : MonoBehaviour
         m_beamScript = GetComponentInParent<PlayerBeam>();
     }
 
-    public void EvBob() // Called by animation event.
+    /*
+    Description: Event to trigger a bob in the camera head bobbing effect.
+    */
+    public void EvBob()
     {
         // Bail conditions...
         if (!m_controller.IsGrounded() || m_animator.GetAnimatorTransitionInfo(0).IsName("Run -> Idle"))
@@ -43,17 +46,26 @@ public class PlayerAnimEventHandler : MonoBehaviour
         m_camEffects.Step();
     }
 
-    public void EvStartGrapple() // Event to tell the grapple script to begin the spell.
+    /*
+    Description: Event to tell the grapple script to begin the spell.
+    */
+    public void EvStartGrapple()
     {
         m_grappleScript.BeginGrapple();
     }
 
-    public void EvStartBeamCharge() // Event to tell the beam script to start the beam charge FX.
+    /*
+    Description: Event to tell the beam script to start the beam charge FX.
+    */
+    public void EvStartBeamCharge()
     {
         m_beamScript.StartBeamCharge();
     }
 
-    public void EvStartBeam() // Event to tell the beam script to start the beam.
+    /*
+    Description: Event to tell the beam script to start the beam.
+    */
+    public void EvStartBeam()
     {
         m_beamScript.StartBeam();
     }

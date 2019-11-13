@@ -45,10 +45,6 @@ public class PlayerBeam : MonoBehaviour
     // -------------------------------------------------------------------------------------------------
     [Header("Effects")]
 
-    [Tooltip("Transform of the end particles object.")]
-    [SerializeField]
-    private Transform m_endParticleTransform = null;
-
     [Tooltip("VFX played at the beam's origin point.")]
     [SerializeField]
     private ParticleObject m_originParticles = new ParticleObject();
@@ -86,7 +82,6 @@ public class PlayerBeam : MonoBehaviour
     private ChestPlate m_bossChestScript;
     private float m_fBeamCharge; // Actual current charge value.
     private float m_fCurrentMeterLevel; // Current charge as displayed on the HUD.
-    private int m_nDissolveBracerIndex;
     private const int m_nRayMask = ~(1 << 2 | 1 << 9); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple, Player.
     private bool m_bBeamUnlocked;
     private bool m_bCanCast;
@@ -135,17 +130,13 @@ public class PlayerBeam : MonoBehaviour
 
         m_endObj = new GameObject("Player_Beam_End_Point");
 
-        // Set end particle effect parent object.
-        if(m_endParticleTransform)
-        {
-            m_endParticleTransform.parent = m_endObj.transform;
-            m_endParticleTransform.localPosition = Vector3.zero;
-        }
+        m_bossChestScript = GameObject.FindGameObjectWithTag("Boss").GetComponentInChildren<ChestPlate>();
 
-        m_bossChestScript = GameObject.FindGameObjectWithTag("BossChest").GetComponentInChildren<ChestPlate>();
+        if(m_fireLoopSFX)
+            m_fireAudioLoop = new AudioLoop(m_fireLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
 
-        m_fireAudioLoop = new AudioLoop(m_fireLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);
-        m_impactAudioLoop = new AudioLoop(m_impactLoopSFX, m_endObj, ESpacialMode.AUDIO_SPACE_WORLD, (m_nBeamLength * m_fMeshLength) + 10.0f);
+        if(m_impactLoopSFX)
+            m_impactAudioLoop = new AudioLoop(m_impactLoopSFX, m_endObj, ESpacialMode.AUDIO_SPACE_WORLD, (m_nBeamLength * m_fMeshLength) + 10.0f);
     }
 
     /*
@@ -204,10 +195,10 @@ public class PlayerBeam : MonoBehaviour
         }
 
         // Stop audio and particle effects.
-        if(m_fireAudioLoop.IsPlaying())
+        if(m_fireAudioLoop != null && m_fireAudioLoop.IsPlaying())
             m_fireAudioLoop.Stop();
 
-        if(m_impactAudioLoop.IsPlaying())
+        if(m_impactAudioLoop != null && m_impactAudioLoop.IsPlaying())
             m_impactAudioLoop.Stop();
 
         // Stop SFX.

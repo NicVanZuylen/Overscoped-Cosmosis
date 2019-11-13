@@ -142,6 +142,7 @@ public class PlayerStats : MonoBehaviour
     private PlayerController m_controller; // Player controller script reference.
     private PlayerBeam m_beamScript; // Player beam controller script reference.
     private CameraEffects m_camEffects; // Camera FX script.
+    private BossBehaviour m_bossScript; // Boss AI script reference.
     private Transform m_camPivot; // Pivot in which the player camera is parented to.
     private ScreenFade m_fadeScript; // Script controller screen fade effects.
     private AudioLoop m_windAudioLoop; // Wind audio loop object.
@@ -173,6 +174,7 @@ public class PlayerStats : MonoBehaviour
         m_beamScript = GetComponent<PlayerBeam>();
         m_camEffects = GetComponentInChildren<CameraEffects>(false);
         m_camPivot = transform.Find("CameraPivot");
+        m_bossScript = GameObject.FindGameObjectWithTag("Boss").GetComponentInChildren<BossBehaviour>();
         m_fadeScript = FindObjectOfType<ScreenFade>();
         m_materials = m_camEffects.GetComponentInChildren<SkinnedMeshRenderer>().materials;
 
@@ -588,6 +590,9 @@ public class PlayerStats : MonoBehaviour
         m_fadeScript.SetFadeRate(0.0f);
         m_fadeScript.SetCallback(RestartScene);
         m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
+
+        // Play boss mockery voice line.
+        m_bossScript.PlayDeathMockVoiceLine();
 
         // Assume checkpoint is reached.
         m_bCheckpointReached = true;

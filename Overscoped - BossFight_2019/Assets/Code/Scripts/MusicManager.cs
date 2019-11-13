@@ -120,11 +120,13 @@ public class MusicManager : MonoBehaviour
     */
     public void PlayRandomTrack(int nGroup = 0)
     {
+        AudioClip[] tracks = m_tracks[nGroup].m_tracks;
+
         // Exit if there are no tracks to play.
-        if (m_tracks[nGroup].m_tracks.Length == 0)
+        if (tracks.Length == 0)
             return;
 
-        int nRandSongIndex = Random.Range(0, m_tracks.Length);
+        int nRandSongIndex = Random.Range(0, tracks.Length);
 
         // If the new random index is equal to the last find a random index in the range before or after it.
         if (nRandSongIndex == m_nLastRandIndex)
@@ -132,7 +134,7 @@ public class MusicManager : MonoBehaviour
             int nPartitionIndex = 0;
 
             // Select a partition of the array range before or after the new random index.
-            if (m_nLastRandIndex == m_tracks[nGroup].m_tracks.Length - 1)
+            if (m_nLastRandIndex == tracks.Length - 1)
                 nPartitionIndex = 0;
             else if (m_nLastRandIndex == 0)
                 nPartitionIndex = 1;
@@ -147,7 +149,7 @@ public class MusicManager : MonoBehaviour
                     break;
 
                 case 1:
-                    nRandSongIndex = Random.Range(m_nLastRandIndex + 1, m_tracks[nGroup].m_tracks.Length);
+                    nRandSongIndex = Random.Range(m_nLastRandIndex + 1, tracks.Length);
                     break;
             }
         }
@@ -155,7 +157,7 @@ public class MusicManager : MonoBehaviour
         // Remember last random song index.
         m_nLastRandIndex = nRandSongIndex;
 
-        SetTrack(m_tracks[nGroup][nRandSongIndex]);
+        SetTrack(tracks[nRandSongIndex]);
     }
 
     /*

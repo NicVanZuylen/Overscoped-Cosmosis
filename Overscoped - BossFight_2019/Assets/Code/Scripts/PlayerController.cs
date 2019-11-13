@@ -78,6 +78,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float m_fRespawnHeight = 10.0f;
 
+    [Tooltip("Minimum time in-air before hitting the ground is considered as landing.")]
+    [SerializeField]
+    private float m_fMinLandTime = 0.1f;
+
     [Tooltip("Whether or not the player is standing on a walkable surface.")]
     [SerializeField]
     private bool m_bOnGround = false;
@@ -95,7 +99,6 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_v3Velocity;
     private float m_fSprintDot;
     private float m_fCurrentGroundMaxSpeed;
-    private bool m_bShouldSprint;
     private bool m_bShouldJump;
     private bool m_bSlopeLimit;
 
@@ -105,6 +108,7 @@ public class PlayerController : MonoBehaviour
     private float m_fJumpInitialVelocity; // Initial impulse applied when jumping.
     private float m_fCurrentGravity;
     private float m_fHeightAboveGround;
+    private float m_fLandTime;
     private int m_nJumpFrame;
     private bool m_bJumping;
 
@@ -808,13 +812,19 @@ public class PlayerController : MonoBehaviour
             // Set gravity to drop gravity if not jumping.
             if (bPrevGrounded && !m_bJumping)
                 m_fCurrentGravity = m_fDropGravity;
+
+            // Count amount of time before landing.
+            m_fLandTime += Time.deltaTime;
         }
 
-        if (!bPrevGrounded && m_v3Velocity.y < 0.0f && m_bOnGround)
+        if (!bPrevGrounded && m_v3Velocity.y < 0.1f && m_fLandTime >= m_fMinLandTime && m_bOnGround)
         {
             // Landing callbacks.
             for (int i = 0; i < m_landCallbacks.Count; ++i)
                 m_landCallbacks[i](this);
+
+            // Reset land time.
+            m_fLandTime = 0.0f;
         }
 
         // ------------------------------------------------------------------------------------------------------

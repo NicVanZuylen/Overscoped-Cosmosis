@@ -59,16 +59,46 @@ public class Portal : MonoBehaviour
 
     delegate void StageFunc();
 
-    StageFunc m_stage;
-    private bool m_bActive;
+    StageFunc m_stage; // Current stage of the portal punch attack.
+    private bool m_bActive; // Whether or not the portal punch attack is active.
 
-    private Rigidbody m_rigidBody;
-    private Material m_portalMat;
-    private Collider m_armCollider;
-    private Vector3 m_v3PunchDirection;
-    private AudioSource m_audioSource;
-    private float m_fCurrentTime;
-    private float m_fCurrentExitTime;
+    private Rigidbody m_rigidBody; // Portal rigidbody reference.
+    private Material m_portalMat; // Portal material reference.
+    private Collider m_armCollider; // Arm collider reference.
+    private Vector3 m_v3PunchDirection; // Direction the arm will exit the portal.
+    private AudioSource m_audioSource; // Audio source reference for the portal.
+    private float m_fCurrentTime; // Elapsed time of the current stage.
+    private float m_fCurrentExitTime; // Elapsed time of the arm exit stage.
+
+    private void Awake()
+    {
+        Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_playerCollider);
+
+        m_armCollider = m_arm.GetComponent<Collider>();
+
+        Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_armCollider);
+        m_rigidBody = GetComponent<Rigidbody>();
+
+        m_portalMat = transform.GetChild(0).GetComponent<MeshRenderer>().material;
+
+        m_audioSource = GetComponent<AudioSource>();
+
+        // Set initial opacity.
+        m_portalMat.SetFloat("_Opacity", 0.0f);
+
+        m_stage = OpenStage;
+        m_arm.SetActive(false);
+        gameObject.SetActive(false);
+        m_bActive = false;
+    }
+
+    private void Update()
+    {
+        // Ensure the portal does not move.
+        m_rigidBody.velocity = Vector3.zero;
+
+        m_stage();
+    }
 
     /*
     Description: Set the direction the fist will punch in. 
@@ -190,28 +220,6 @@ public class Portal : MonoBehaviour
         m_fCurrentTime = 0.0f;
     }
 
-    private void Awake()
-    {
-        Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_playerCollider);
-
-        m_armCollider = m_arm.GetComponent<Collider>();
-
-        Physics.IgnoreCollision(GetComponent<SphereCollider>(), m_armCollider);
-        m_rigidBody = GetComponent<Rigidbody>();
-
-        m_portalMat = transform.GetChild(0).GetComponent<MeshRenderer>().material;
-
-        m_audioSource = GetComponent<AudioSource>();
-
-        // Set initial opacity.
-        m_portalMat.SetFloat("_Opacity", 0.0f);
-
-        m_stage = OpenStage;
-        m_arm.SetActive(false);
-        gameObject.SetActive(false);
-        m_bActive = false;
-    }
-
     /*
     Description: Open the portal. 
     */
@@ -298,13 +306,5 @@ public class Portal : MonoBehaviour
         {
             Deactivate();
         }
-    }
-
-    private void Update()
-    {
-        // Ensure the portal does not move.
-        m_rigidBody.velocity = Vector3.zero;
-
-        m_stage();
     }
 }

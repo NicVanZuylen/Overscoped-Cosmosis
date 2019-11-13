@@ -5228,6 +5228,50 @@ Transform:
   m_Father: {fileID: 6058883267851585652}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5423184261563786683
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5488080000059276419}
+  - component: {fileID: 9079376735414269831}
+  m_Layer: 11
+  m_Name: Block_Collider_001
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5488080000059276419
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5423184261563786683}
+  m_LocalRotation: {x: -0, y: -0, z: -0.0000000074505815, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 65.000015, y: 65, z: 65.000015}
+  m_Children: []
+  m_Father: {fileID: 6058883267851585652}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &9079376735414269831
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5423184261563786683}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.11871411, y: 0.81348175, z: 0.28340247}
+  m_Center: {x: -0.13, y: 0.48, z: -0.03}
 --- !u!1 &5474834809464861565
 GameObject:
   m_ObjectHideFlags: 0
@@ -5260,6 +5304,50 @@ Transform:
   m_Father: {fileID: 1052553494790951508}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5566012134820269634
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6656205919289494208}
+  - component: {fileID: 4976131254499149887}
+  m_Layer: 11
+  m_Name: Block_Collider_002
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6656205919289494208
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566012134820269634}
+  m_LocalRotation: {x: -0, y: -0, z: -0.0000000074505815, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 65.000015, y: 65, z: 65.000015}
+  m_Children: []
+  m_Father: {fileID: 6058883267851585652}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4976131254499149887
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566012134820269634}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.11871411, y: 0.81348175, z: 0.28340247}
+  m_Center: {x: 0.13, y: 0.48, z: -0.03}
 --- !u!1 &5598514260971610761
 GameObject:
   m_ObjectHideFlags: 0
@@ -10469,7 +10557,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e7c3b8f069b1245a8784bb4ef84e75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_decoupleVector: {fileID: 2047082662467148259}
+  m_decoupleVector: {fileID: 0}
   m_fDecoupleForce: 50
   m_fShakeMagnitude: 4.5
   m_fShakeTime: 0.05
@@ -10501,7 +10589,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9789a6ac4ed2729439bc4384b83b906e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_player: {fileID: 0}
   m_meteors:
   - {fileID: 6466806008149339150}
   - {fileID: 7647746820488663701}
@@ -10764,6 +10851,8 @@ Transform:
   - {fileID: 2047082662467148259}
   - {fileID: 2838758919735587132}
   - {fileID: 1022958751778713243}
+  - {fileID: 5488080000059276419}
+  - {fileID: 6656205919289494208}
   m_Father: {fileID: 986188087260139517}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10858,11 +10947,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_PropertySheet.m_Int.m_Array.Array.data[0].m_Value
       value: 1000000
-      objectReference: {fileID: 0}
-    - target: {fileID: 3729592265169793721, guid: bca3813edeb8dd240a9e69dda8115d30,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3729592266355518211, guid: bca3813edeb8dd240a9e69dda8115d30,
         type: 3}

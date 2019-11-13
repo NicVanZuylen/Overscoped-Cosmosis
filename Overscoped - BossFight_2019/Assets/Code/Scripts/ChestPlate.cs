@@ -39,6 +39,7 @@ public class ChestPlate : MonoBehaviour
     private void Awake()
     {
         m_playerBeamScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBeam>();
+        m_camEffects = m_playerBeamScript.gameObject.GetComponentInChildren<CameraEffects>();
         m_bossScript = GetComponentInParent<BossBehaviour>();
         m_material = GetComponent<MeshRenderer>().sharedMaterial;
 
@@ -90,11 +91,14 @@ public class ChestPlate : MonoBehaviour
         m_healthBar.fillAmount = 1.0f - fHealthPercentage;
         m_healthBar.color = m_healthGradient.Evaluate(fHealthPercentage);
 
-        if (m_fHealth <= 0.0f)
+        if (m_fHealth <= 0.0f && !enabled)
         {
             // Remove chestplate & progress stage.
             m_bossScript.ProgressStage();
             enabled = true;
+
+            // Begin camera shake feedback.
+            m_camEffects.ApplyShake(0.5f, 1.0f, true);
 
             // Reset heart layer to default.
             m_heart.layer = 0;

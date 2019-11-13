@@ -212,6 +212,9 @@ public class Portal : MonoBehaviour
         // Reset stage.
         m_stage = OpenStage;
 
+        // Reset current arm exit time.
+        m_fCurrentExitTime = 0.0f;
+
         // Deactivate portal and arm.
         gameObject.SetActive(false);
         m_arm.SetActive(false);

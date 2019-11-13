@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Description: Adds a hover-like bobbing effect to the object this script is attached to.
+ * Author: Nic Van Zuylen
+*/
+
 public class ObjectBobber : MonoBehaviour
 {
     [Tooltip("Maximum height above & below the original position the object will bob.")]

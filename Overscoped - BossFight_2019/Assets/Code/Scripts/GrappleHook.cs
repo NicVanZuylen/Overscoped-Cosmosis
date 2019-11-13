@@ -317,6 +317,10 @@ public class GrappleHook : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------------------------------
         // Active behaviour
 
+        // Release grapple if the arm is extending but input is canceled.
+        if (m_bArmExtending && Input.GetMouseButtonUp(0))
+            ReleaseGrapple();
+
         if (m_bGrappleHookActive)
         {
             m_fGrappleLineProgress += m_fGrappleLineSpeed * Time.deltaTime;
@@ -588,10 +592,9 @@ public class GrappleHook : MonoBehaviour
     */
     public void BeginGrapple()
     {
-        // Play SFX
-        //if (m_grappleFireSFX)
-        //    m_sfxSource.PlayOneShot(m_grappleFireSFX, m_fGrappleVolume);
+        Debug.Log("Begin Grapple!");
 
+        // Play SFX
         if (m_grappleExtendSFX)
             m_sfxSource.PlayOneShot(m_grappleExtendSFX, m_fGrappleVolume);
 
@@ -626,6 +629,8 @@ public class GrappleHook : MonoBehaviour
         m_bGrappleHookActive = false;
         m_bGrappleLocked = false;
         m_fGrappleLineProgress = 0.0f;
+
+        Debug.Log("release!");
 
         m_animController.SetBool("isCasting", false);
         m_animController.SetBool("isGrappling", false);

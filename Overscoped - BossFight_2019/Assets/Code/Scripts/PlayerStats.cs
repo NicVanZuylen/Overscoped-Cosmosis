@@ -26,6 +26,14 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fMaxHealth = 100.0f;
 
+    [Tooltip("Rate in which health points will regenerate over time.")]
+    [SerializeField]
+    private float m_fHealthRegenRate = 1.0f;
+
+    [Tooltip("Amount of time health regen is interrupted after taking damage.")]
+    [SerializeField]
+    private float m_fRegenInterruptionTime = 3.0f;
+
     [SerializeField]
     private float m_fMaxMana = 100.0f;
 
@@ -156,7 +164,8 @@ public class PlayerStats : MonoBehaviour
     // Resources
     private float m_fHealth; // Everyone knows what this does.
     private float m_fMana; // Resource used up while grappling.
-    private float m_fCurrentRegenDelay; // Current timer value of the mana regen.
+    private float m_fCurrentHealthIntTime; // Current health interruption timer value.
+    private float m_fCurrentManaRegenDelay; // Current timer value of the mana regen.
     private bool m_bIsAlive; // Whether or not the player lives.
 
     // Respawn
@@ -188,7 +197,7 @@ public class PlayerStats : MonoBehaviour
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
-        m_fCurrentRegenDelay = 1.0f;
+        m_fCurrentManaRegenDelay = 1.0f;
         m_bIsAlive = true;
 
         m_fSplineInterval = m_fDeathRecordTime / m_camEffects.MaxSplineCount();
@@ -344,10 +353,26 @@ public class PlayerStats : MonoBehaviour
                 m_materials[i].SetFloat("_Dissolve", m_fRespawnDissolve);
         }
 
+        // Health regeneration.
+        if(m_fCurrentHealthIntTime <= 0.0f)
+        {
+            // Regenerate health.
+            m_fHealth += m_fHealthRegenRate * Time.deltaTime;
+
+            if (m_fHealth > m_fMaxHealth)
+                m_fHealth = m_fMaxHealth;
+
+            // Adjust fill amount.
+            m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
+        }
+        else
+            m_fCurrentHealthIntTime -= Time.deltaTime;
+
+        // Grapple mana decay.
         if (m_hookScript.GrappleActive())
         {
             // Reset mana regen delay.
-            m_fCurrentRegenDelay = m_fManaRegenDelay;
+            m_fCurrentManaRegenDelay = m_fManaRegenDelay;
 
             // Lose mana whilst the hook is active.
             m_fMana -= m_fManaLossRate * Time.deltaTime;
@@ -358,9 +383,9 @@ public class PlayerStats : MonoBehaviour
         else
         {
             // Count down regen delay.
-            m_fCurrentRegenDelay -= Time.deltaTime;
+            m_fCurrentManaRegenDelay -= Time.deltaTime;
 
-            if (m_fCurrentRegenDelay <= 0.0f)
+            if (m_fCurrentManaRegenDelay <= 0.0f)
             {
                 // Regenerate mana.
                 switch (m_manaRegenMode)
@@ -571,6 +596,9 @@ public class PlayerStats : MonoBehaviour
         // Play camera effects...
         m_camEffects.ApplyShake(0.1f, 0.8f, true);
         m_camEffects.ApplyChromAbbShake(0.1f, 0.6f, 0.8f);
+
+        // Interrupt regenration.
+        m_fCurrentHealthIntTime = m_fRegenInterruptionTime;
 
         if(m_fHealth <= 0.0f)
         {

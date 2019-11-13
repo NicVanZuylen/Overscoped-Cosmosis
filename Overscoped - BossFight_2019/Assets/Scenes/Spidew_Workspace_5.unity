@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.067926, g: 0.11658778, b: 0.2155657, a: 1}
+  m_IndirectSpecularColor: {r: 0.061417833, g: 0.07427355, b: 0.11543029, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -66236,6 +66236,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: MidlifeCrisisMan
       objectReference: {fileID: 0}
+    - target: {fileID: 1052553494790951511, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1052553494790951508, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -66296,16 +66301,21 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3729592265509758163, guid: 15224bf2b194e9c47af1aa65c1964291,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1052553495887856270, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_playerCollider
       value: 
       objectReference: {fileID: 1622475571}
-    - target: {fileID: 1195823996117230229, guid: 15224bf2b194e9c47af1aa65c1964291,
+    - target: {fileID: 1052553495887856270, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
-      propertyPath: m_player
-      value: 
-      objectReference: {fileID: 1622475564}
+      propertyPath: m_fArmExitTime
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 4685655471626103380, guid: 15224bf2b194e9c47af1aa65c1964291,
         type: 3}
       propertyPath: m_healthBar
@@ -68859,12 +68869,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 02a33ef7a8302d64fbf52bda3b12b604,
     type: 3}
   m_PrefabInstance: {fileID: 1622380321}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1622475564 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3098781030927477070, guid: 6f93dca712e3bef4fad65080656ce884,
-    type: 3}
-  m_PrefabInstance: {fileID: 1449627788882328628}
   m_PrefabAsset: {fileID: 0}
 --- !u!143 &1622475571 stripped
 CharacterController:

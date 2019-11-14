@@ -39,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 2035111234}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.06802847, g: 0.11711962, b: 0.21696234, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1160,6 +1160,8 @@ MonoBehaviour:
     _prefab: Assets/Prefabs/VFX/PS_Player_Grapple_Destination.prefab
   - _gameObject: {fileID: 595073325}
     _prefab: Assets/Prefabs/VFX/PS_Player_Aim_Indicator.prefab
+  - _gameObject: {fileID: 4069167062869992328}
+    _prefab: Assets/Prefabs/VFX/PS_Boss_Heart_Explosion.prefab
 --- !u!4 &246005845
 Transform:
   m_ObjectHideFlags: 11
@@ -17024,6 +17026,75 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1606079551651355213}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3383808039278845739
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1624997481995992227, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_Name
+      value: PS_Boss_Heart_Explosion
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.908192
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.000000014901161
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 5.136971
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1624997481995992238, guid: a3d2f02149591a7478182023374fef85,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a3d2f02149591a7478182023374fef85, type: 3}
 --- !u!1001 &3546352007842530125
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17385,6 +17456,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bca3813edeb8dd240a9e69dda8115d30, type: 3}
+--- !u!1 &4069167062869992328 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1624997481995992227, guid: a3d2f02149591a7478182023374fef85,
+    type: 3}
+  m_PrefabInstance: {fileID: 3383808039278845739}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4217343517269098176
 PrefabInstance:
   m_ObjectHideFlags: 0

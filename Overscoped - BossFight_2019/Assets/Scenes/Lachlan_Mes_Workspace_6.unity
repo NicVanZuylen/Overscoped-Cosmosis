@@ -22557,6 +22557,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Anim_Meteor
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: a27fac150e6c8644f860364fd71f01ac,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: a27fac150e6c8644f860364fd71f01ac,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -31547,7 +31552,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1999135495}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &735634384
 PrefabInstance:
@@ -50305,6 +50310,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Enviro_Island_01
       objectReference: {fileID: 0}
+    - target: {fileID: 977943225847428824, guid: e14ab99e6b5a503448bb1cf798046007,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: e14ab99e6b5a503448bb1cf798046007,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -50384,11 +50394,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 977943225847428824, guid: e14ab99e6b5a503448bb1cf798046007,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e14ab99e6b5a503448bb1cf798046007, type: 3}
@@ -60197,6 +60202,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4121546099838559120, guid: 42a0f5118b89e2f459be36b77ff09d8b,
+        type: 3}
+      propertyPath: m_Convex
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -2064985977466988641, guid: 42a0f5118b89e2f459be36b77ff09d8b,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -60222,11 +60232,6 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[4]
       value: 
       objectReference: {fileID: 2100000, guid: 8ff16dd799a76b648a13f3235e5c7015, type: 2}
-    - target: {fileID: 4121546099838559120, guid: 42a0f5118b89e2f459be36b77ff09d8b,
-        type: 3}
-      propertyPath: m_Convex
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42a0f5118b89e2f459be36b77ff09d8b, type: 3}
 --- !u!1 &1434571607 stripped
@@ -70654,6 +70659,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeteorTargetVolume (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5612638907789637679, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1621879146464463823, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
         type: 3}
       propertyPath: m_IsActive
@@ -70703,18 +70713,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7553771268920189769, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
+    - target: {fileID: 88082614018859665, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
         type: 3}
-      propertyPath: m_Enabled
-      value: 1
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7553771268920189769, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
-        type: 3}
-      propertyPath: m_Center.x
-      value: -91.46
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 7553771268920189769, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d, type: 3}
 --- !u!4 &1722805791 stripped
 Transform:
@@ -78804,20 +78808,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1722805790}
   m_PrefabAsset: {fileID: 0}
---- !u!136 &1939285248
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939285247}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 25
-  m_Height: 14.72
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1941722972
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -86516,6 +86506,11 @@ PrefabInstance:
     - target: {fileID: 9158341367325311, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d, type: 3}
       propertyPath: m_Name
       value: MeteorTargetVolume (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1621879146464463823, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9158341367325298, guid: 6dca9d45c527d5a4ea1bbcdd1de8576d, type: 3}
       propertyPath: m_LocalPosition.x

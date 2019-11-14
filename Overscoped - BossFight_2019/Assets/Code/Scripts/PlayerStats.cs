@@ -557,7 +557,7 @@ public class PlayerStats : MonoBehaviour
 #if UNITY_EDITOR
         return true;
 #else
-        return m_fMana > m_fMinManaCost;
+        return m_fMana > 0.0f;
 #endif
     }
 

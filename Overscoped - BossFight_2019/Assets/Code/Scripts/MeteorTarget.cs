@@ -23,7 +23,7 @@ public class MeteorTarget : MonoBehaviour
     private float m_fAOEDamagePerSec = 10.0f;
 
     [SerializeField]
-    private Renderer[] m_particlesToFade = null;
+    private Renderer[] m_particlesToFade;
 
     //private GameObject m_indicator;
     private Queue<MeteorTarget> m_targetPool;
@@ -39,23 +39,23 @@ public class MeteorTarget : MonoBehaviour
         m_collider = GetComponent<BoxCollider>();
         m_targetPool = targetPool;
 
-        m_fadeMaterials = new Material[m_particlesToFade.Length];
-
-        // Cache fade particle materials.
-        for (int i = 0; i < m_fadeMaterials.Length; ++i)
-            m_fadeMaterials[i] = m_particlesToFade[i].material;
-
-        m_fAOEAlphaFades = new float[m_fadeMaterials.Length];
-
-        for (int i = 0; i < m_fAOEAlphaFades.Length; ++i)
-            m_fAOEAlphaFades[i] = m_fadeMaterials[i].GetFloat("_Alpha");
+        
     }
 
     private void Update()
     {
         m_fAOETime -= Time.deltaTime;
 
-        if(m_fAOETime <= 0.0f && m_aoeParticles.IsPlaying())
+        if (m_fAOETime <= 0.0f)
+        {
+            for (int i = 0; i < m_particlesToFade.Length; ++i)
+            {
+                if (m_particlesToFade[i].material.GetFloat("_Alpha") > 0)
+                    m_particlesToFade[i].material.SetFloat("_Alpha", m_particlesToFade[i].material.GetFloat("_Alpha") - Time.deltaTime);
+            }
+        }
+
+        if (m_fAOETime <= 0.0f && !m_aoeParticles.IsPlaying())
         {
             // Make this target available in the pool again.
             m_targetPool.Enqueue(this);
@@ -64,25 +64,12 @@ public class MeteorTarget : MonoBehaviour
             if (m_explosion.IsPlaying())
                 m_explosion.Stop();
 
-            for(int i = 0; i < m_fadeMaterials.Length; ++i)
-            {
-                m_fAOEAlphaFades[i] -= Time.deltaTime;
-                m_fadeMaterials[i].SetFloat("_Alpha", Mathf.Max(m_fAOEAlphaFades[i], 0.0f));
-            }
-
             // Disable this object and stop particle effects once faded.
-            if (m_fAOEAlphaFades[0] <= 0.0f)
+        }
+            if (m_particlesToFade[0].material.GetFloat("_Alpha") <= 0.0f && m_particlesToFade[1].material.GetFloat("_Alpha") <= 0.0f && m_particlesToFade[2].material.GetFloat("_Alpha") <= 0.0f)
             {
                 m_aoeParticles.Stop();
-                gameObject.SetActive(false);
             }
-        }
-        else
-        {
-            m_fAOEAlphaFades[0] = 0.3f;
-            m_fAOEAlphaFades[1] = 0.5f;
-            m_fAOEAlphaFades[2] = 1.0f;
-        }
     }
 
     public void SummonMeteor(Meteor meteor, Vector3 v3Origin)
@@ -102,7 +89,7 @@ public class MeteorTarget : MonoBehaviour
             m_indicator.Stop();
         
         // Begin and reset AOE time.
-        enabled = true;
+        gameObject.SetActive(true);
         m_fAOETime = m_fAOEDuration;
 
         if(!m_explosion.IsPlaying())
@@ -112,9 +99,9 @@ public class MeteorTarget : MonoBehaviour
             m_aoeParticles.Play();
 
         // Set initial material alphas.
-        m_fAOEAlphaFades[0] = 0.3f;
-        m_fAOEAlphaFades[1] = 0.5f;
-        m_fAOEAlphaFades[2] = 1.0f;
+        m_particlesToFade[0].material.SetFloat("_Alpha", 0.3f);
+        m_particlesToFade[1].material.SetFloat("_Alpha", 0.5f);
+        m_particlesToFade[2].material.SetFloat("_Alpha", 1.0f);
     }
 
     private void OnTriggerStay(Collider other)

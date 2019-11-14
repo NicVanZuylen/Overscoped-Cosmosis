@@ -9622,7 +9622,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4551823218363787963}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0, z: 8}
+  m_LocalPosition: {x: 0, y: -0, z: 7.34}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_Children:
   - {fileID: 8752469103085457121}
@@ -28768,9 +28768,9 @@ CapsuleCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 5.5
-  m_Height: 20
+  m_Height: 25
   m_Direction: 2
-  m_Center: {x: 0, y: 0, z: 5.09}
+  m_Center: {x: 0, y: 0, z: 12}
 --- !u!114 &850141592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28783,10 +28783,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2ed15def9087cb4db2864bb7dda347f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_fChargeAmount: 10
+  m_fChargeAmount: 15
   m_pickupSFX:
     m_clips:
-    - {fileID: 8300000, guid: bd289c3fd7290ec4aaa0501f21503c40, type: 3}
+    - {fileID: 8300000, guid: fdb9d4557153f3f4d86d456161fb309a, type: 3}
     m_source: {fileID: 528588911732525926}
     m_fCooldown: 0
   m_pickupVFX:

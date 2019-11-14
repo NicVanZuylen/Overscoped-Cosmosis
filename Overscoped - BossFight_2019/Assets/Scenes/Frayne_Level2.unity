@@ -38,8 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.00017299959, g: 0.000021452797, b: 0.0000010470402,
-    a: 1}
+  m_IndirectSpecularColor: {r: 0.011205693, g: 0.00988782, b: 0.0073682494, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -94753,6 +94752,11 @@ PrefabInstance:
       propertyPath: m_landSFX.m_clips.Array.data[1]
       value: 
       objectReference: {fileID: 8300000, guid: 70e8b465998ac0b46b69903ed2a6aac5, type: 3}
+    - target: {fileID: 5364623917393187635, guid: 6f93dca712e3bef4fad65080656ce884,
+        type: 3}
+      propertyPath: m_fRespawnMaterializeRate
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1195755087452859737, guid: 6f93dca712e3bef4fad65080656ce884,
         type: 3}
       propertyPath: m_fJumpHeight

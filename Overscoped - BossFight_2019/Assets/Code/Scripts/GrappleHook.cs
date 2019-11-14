@@ -59,6 +59,14 @@ public class GrappleHook : MonoBehaviour
     [SerializeField]
     private float m_fDestinationRadius = 2.0f;
 
+    [Tooltip("Impulse added to the player upwards when reaching the grapple destination.")]
+    [SerializeField]
+    private float m_fDestinationUpPush = 80.0f;
+
+    [Tooltip("Impulse added to the player upwards when reaching the grapple destination.")]
+    [SerializeField]
+    private float m_fDestinationNormalPush = 30.0f;
+
     [Tooltip("Allowance of lateral movement when grappling.")]
     [SerializeField]
     private float m_fDriftTolerance = 8.0f;
@@ -204,6 +212,7 @@ public class GrappleHook : MonoBehaviour
     private static float m_fGrappleVolume = 1.0f;
     private EGrappleState m_grappleState;
     private EGrappleMode m_grappleMode;
+    private bool m_bWaitForRelease; // Whether or not to wait for mouse button release before allowing grappling again.
 
     // Pull function
     private PullObject m_pullObj;
@@ -358,14 +367,16 @@ public class GrappleHook : MonoBehaviour
                 m_targetVFX.Play();
         }
         else if (m_targetVFX.IsPlaying())
-            m_targetVFX.Stop();
+            m_targetVFX.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
 
         // If the raycast returned positive and the player is holding left mouse...
-        if (m_bWithinRange && Input.GetMouseButton(0))
+        if (m_bWithinRange && !m_bWaitForRelease && Input.GetMouseButton(0))
         {
             // Begin grapple sequence.
             BeginCast();
         }
+        else if (m_bWaitForRelease && !Input.GetMouseButton(0))
+            m_bWaitForRelease = false;
     }
 
     /*
@@ -491,8 +502,10 @@ public class GrappleHook : MonoBehaviour
 
     /*
     Description: Release the grapple.
+    Param:
+        bool bWaitForRelease: Whether or not to force the player to release the mouse button before attempting to grapple again.
     */
-    public void ReleaseGrapple()
+    public void ReleaseGrapple(bool bWaitForRelease = false)
     {
         SetState(EGrappleState.GRAPPLE_IDLE);
 
@@ -518,6 +531,9 @@ public class GrappleHook : MonoBehaviour
         // Release boost
         if(m_fGrappleHookedTime >= m_fMinReleaseBoostTime)
             m_controller.AddImpulse(m_controller.LookForward() * m_fReleaseForce);
+
+        // Flag to wait for release.
+        m_bWaitForRelease = bWaitForRelease;
 
         // Reset stats.
         m_fGrappleHookedTime = 0.0f;
@@ -593,13 +609,30 @@ public class GrappleHook : MonoBehaviour
         if (v3GrappleDif.sqrMagnitude <= m_fDestinationRadius * m_fDestinationRadius)
         {
             // Disable grapple.
-            ReleaseGrapple();
+            ReleaseGrapple(true);
+
+            Vector3 v3GrappleNormal = m_fireHit.normal;
+
+            // Push up force, the push will only be applied if the surface normal is not pointing upwards.
+            if(Vector3.Dot(v3GrappleNormal, Vector3.up) < 0.9f)
+            {
+                Vector3 v3GrappleRight = Vector3.Cross(v3GrappleNormal, Vector3.up);
+                Vector3 v3GrappleUp = Vector3.Cross(v3GrappleRight, v3GrappleNormal); // Vector upwards along the surface normal.
+
+                // Multiplier for additional force added to the upwards push, the less v3GrappleUp points upwards the greater the push.
+                float fUpMult = 1.0f - Vector3.Dot(v3GrappleUp, Vector3.up);
+
+                v3NetForce += v3GrappleUp * (m_fDestinationUpPush + (m_fDestinationUpPush * fUpMult));
+                v3NetForce += -controller.LookForward() * m_fDestinationNormalPush;
+            }
 
             // Stop looping SFX.
             m_grappleLoopAudio.Stop();
 
             m_controller.FreeOverride();
             m_controller.SetGravity(m_controller.JumpGravity());
+
+            return m_controller.GetVelocity() + v3NetForce;
         }
 
         // The component of the velocity + net force away from the grapple point.

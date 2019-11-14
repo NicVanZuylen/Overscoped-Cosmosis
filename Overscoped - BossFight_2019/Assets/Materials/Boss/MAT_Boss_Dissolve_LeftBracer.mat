@@ -20,11 +20,23 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 2800000, guid: f0385073dd07b4a46891e092a30ae0a0, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9fce632ba6b1db74e8129536e9ba81c2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DissolveNoise:
         m_Texture: {fileID: 2800000, guid: 2625d80a94139144ab91e1e31c35416c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Emiisionmap:
+        m_Texture: {fileID: 2800000, guid: f0385073dd07b4a46891e092a30ae0a0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureArray0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample2:
+        m_Texture: {fileID: 2800000, guid: f0385073dd07b4a46891e092a30ae0a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _texcoord:
@@ -35,7 +47,8 @@ Material:
     - _Dissolve: 1
     - _DissolveEmissionEdge: 0.05
     - _EmissionEdge: 0.05
-    - _FresnelOnOff: 1
+    - _Float1: 2.83
+    - _FresnelOnOff: 0
     - _FresnelStrength: 3
     - _PulseSpeed: 1
     m_Colors:

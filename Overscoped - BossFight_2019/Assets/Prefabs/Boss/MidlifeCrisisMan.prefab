@@ -10402,7 +10402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1824802df4fac80468c999abd13c246f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_fMaxHealth: 5
+  m_fMaxHealth: 8
   m_fPopTime: 0.5
   m_healthBar: {fileID: 0}
   m_healthGradient:
@@ -10630,11 +10630,7 @@ MonoBehaviour:
   m_tentrilsRenderer: {fileID: 278595566405145127}
   m_spawnSFX:
     m_clips:
-    - {fileID: 8300000, guid: 2cd3bc7c8e4ce834a93fb0821aa1dd6d, type: 3}
-    - {fileID: 8300000, guid: cb8114015c5bcf94d86ea9adf1f7c9f1, type: 3}
-    - {fileID: 8300000, guid: 703b3d937a71e1e4ebcb7fc490320d16, type: 3}
-    - {fileID: 8300000, guid: 08587b5a845b27b46a935f8ed3d5b295, type: 3}
-    - {fileID: 8300000, guid: d56eda0b0eb571c468c05997e782dce5, type: 3}
+    - {fileID: 8300000, guid: dfb27f377ce1c1c41932b1f9bbd1edb2, type: 3}
     m_source: {fileID: 8595412328508500494}
     m_fCooldown: 1
   m_bossHitSFX:
@@ -10702,7 +10698,7 @@ MonoBehaviour:
     m_fCooldown: 0
   m_meteorSummonSFX: {fileID: 0}
   m_portalAmbientsSFX: {fileID: 8300000, guid: 82ff5e5c8156d95458cf6036fbb628af, type: 3}
-  m_beamChargeSFX: {fileID: 8300000, guid: 4a2ce9cc009b51f498c174543d22df86, type: 3}
+  m_beamChargeSFX: {fileID: 8300000, guid: 095a3b81e7928534ba01ca5a2a06c2ee, type: 3}
   m_beamStopSFX: {fileID: 8300000, guid: 8d61c6e7c371875438fc2486055a5530, type: 3}
   m_beamFireLoopingSFX: {fileID: 8300000, guid: 6f7952f6b9e5d124baea971cae042152,
     type: 3}
@@ -11208,6 +11204,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5918001827861300261, guid: ca323c48f256131459a83772a53cf010,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5918001827861300261, guid: ca323c48f256131459a83772a53cf010,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5918001827861300261, guid: ca323c48f256131459a83772a53cf010,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 712468161514190651, guid: ca323c48f256131459a83772a53cf010,
         type: 3}
       propertyPath: m_armMaterials.Array.size
@@ -11240,14 +11251,9 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: f47b72ba23e82f942bbc818f3092098d, type: 2}
     - target: {fileID: 712468161514190651, guid: ca323c48f256131459a83772a53cf010,
         type: 3}
-      propertyPath: m_fArmExitTime
-      value: 0.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 712468161514190651, guid: ca323c48f256131459a83772a53cf010,
-        type: 3}
       propertyPath: m_punchImpactSFX.m_clips.Array.data[0]
       value: 
-      objectReference: {fileID: 8300000, guid: ac245ce92cbf52846ad8596ba1b23d12, type: 3}
+      objectReference: {fileID: 8300000, guid: 7973ab2ba39fcd54e88a9d758d1caa16, type: 3}
     - target: {fileID: 607708152880609479, guid: ca323c48f256131459a83772a53cf010,
         type: 3}
       propertyPath: m_PlayOnAwake

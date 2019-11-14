@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MAT_UI_Crosshair_01
+  m_Shader: {fileID: 4800000, guid: 6645b21d97150f64d8aec3bddd499c63, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3099
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Sprite:
+        m_Texture: {fileID: 2800000, guid: 5736ac28793548249b17c12a8f621961, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AlphaHigh: 1
+    - _AlphaInRange: 1
+    - _AlphaLow: 1
+    - _AlphaOutRange: 1
+    - _ColorMask: 15
+    - _ColourMultiplier: 10
+    - _InRange: 1
+    - _Mana: 0
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _ColourHigh: {r: 1, g: 0.6128649, b: 0, a: 0}
+    - _ColourInRange: {r: 0.7490196, g: 0.26288152, b: 0, a: 0}
+    - _ColourLow: {r: 1, g: 1, b: 1, a: 0}
+    - _ColourOutRange: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}

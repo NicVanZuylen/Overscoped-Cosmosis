@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(AudioSource))]
+/*
+ * Description: Controls beam charge pickups & player detection from pickups.
+ * Author: Nic Van Zuylen
+*/
 
 public class BeamPickup : MonoBehaviour
 {
@@ -14,13 +17,9 @@ public class BeamPickup : MonoBehaviour
 
     [Header("Effects")]
 
-    [Tooltip("Audio source of pickup SFX.")]
+    [Tooltip("SFX played when the crystal is picked up.")]
     [SerializeField]
-    private AudioSource m_pickupSFXSource = null;
-
-    [Tooltip("Sound effect played upon pickup.")]
-    [SerializeField]
-    private AudioClip m_pickupSFX = null;
+    private AudioSelection m_pickupSFX = new AudioSelection();
 
     [Tooltip("VFX played on pickup.")]
     [SerializeField]
@@ -45,15 +44,6 @@ public class BeamPickup : MonoBehaviour
 
         if (m_pickupVFX.m_particleSystems.Length > 0)
             m_pickupVFX.m_particleSystems[0].transform.parent = null;
-
-        if(m_pickupSFXSource)
-        {
-            // Detach object.
-            m_pickupSFXSource.gameObject.transform.parent = null;
-
-            m_pickupSFXSource.spatialBlend = 1.0f;
-            m_pickupSFXSource.playOnAwake = false;
-        }
     }
 
     private void OnEnable()
@@ -70,14 +60,14 @@ public class BeamPickup : MonoBehaviour
             // Increment beam charge...
             m_playerBeamScript.IncreaseCharge(m_fChargeAmount);
 
+            // Set VFX position.
+            m_pickupVFX.SetPosition(transform.position);
+
             // Play pickup particle effect.
             m_pickupVFX.Play();
 
-            // Play pickup sound FX.
-            if(m_pickupSFX && m_pickupSFXSource)
-            {
-                m_pickupSFXSource.PlayOneShot(m_pickupSFX);
-            }
+            // Play pickup SFX.
+            m_pickupSFX.PlayIndex(0, PlayerStats.GetPlayerVolume());
 
             // Add to respawn pickup object pool.
             PickupRespawner.EnqueuePickup(this);

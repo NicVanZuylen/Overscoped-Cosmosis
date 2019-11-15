@@ -394,8 +394,11 @@ public class GrappleHook : MonoBehaviour
             m_grappleMode = EGrappleMode.GRAPPLE_MODE_GRAPPLE;
 
         // Set grapple destination point position, parent & distance.
-        m_grapplePoint.transform.position = m_fireHit.point;
-        m_grapplePoint.transform.parent = m_fireHit.collider.transform;
+        Transform grapplePointTransform = m_grapplePoint.transform;
+
+        grapplePointTransform.position = m_fireHit.point;
+        grapplePointTransform.parent = m_fireHit.collider.transform;
+        grapplePointTransform.rotation = Quaternion.LookRotation(m_fireHit.normal, Vector3.up); // Rotate grapple point to face normal, to rotate the VFX.
         m_fGrapLineLength = m_fireHit.distance;
 
         // Play SFX.
@@ -495,9 +498,12 @@ public class GrappleHook : MonoBehaviour
             m_controller.AddImpulse(v3Impulse);
         }
 
-        // Begin override.
+        // Begin overrides.
         if(m_grappleMode == EGrappleMode.GRAPPLE_MODE_GRAPPLE)
+        {
             m_controller.OverrideMovement(GrappleFly);
+            m_controller.OverrideCollision(OnGrappleCollision);
+        }
     }
 
     /*
@@ -509,9 +515,12 @@ public class GrappleHook : MonoBehaviour
     {
         SetState(EGrappleState.GRAPPLE_IDLE);
 
-        // Release grapple override.
+        // Release grapple overrides.
         if(m_grappleMode == EGrappleMode.GRAPPLE_MODE_GRAPPLE)
-            m_controller.FreeOverride();
+        {
+            m_controller.FreeMovementOverride();
+            m_controller.FreeCollisionOverride();
+        }
 
         // Set new gravity value when releasing from hooked state.
         if (m_grappleState == EGrappleState.GRAPPLE_HOOKED && m_grappleMode == EGrappleMode.GRAPPLE_MODE_GRAPPLE)
@@ -611,25 +620,13 @@ public class GrappleHook : MonoBehaviour
             // Disable grapple.
             ReleaseGrapple(true);
 
-            Vector3 v3GrappleNormal = m_fireHit.normal;
-
-            // Push up force, the push will only be applied if the surface normal is not pointing upwards.
-            if(Vector3.Dot(v3GrappleNormal, Vector3.up) < 0.9f)
-            {
-                Vector3 v3GrappleRight = Vector3.Cross(v3GrappleNormal, Vector3.up);
-                Vector3 v3GrappleUp = Vector3.Cross(v3GrappleRight, v3GrappleNormal); // Vector upwards along the surface normal.
-
-                // Multiplier for additional force added to the upwards push, the less v3GrappleUp points upwards the greater the push.
-                float fUpMult = 1.0f - Vector3.Dot(v3GrappleUp, Vector3.up);
-
-                v3NetForce += v3GrappleUp * (m_fDestinationUpPush + (m_fDestinationUpPush * fUpMult));
-                v3NetForce += -controller.LookForward() * m_fDestinationNormalPush;
-            }
+            // Run collision code.
+            v3NetForce += OnGrappleCollision(controller, fDeltaTime);
 
             // Stop looping SFX.
             m_grappleLoopAudio.Stop();
 
-            m_controller.FreeOverride();
+            m_controller.FreeMovementOverride();
             m_controller.SetGravity(m_controller.JumpGravity());
 
             return m_controller.GetVelocity() + v3NetForce;
@@ -645,6 +642,29 @@ public class GrappleHook : MonoBehaviour
         }
 
         return m_controller.GetVelocity() + v3NetForce;
+    }
+
+    Vector3 OnGrappleCollision(PlayerController controller, float fDeltaTime)
+    {
+        Vector3 v3Impulse = Vector3.zero;
+        Vector3 v3GrappleNormal = m_fireHit.normal;
+
+        // Push up force, the push will only be applied if the surface normal is not pointing upwards.
+        if (Vector3.Dot(v3GrappleNormal, Vector3.up) < 0.9f)
+        {
+            Vector3 v3GrappleRight = Vector3.Cross(v3GrappleNormal, Vector3.up);
+            Vector3 v3GrappleUp = Vector3.Cross(v3GrappleRight, v3GrappleNormal); // Vector upwards along the surface normal.
+
+            // Multiplier for additional force added to the upwards push, the less v3GrappleUp points upwards the greater the push.
+            float fUpMult = 1.0f - Vector3.Dot(v3GrappleUp, Vector3.up);
+
+            v3Impulse += v3GrappleUp * (m_fDestinationUpPush + (m_fDestinationUpPush * fUpMult));
+            v3Impulse += -controller.LookForward() * m_fDestinationNormalPush;
+
+            Debug.Log("thing");
+        }
+
+        return v3Impulse;
     }
 
     /*

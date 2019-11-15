@@ -18,9 +18,12 @@ public class ChestPlate : MonoBehaviour
     [SerializeField]
     private float m_fPopTime = 0.5f;
 
-    [Tooltip("Health bar image representing the force field.")]
+    [Tooltip("Health bar material representing the force field health.")]
     [SerializeField]
-    private Image m_healthBar = null;
+    private Material m_healthFillMat = null;
+
+    [SerializeField]
+    private Material m_healthBarThumpMat = null;
 
     [Tooltip("Color gradient for the health bar as it lowers.")]
     [SerializeField]
@@ -53,6 +56,8 @@ public class ChestPlate : MonoBehaviour
         // Initial health.
         m_fHealth = m_fMaxHealth;
 
+        m_healthBarThumpMat.SetInt("_ThumpingSwitch", 0);
+
         // Disable script to prevent premature popping.
         enabled = false;
     }
@@ -72,6 +77,8 @@ public class ChestPlate : MonoBehaviour
     private void OnDestroy()
     {
         m_material.SetFloat("_IsHit", 0.0f);
+        m_healthFillMat.SetFloat("_Resource", 1.0f); // Reset health bar fill.
+        m_healthBarThumpMat.SetInt("_ThumpingSwitch", 0);
     }
 
     /*
@@ -88,8 +95,8 @@ public class ChestPlate : MonoBehaviour
         m_material.SetFloat("_IsHit", fHealthPercentage);
 
         // Set health bar fill & colour.
-        m_healthBar.fillAmount = 1.0f - fHealthPercentage;
-        m_healthBar.color = m_healthGradient.Evaluate(fHealthPercentage);
+        m_healthFillMat.SetFloat("_Resource", 1.0f - fHealthPercentage);
+        m_healthFillMat.color = m_healthGradient.Evaluate(fHealthPercentage);
 
         if (m_fHealth <= 0.0f && !enabled)
         {
@@ -99,6 +106,9 @@ public class ChestPlate : MonoBehaviour
 
             // Begin camera shake feedback.
             m_camEffects.ApplyShake(0.5f, 1.0f, true);
+
+            // Begin health bar thumping.
+            m_healthBarThumpMat.SetInt("_ThumpingSwitch", 1);
 
             // Reset heart layer to default.
             m_heart.layer = 0;

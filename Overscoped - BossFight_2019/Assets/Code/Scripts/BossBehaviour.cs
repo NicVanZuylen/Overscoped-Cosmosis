@@ -385,7 +385,7 @@ public class BossBehaviour : MonoBehaviour
 
         m_portalAmbientsAudioLoop = new AudioLoop(m_portalAmbientsSFX, m_portal, ESpacialMode.AUDIO_SPACE_NONE);
 
-        m_beamImpactAudioLoop = new AudioLoop(m_beamImpactLoopingSFX, m_beamDestinationVFX.m_particleSystems[0].gameObject, ESpacialMode.AUDIO_SPACE_WORLD);
+        m_beamImpactAudioLoop = new AudioLoop(m_beamImpactLoopingSFX, m_beamDestinationVFX.m_objects[0], ESpacialMode.AUDIO_SPACE_WORLD);
 
         // Disable until the player reaches the arena.
         enabled = false;

@@ -17,10 +17,6 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     private GameObject[] m_menuHandles = null;
 
-    [Header("Title screen button references.")]
-    [SerializeField]
-    private Button[] m_titleScreenButtons = null;
-
     [Header("Volume slider references")]
 
     [SerializeField]
@@ -64,8 +60,6 @@ public class MainMenu : MonoBehaviour
 
         m_musicManager = GetComponent<MusicManager>();
 
-        m_musicManager.PlayTrackIndex(0);
-
         // Creates a instance of SettingIO
         m_settingSaver = new SettingsIO();
         m_settingSaver.ReadFile();
@@ -81,7 +75,12 @@ public class MainMenu : MonoBehaviour
 
         // Set current menu state.
         m_eState = EMenuState.MENU_TITLE;
+    }
 
+    private void Start()
+    {
+        // Play music.
+        m_musicManager.PlayTrackIndex(0);
     }
 
     private void UpdateOptionsUI()
@@ -119,10 +118,6 @@ public class MainMenu : MonoBehaviour
     {
         m_fadeScript.SetCallback(LoadGameScene);
         m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
-
-        // Disable main menu buttons.
-        for (int i = 0; i < m_titleScreenButtons.Length; ++i)
-            m_titleScreenButtons[i].interactable = false;
     }
 
     /*

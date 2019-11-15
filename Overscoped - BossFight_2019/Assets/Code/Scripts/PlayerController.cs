@@ -800,6 +800,9 @@ public class PlayerController : MonoBehaviour
 
         m_bOnGround &= !m_bSlopeLimit;
 
+        // Update grounded status in animation controller.
+        m_animController.SetBool("isGrounded", m_bOnGround);
+
         // Ground detection result should be confirmed here.
         if (m_bOnGround)
             m_bJumping = false;
@@ -877,11 +880,13 @@ public class PlayerController : MonoBehaviour
         if(other.tag == "Killbox")
         {
             // Begin screen fade and respawn once the screen is black.
-            ScreenFade camScreenFade = m_cameraEffects.GetScreenFade();
+            //ScreenFade camScreenFade = m_cameraEffects.GetScreenFade();
+            //
+            //camScreenFade.SetCallback(RespawnLastCheckpoint);
+            //camScreenFade.SetFadeRate(3.5f);
+            //camScreenFade.BeginFade(ScreenFade.EFadeMode.FADE_IN);
 
-            camScreenFade.SetCallback(RespawnLastCheckpoint);
-            camScreenFade.SetFadeRate(3.5f);
-            camScreenFade.BeginFade(ScreenFade.EFadeMode.FADE_IN);
+            RespawnLastCheckpoint();
         }
     }
 }

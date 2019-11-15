@@ -37,10 +37,6 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fMaxMana = 100.0f;
 
-    [Tooltip("Minimum mana to cast the grapple.")]
-    [SerializeField]
-    private float m_fMinManaCost = 15.0f;
-
     [Tooltip("Rate of player's mana loss when using the grapple.")]
     [SerializeField]
     private float m_fManaLossRate = 5.0f;
@@ -66,7 +62,7 @@ public class PlayerStats : MonoBehaviour
     private float m_fPortalPunchForce = 100.0f;
 
     // -------------------------------------------------------------------------------------------------
-    [Header("Death")]
+    [Header("Death & Respawn")]
 
     [Tooltip("Amount of time's worth of movement captured by the camera spline.")]
     [SerializeField]
@@ -88,13 +84,17 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fTimeSlowDuration = 2.0f;
 
+    [Tooltip("Rate in which the player will re-materialize when spawning.")]
+    [SerializeField]
+    private float m_fRespawnMaterializeRate = 1.0f;
+
     // -------------------------------------------------------------------------------------------------
     [Space(10)]
     [Header("GUI")]
     [Space(10)]
 
     [SerializeField]
-    private Image m_healthFill = null;
+    private Material m_healthFillMat = null;
 
     [SerializeField]
     private Material m_manaFillMat = null;
@@ -213,10 +213,19 @@ public class PlayerStats : MonoBehaviour
         // Spawn at checkpoint if it has been reached.
         if (m_bCheckpointReached && m_checkpoint)
         {
-
             transform.position = m_checkpoint.position;
             m_controller.SetLookRotation(m_checkpoint.rotation);
         }
+    }
+
+    private void Start()
+    {
+        // Disable scripts until dissolve-in is finished.
+        m_beamScript.enabled = false;
+        m_controller.SetFocus(false);
+        m_controller.enabled = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        m_hookScript.enabled = false;
     }
 
     /*
@@ -314,6 +323,9 @@ public class PlayerStats : MonoBehaviour
         // Reset shader values.
         for (int i = 0; i < m_materials.Length; ++i)
             m_materials[i].SetFloat("_Dissolve", 0.0f);
+
+        m_healthFillMat.SetFloat("_Resource", 1.0f);
+        m_manaFillMat.SetFloat("_Resource", 1.0f);
     }
 
     // Update is called once per frame
@@ -347,10 +359,21 @@ public class PlayerStats : MonoBehaviour
         if(m_fRespawnDissolve > 0.0f)
         {
             // Count down dissolve level and update shader.
-            m_fRespawnDissolve = Mathf.Max(m_fRespawnDissolve - Time.deltaTime, 0.0f);
+            m_fRespawnDissolve = Mathf.Max(m_fRespawnDissolve - (Time.deltaTime * m_fRespawnMaterializeRate), 0.0f);
 
             for (int i = 0; i < m_materials.Length; ++i)
                 m_materials[i].SetFloat("_Dissolve", m_fRespawnDissolve);
+
+            // Enable scripts once dissolve in is finished.
+            if(m_fRespawnDissolve <= 0.0f)
+            {
+                m_beamScript.enabled = true;
+                m_controller.SetFocus(true);
+                m_controller.enabled = true;
+                m_hookScript.enabled = true;
+            }
+            
+            return;
         }
 
         // Health regeneration.
@@ -363,7 +386,7 @@ public class PlayerStats : MonoBehaviour
                 m_fHealth = m_fMaxHealth;
 
             // Adjust fill amount.
-            m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
+            m_healthFillMat.SetFloat("_Resource", m_fHealth / m_fMaxHealth);
         }
         else
             m_fCurrentHealthIntTime -= Time.deltaTime;
@@ -534,7 +557,11 @@ public class PlayerStats : MonoBehaviour
     */
     public bool EnoughMana()
     {
-        return m_fMana > m_fMinManaCost;
+#if UNITY_EDITOR
+        return true;
+#else
+        return m_fMana > 0.0f;
+#endif
     }
 
     /*
@@ -588,7 +615,7 @@ public class PlayerStats : MonoBehaviour
         m_fHealth -= fDamage;
 
         // Set GUI value.
-        m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
+        m_healthFillMat.SetFloat("_Resource", m_fHealth / m_fMaxHealth);
 
         // Play Hurt SFX...
         m_hurtSFX.PlayRandom();

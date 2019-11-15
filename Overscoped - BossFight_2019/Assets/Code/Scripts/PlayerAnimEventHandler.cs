@@ -47,11 +47,11 @@ public class PlayerAnimEventHandler : MonoBehaviour
     }
 
     /*
-    Description: Event to tell the grapple script to begin extending the grapple rope.
+    Description: Event to tell the grapple script to begin the spell.
     */
-    public void EvBeginExtension()
+    public void EvStartGrapple()
     {
-        m_grappleScript.BeginExtension();
+        m_grappleScript.BeginGrapple();
     }
 
     /*

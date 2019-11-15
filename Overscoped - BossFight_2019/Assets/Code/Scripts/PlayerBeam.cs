@@ -226,7 +226,7 @@ public class PlayerBeam : MonoBehaviour
             m_animator.SetBool("isBeamCasting", m_bCasting);
 
             // Release condition.
-            if (m_bBeamEnabled && (!Input.GetMouseButton(1) || m_fBeamCharge <= 0.0f))
+            if (m_bBeamEnabled && (Input.GetMouseButtonUp(1) || m_fBeamCharge <= 0.0f))
             {
                 // Stop beam and ensure beam charge does not fall below zero.
 

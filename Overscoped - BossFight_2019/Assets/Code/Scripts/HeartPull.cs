@@ -8,18 +8,16 @@ public class HeartPull : PullObject
     [SerializeField]
     private float m_fDissolveTime = 10.0f;
 
-    private GameObject m_player; // Player object reference.
-    private CameraEffects m_camEffects; // Camera effects script reference.
-    private PlayerBeam m_playerBeamScript; // Player beam constroller script reference.
-    private BossBehaviour m_bossScript; // Boss AI script reference.
-    private Material m_material; // Heart material reference.
+    private GameObject m_player;
+    private PlayerBeam m_playerBeamScript;
+    private BossBehaviour m_bossScript;
+    private Material m_material;
 
     new private void Awake()
     {
         base.Awake();
 
         m_player = GameObject.FindGameObjectWithTag("Player");
-        m_camEffects = m_player.GetComponentInChildren<CameraEffects>();
         m_playerBeamScript = m_player.GetComponent<PlayerBeam>();
         m_bossScript = GetComponentInParent<BossBehaviour>();
 

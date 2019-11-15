@@ -48,12 +48,12 @@ MonoBehaviour:
     supportRayTracing: 0
     lightLoopSettings:
       cookieSize: 128
-      cookieTexArraySize: 16
+      cookieTexArraySize: 32
       pointCookieSize: 128
-      cubeCookieTexArraySize: 16
+      cubeCookieTexArraySize: 32
       planarReflectionProbeCacheSize: 2
       planarReflectionTextureSize: 1024
-      reflectionProbeCacheSize: 64
+      reflectionProbeCacheSize: 32
       reflectionCubemapSize: 256
       reflectionCacheCompressed: 0
       planarReflectionCacheCompressed: 0
@@ -62,11 +62,11 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 0
       supportFabricConvolution: 0
-      maxDirectionalLightsOnScreen: 16
+      maxDirectionalLightsOnScreen: 5
       maxPunctualLightsOnScreen: 512
-      maxAreaLightsOnScreen: 64
+      maxAreaLightsOnScreen: 32
       maxEnvLightsOnScreen: 64
-      maxDecalsOnScreen: 512
+      maxDecalsOnScreen: 128
     hdShadowInitParams:
       shadowAtlasResolution: 4096
       maxShadowRequests: 128
@@ -74,9 +74,9 @@ MonoBehaviour:
       useDynamicViewportRescale: 1
       shadowQuality: 0
     decalSettings:
-      drawDistance: 1000
-      atlasWidth: 4096
-      atlasHeight: 4096
+      drawDistance: 512
+      atlasWidth: 1024
+      atlasHeight: 1024
       perChannelMask: 0
     postProcessSettings:
       m_LutSize: 32

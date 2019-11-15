@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: MAT_UI_Beam_Charge
   m_Shader: {fileID: 4800000, guid: abe3601caa19c664a97860472bb51afc, type: 3}
-  m_ShaderKeywords: _USEALPHAMASK_ON
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -20,23 +20,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Alpha:
-        m_Texture: {fileID: 2800000, guid: 1539606a70ccd1f4998d7799b2c12c89, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _AlphaMask:
-        m_Texture: {fileID: 2800000, guid: 1539606a70ccd1f4998d7799b2c12c89, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: a8de9c9c15d9c7e4eaa883c727391bee, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Noise:
-        m_Texture: {fileID: 2800000, guid: e451e4a7415133e499b571c26159bd98, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Texture:
-        m_Texture: {fileID: 2800000, guid: 1539606a70ccd1f4998d7799b2c12c89, type: 3}
+        m_Texture: {fileID: 2800000, guid: cd460ee4ac5c1e746b7a734cc7cc64dd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _texcoord:
@@ -44,29 +32,20 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _ColorMask: 15
     - _ColourIntensity: 2
     - _EdgeIntensity: 20
-    - _Mana: 0.09756485
+    - _Mana: 0.18251473
     - _PeakIntensity: 1
-    - _Resource: 15.607993
+    - _Resource: 0.082711965
     - _ResourcePercentage: 0
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _Stepped: 1
-    - _UseAlphaMask: 1
-    - _UseUIAlphaClip: 0
+    - _UseAlphaMask: 0
     - _YEEE: 0
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorHigh: {r: 0.07846066, g: 0, b: 0.18867922, a: 1}
-    - _ColorLow: {r: 0, g: 0, b: 0.029000001, a: 0}
+    - _ColorHigh: {r: 0.5849056, g: 0.31728372, b: 0.53550214, a: 0}
+    - _ColorLow: {r: 0.034141976, g: 0.033641864, b: 0.26415092, a: 0}
     - _Colorlow: {r: 0.15833035, g: 0.06594872, b: 0.35849056, a: 0}
-    - _EdgeColour: {r: 0.71614885, g: 0.2688679, b: 1, a: 0}
-    - _NoiseOffset: {r: 0.1, g: -0.1, b: 0, a: 0}
-    - _NoiseTiling: {r: 1, g: 1, b: 0, a: 0}
+    - _EdgeColour: {r: 0.5680933, g: 0, b: 1, a: 1}
+    - _NoiseOffset: {r: 0.3, g: -0.15, b: 0, a: 0}
+    - _NoiseTiling: {r: 1.5, g: 1.5, b: 0, a: 0}
     - _Offset: {r: 0.1, g: -0.3, b: 0, a: 0}
     - _Tiling: {r: 1.5, g: 1.5, b: 0, a: 0}

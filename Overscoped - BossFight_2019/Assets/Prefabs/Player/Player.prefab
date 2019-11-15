@@ -5684,8 +5684,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_fMaxHealth: 200
-  m_fHealthRegenRate: 1
-  m_fRegenInterruptionTime: 3
   m_fMaxMana: 200
   m_fMinManaCost: 15
   m_fManaLossRate: 15
@@ -5816,9 +5814,9 @@ MonoBehaviour:
   m_fPullAcceleration: 18
   m_fGrappleMoveAcceleration: 30
   m_fMaxFlySpeed: 40
-  m_fDestinationRadius: 10
-  m_fDestinationUpPush: 10
+  m_fDestinationRadius: 2
   m_fDriftTolerance: 5
+  m_fLandMoveAcceleration: 4
   m_fGrappleRange: 100
   m_fMinReleaseBoostTime: 2
   m_fReleaseForce: 6
@@ -5878,6 +5876,7 @@ MonoBehaviour:
   m_fMinBeamCharge: 15
   m_beamOrigin: {fileID: 8150041405091459925}
   m_nBeamLength: 512
+  m_endParticleTransform: {fileID: 0}
   m_originParticles:
     m_particleSystems:
     - {fileID: 5922908930142460355}
@@ -6325,11 +6324,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 101956286138558622}
     m_Modifications:
-    - target: {fileID: 4844925331090585789, guid: da2cd13a173260b45becf3fe595f395d,
-        type: 3}
-      propertyPath: m_Name
-      value: PS_Player_Grapple_Destination
-      objectReference: {fileID: 0}
     - target: {fileID: 4844925331090585790, guid: da2cd13a173260b45becf3fe595f395d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6384,6 +6378,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4844925331090585789, guid: da2cd13a173260b45becf3fe595f395d,
+        type: 3}
+      propertyPath: m_Name
+      value: PS_Player_Grapple_Destination
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: da2cd13a173260b45becf3fe595f395d, type: 3}

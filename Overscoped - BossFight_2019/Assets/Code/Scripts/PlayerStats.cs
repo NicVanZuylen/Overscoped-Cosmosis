@@ -26,16 +26,12 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private float m_fMaxHealth = 100.0f;
 
-    [Tooltip("Rate in which health points will regenerate over time.")]
-    [SerializeField]
-    private float m_fHealthRegenRate = 1.0f;
-
-    [Tooltip("Amount of time health regen is interrupted after taking damage.")]
-    [SerializeField]
-    private float m_fRegenInterruptionTime = 3.0f;
-
     [SerializeField]
     private float m_fMaxMana = 100.0f;
+
+    [Tooltip("Minimum mana to cast the grapple.")]
+    [SerializeField]
+    private float m_fMinManaCost = 15.0f;
 
     [Tooltip("Rate of player's mana loss when using the grapple.")]
     [SerializeField]
@@ -62,7 +58,7 @@ public class PlayerStats : MonoBehaviour
     private float m_fPortalPunchForce = 100.0f;
 
     // -------------------------------------------------------------------------------------------------
-    [Header("Death & Respawn")]
+    [Header("Death")]
 
     [Tooltip("Amount of time's worth of movement captured by the camera spline.")]
     [SerializeField]
@@ -83,10 +79,6 @@ public class PlayerStats : MonoBehaviour
     [Tooltip("Amount if time time will take to halt before the death spline is ridden.")]
     [SerializeField]
     private float m_fTimeSlowDuration = 2.0f;
-
-    [Tooltip("Rate in which the player will re-materialize when spawning.")]
-    [SerializeField]
-    private float m_fRespawnMaterializeRate = 1.0f;
 
     // -------------------------------------------------------------------------------------------------
     [Space(10)]
@@ -164,8 +156,7 @@ public class PlayerStats : MonoBehaviour
     // Resources
     private float m_fHealth; // Everyone knows what this does.
     private float m_fMana; // Resource used up while grappling.
-    private float m_fCurrentHealthIntTime; // Current health interruption timer value.
-    private float m_fCurrentManaRegenDelay; // Current timer value of the mana regen.
+    private float m_fCurrentRegenDelay; // Current timer value of the mana regen.
     private bool m_bIsAlive; // Whether or not the player lives.
 
     // Respawn
@@ -197,7 +188,7 @@ public class PlayerStats : MonoBehaviour
 
         m_fHealth = m_fMaxHealth;
         m_fMana = m_fMaxMana;
-        m_fCurrentManaRegenDelay = 1.0f;
+        m_fCurrentRegenDelay = 1.0f;
         m_bIsAlive = true;
 
         m_fSplineInterval = m_fDeathRecordTime / m_camEffects.MaxSplineCount();
@@ -213,19 +204,10 @@ public class PlayerStats : MonoBehaviour
         // Spawn at checkpoint if it has been reached.
         if (m_bCheckpointReached && m_checkpoint)
         {
+
             transform.position = m_checkpoint.position;
             m_controller.SetLookRotation(m_checkpoint.rotation);
         }
-    }
-
-    private void Start()
-    {
-        // Disable scripts until dissolve-in is finished.
-        m_beamScript.enabled = false;
-        m_controller.SetFocus(false);
-        m_controller.enabled = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        m_hookScript.enabled = false;
     }
 
     /*
@@ -356,43 +338,16 @@ public class PlayerStats : MonoBehaviour
         if(m_fRespawnDissolve > 0.0f)
         {
             // Count down dissolve level and update shader.
-            m_fRespawnDissolve = Mathf.Max(m_fRespawnDissolve - (Time.deltaTime * m_fRespawnMaterializeRate), 0.0f);
+            m_fRespawnDissolve = Mathf.Max(m_fRespawnDissolve - Time.deltaTime, 0.0f);
 
             for (int i = 0; i < m_materials.Length; ++i)
                 m_materials[i].SetFloat("_Dissolve", m_fRespawnDissolve);
-
-            // Enable scripts once dissolve in is finished.
-            if(m_fRespawnDissolve <= 0.0f)
-            {
-                m_beamScript.enabled = true;
-                m_controller.SetFocus(true);
-                m_controller.enabled = true;
-                m_hookScript.enabled = true;
-            }
-            
-            return;
         }
 
-        // Health regeneration.
-        if(m_fCurrentHealthIntTime <= 0.0f)
-        {
-            // Regenerate health.
-            m_fHealth += m_fHealthRegenRate * Time.deltaTime;
-
-            if (m_fHealth > m_fMaxHealth)
-                m_fHealth = m_fMaxHealth;
-
-            // Adjust fill amount.
-            m_healthFill.fillAmount = (m_fHealth / m_fMaxHealth) * 0.5f;
-        }
-        else
-            m_fCurrentHealthIntTime -= Time.deltaTime;
-
-        // Grapple mana decay.
         if (m_hookScript.GrappleActive())
         {
             // Reset mana regen delay.
-            m_fCurrentManaRegenDelay = m_fManaRegenDelay;
+            m_fCurrentRegenDelay = m_fManaRegenDelay;
 
             // Lose mana whilst the hook is active.
             m_fMana -= m_fManaLossRate * Time.deltaTime;
@@ -403,9 +358,9 @@ public class PlayerStats : MonoBehaviour
         else
         {
             // Count down regen delay.
-            m_fCurrentManaRegenDelay -= Time.deltaTime;
+            m_fCurrentRegenDelay -= Time.deltaTime;
 
-            if (m_fCurrentManaRegenDelay <= 0.0f)
+            if (m_fCurrentRegenDelay <= 0.0f)
             {
                 // Regenerate mana.
                 switch (m_manaRegenMode)
@@ -554,11 +509,7 @@ public class PlayerStats : MonoBehaviour
     */
     public bool EnoughMana()
     {
-#if UNITY_EDITOR
-        return true;
-#else
-        return m_fMana > 0.0f;
-#endif
+        return m_fMana > m_fMinManaCost;
     }
 
     /*
@@ -620,9 +571,6 @@ public class PlayerStats : MonoBehaviour
         // Play camera effects...
         m_camEffects.ApplyShake(0.1f, 0.8f, true);
         m_camEffects.ApplyChromAbbShake(0.1f, 0.6f, 0.8f);
-
-        // Interrupt regenration.
-        m_fCurrentHealthIntTime = m_fRegenInterruptionTime;
 
         if(m_fHealth <= 0.0f)
         {

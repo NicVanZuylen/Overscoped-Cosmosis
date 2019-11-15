@@ -51,7 +51,6 @@ Shader "Cosmosis/UI/Sprite_Default"
 		{
 			Name "Default"
 		CGPROGRAM
-			
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 3.0
@@ -130,8 +129,8 @@ Shader "Cosmosis/UI/Sprite_Default"
 	
 }
 /*ASEBEGIN
-Version=16900
-7;20;1906;999;1174;504;1;True;False
+Version=16800
+1927;26;1906;993;1174;501;1;True;False
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;0,0;Float;False;True;2;Float;ASEMaterialInspector;0;7;Cosmosis/UI/Sprite_Default;5056123faa0c79b47ab6ad7e8bf059a4;True;Default;0;0;Default;2;True;2;5;False;-1;10;False;-1;0;1;False;-1;0;False;-1;False;False;True;2;False;-1;True;True;True;True;True;0;True;-9;True;True;0;True;-5;255;True;-8;255;True;-7;0;True;-4;0;True;-6;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;True;2;False;-1;True;0;False;-1;False;True;5;Queue=Transparent=Queue=0;IgnoreProjector=True;RenderType=Transparent=RenderType;PreviewType=Plane;CanUseSpriteAtlas=True;False;0;False;False;False;False;False;False;False;False;False;False;True;2;0;;0;0;Standard;0;0;1;True;False;2;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0,0,0;False;0
 ASEEND*/
-//CHKSM=74AB234A61E3D29AA0399398F20D482CE8ABEA52
+//CHKSM=742F0791FE0A4E3E4FEEBF89F986854FD83F8635

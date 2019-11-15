@@ -503,7 +503,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 881643811}
+      - m_Target: {fileID: 0}
         m_MethodName: UpdateMusicVolumeCallback
         m_Mode: 1
         m_Arguments:
@@ -3261,7 +3261,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 881643811}
+      - m_Target: {fileID: 0}
         m_MethodName: UpdateMusicVolumeCallback
         m_Mode: 1
         m_Arguments:
@@ -4161,8 +4161,8 @@ GameObject:
   - component: {fileID: 5817722434322119705}
   - component: {fileID: 881643818}
   - component: {fileID: 881643819}
-  - component: {fileID: 881643820}
   - component: {fileID: 881643811}
+  - component: {fileID: 881643820}
   m_Layer: 5
   m_Name: Canvas01_Menu
   m_TagString: Untagged
@@ -4477,25 +4477,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &881643820
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8179654049595898029}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62ae4aaf388c13043a6ad1e4e0637d37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_tracks:
-  - m_tracks:
-    - {fileID: 8300000, guid: 8a021dca8a40dd44e98daba16b913692, type: 3}
-  m_bCrossFadeTracks: 1
-  m_fCrossFadeTime: 5
-  m_firstSource: {fileID: 881643819}
-  m_secondSource: {fileID: 881643818}
 --- !u!114 &881643811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4522,6 +4503,25 @@ MonoBehaviour:
   m_windVolume: {fileID: 371838096248895759}
   m_musicVolume: {fileID: 3517520939625252357}
   m_applyButton: {fileID: 9150574651985208875}
+--- !u!114 &881643820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8179654049595898029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62ae4aaf388c13043a6ad1e4e0637d37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_tracks:
+  - m_tracks:
+    - {fileID: 8300000, guid: 8a021dca8a40dd44e98daba16b913692, type: 3}
+  m_bCrossFadeTracks: 1
+  m_fCrossFadeTime: 5
+  m_firstSource: {fileID: 881643819}
+  m_secondSource: {fileID: 881643818}
 --- !u!1 &8351593108308187108
 GameObject:
   m_ObjectHideFlags: 0

@@ -800,9 +800,6 @@ public class PlayerController : MonoBehaviour
 
         m_bOnGround &= !m_bSlopeLimit;
 
-        // Update grounded status in animation controller.
-        m_animController.SetBool("isGrounded", m_bOnGround);
-
         // Ground detection result should be confirmed here.
         if (m_bOnGround)
             m_bJumping = false;

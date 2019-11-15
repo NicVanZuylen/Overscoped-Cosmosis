@@ -17,9 +17,10 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     private GameObject[] m_menuHandles = null;
 
-    [Header("Title screen button references.")]
+    [Header("Graphics option references.")]
+
     [SerializeField]
-    private Button[] m_titleScreenButtons = null;
+    private Slider m_gammaSlider = null;
 
     [Header("Volume slider references")]
 
@@ -86,6 +87,9 @@ public class MainMenu : MonoBehaviour
 
     private void UpdateOptionsUI()
     {
+        // Video
+        m_gammaSlider.value = m_settings.m_fGamma;
+
         // Audio
         m_masterVolume.value = m_settings.m_fMasterVolume;
         m_bossVolume.value = m_settings.m_fBossVolume;
@@ -119,10 +123,6 @@ public class MainMenu : MonoBehaviour
     {
         m_fadeScript.SetCallback(LoadGameScene);
         m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
-
-        // Disable main menu buttons.
-        for (int i = 0; i < m_titleScreenButtons.Length; ++i)
-            m_titleScreenButtons[i].interactable = false;
     }
 
     /*
@@ -158,6 +158,9 @@ public class MainMenu : MonoBehaviour
     public void ApplyButtonCallback()
     {
         // Set settings values.
+
+        // Graphics
+        m_settings.m_fGamma = m_gammaSlider.value;
 
         // Volumes
         m_settings.m_fMasterVolume = m_masterVolume.value;

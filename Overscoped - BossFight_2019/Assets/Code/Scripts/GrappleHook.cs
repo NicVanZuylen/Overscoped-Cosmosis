@@ -513,6 +513,10 @@ public class GrappleHook : MonoBehaviour
     */
     public void ReleaseGrapple(bool bWaitForRelease = false)
     {
+        // Set new gravity value when releasing from hooked state.
+        if (m_grappleState == EGrappleState.GRAPPLE_HOOKED && m_grappleMode == EGrappleMode.GRAPPLE_MODE_GRAPPLE)
+            m_controller.SetGravity(m_fReleaseGravity);
+
         SetState(EGrappleState.GRAPPLE_IDLE);
 
         // Release grapple overrides.
@@ -521,10 +525,6 @@ public class GrappleHook : MonoBehaviour
             m_controller.FreeMovementOverride();
             m_controller.FreeCollisionOverride();
         }
-
-        // Set new gravity value when releasing from hooked state.
-        if (m_grappleState == EGrappleState.GRAPPLE_HOOKED && m_grappleMode == EGrappleMode.GRAPPLE_MODE_GRAPPLE)
-            m_controller.SetGravity(m_fReleaseGravity);
 
         // Stop VFX.
         if(m_grappleHandVFX.IsPlaying())

@@ -1,10 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField]
+    private Image[] m_bossHealthImages = null;
+
     private GameObject m_player;
     private BossBehaviour m_bossScript;
     private Plane m_worldSplitPlane; // Separates the arena and tutorial areas.
@@ -19,6 +23,9 @@ public class GameManager : MonoBehaviour
         m_bossScript = GameObject.FindGameObjectWithTag("Boss").GetComponent<BossBehaviour>();
         GameObject worldPlane = transform.GetChild(0).gameObject;
         m_musicManager = GetComponent<MusicManager>();
+
+        for (int i = 0; i < m_bossHealthImages.Length; ++i)
+            m_bossHealthImages[i].enabled = false;
 
         // Play random track out of the first group to start.
         m_musicManager.PlayRandomTrack();
@@ -53,6 +60,10 @@ public class GameManager : MonoBehaviour
         {
             m_musicManager.PlayTrackIndex(0, 1);
 
+            // Enable boss health bar once fight starts.
+            for (int i = 0; i < m_bossHealthImages.Length; ++i)
+                m_bossHealthImages[i].enabled = true;
+
             Debug.Log("Good people of Cyrodiil. WELCOME, to the Arena!");
 
             // Enable boss AI and disable game manager script for updates.
@@ -64,6 +75,10 @@ public class GameManager : MonoBehaviour
             if (!m_bossScript.gameObject.activeInHierarchy)
             {
                 Debug.Log("Boss dead");
+
+                // Disable health bar once fight is finished.
+                for (int i = 0; i < m_bossHealthImages.Length; ++i)
+                    m_bossHealthImages[i].enabled = false;
 
                 // Change music track when boss is killed.
                 m_musicManager.PlayTrackIndex(0);

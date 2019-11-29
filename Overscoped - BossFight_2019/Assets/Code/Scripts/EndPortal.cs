@@ -26,15 +26,22 @@ public class EndPortal : MonoBehaviour
     {
         if (other.tag == "Player")
         {
+            // Prevent the player from opening the pause menu once the portal is reached.
+            m_pauseScript.enabled = false;
+
             // Begin fade to black before transitioning to the title screen.
             m_fadeScript.SetFadeRate(0.3f);
             m_fadeScript.SetCallback(m_pauseScript.ShowCreditsScreen);
             m_fadeScript.BeginFade(ScreenFade.EFadeMode.FADE_IN);
 
-
             // Freeze game.
             other.gameObject.GetComponent<PlayerController>().SetPaused(true);
             Time.timeScale = 0.0f;
+
+            // Silence audo.
+            BossBehaviour.SetVolume(0.0f, 0.0f);
+            PlayerStats.SetVolume(0.0f, 0.0f, 0.0f);
+            GrappleHook.SetVolume(0.0f, 0.0f);
 
             m_collider.enabled = false;
         }

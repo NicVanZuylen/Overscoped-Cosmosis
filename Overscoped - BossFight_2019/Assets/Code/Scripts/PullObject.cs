@@ -104,7 +104,7 @@ public class PullObject : MonoBehaviour
         m_fTension = 0.0f;
 
         if(m_decoupleVector != null)
-            m_rigidbody.AddForce((m_decoupleVector.forward + playerDirection) * m_fDecoupleForce, ForceMode.Impulse);
+            m_rigidbody.AddForce(m_decoupleVector.forward * m_fDecoupleForce, ForceMode.Impulse);
         else
             m_rigidbody.AddForce(playerDirection * m_fDecoupleForce, ForceMode.Impulse);
 

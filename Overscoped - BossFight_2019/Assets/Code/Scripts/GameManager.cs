@@ -9,7 +9,12 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Image[] m_bossHealthImages = null;
 
+    [Tooltip("Push added to the player when spawning from the portal.")]
+    [SerializeField]
+    private float m_fExitPortalForce = 10.0f;
+
     private GameObject m_player;
+    private Transform m_playerTransform;
     private BossBehaviour m_bossScript;
     private Plane m_worldSplitPlane; // Separates the arena and tutorial areas.
     private MusicManager m_musicManager;
@@ -20,12 +25,20 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         m_player = GameObject.FindGameObjectWithTag("Player");
+        m_playerTransform = m_player.transform;
         m_bossScript = GameObject.FindGameObjectWithTag("Boss").GetComponent<BossBehaviour>();
         GameObject worldPlane = transform.GetChild(0).gameObject;
         m_musicManager = GetComponent<MusicManager>();
 
         for (int i = 0; i < m_bossHealthImages.Length; ++i)
             m_bossHealthImages[i].enabled = false;
+
+        // Give the player a push to give the sense the just exited the portal.
+        if(!PlayerStats.CheckpointReached())
+        {
+            PlayerController playerController = m_player.GetComponent<PlayerController>();
+            playerController.AddImpulse(playerController.LookForward() * m_fExitPortalForce);
+        }
 
         // Play random track out of the first group to start.
         m_musicManager.PlayRandomTrack();
@@ -56,7 +69,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         // Boss will begin to attack the player once they are on the arena side of the plane.
-        if (m_worldSplitPlane.GetSide(m_player.transform.position) && !m_bossScript.enabled)
+        if (m_worldSplitPlane.GetSide(m_playerTransform.position) && !m_bossScript.enabled)
         {
             m_musicManager.PlayTrackIndex(0, 1);
 

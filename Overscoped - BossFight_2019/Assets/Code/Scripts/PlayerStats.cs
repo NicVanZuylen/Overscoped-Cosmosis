@@ -704,4 +704,13 @@ public class PlayerStats : MonoBehaviour
     {
         return m_fPlayerVolume;
     }
+
+    /*
+    Description: Get whether or not the player has reached the checkpoint at the start of the boss fight.
+    Return Type: bool
+    */
+    public static bool CheckpointReached()
+    {
+        return m_bCheckpointReached;
+    }
 }

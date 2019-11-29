@@ -97,6 +97,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_v3SurfaceUp;
     private Vector3 m_v3SurfaceForward;
     private Vector3 m_v3Velocity;
+    private Vector3 m_v3CollisionImpulse;
     private float m_fSprintDot;
     private float m_fCurrentGroundMaxSpeed;
     private bool m_bShouldJump;
@@ -126,7 +127,8 @@ public class PlayerController : MonoBehaviour
     // Runs once when a jump is initiated.
     public delegate void PlayerControllerCallback(PlayerController controller);
 
-    private OverrideFunction m_overrideFunction;
+    private OverrideFunction m_movementOverride;
+    private OverrideFunction m_collisionOverride;
     private bool m_bOverridden;
     private bool m_bJustResumed;
 
@@ -365,7 +367,7 @@ public class PlayerController : MonoBehaviour
     */
     public void OverrideMovement(OverrideFunction function)
     {
-        m_overrideFunction = function;
+        m_movementOverride = function;
         m_bOverridden = true;
         m_bJumping = false;
     }
@@ -373,9 +375,25 @@ public class PlayerController : MonoBehaviour
     /*
     Description: Remove the movement override. (Re-enables default movement behaviour.)
     */
-    public void FreeOverride()
+    public void FreeMovementOverride()
     {
         m_bOverridden = false;
+    }
+
+    /*
+    Description: Set a collision override delegate that will run whenever the player collides with something.
+    */
+    public void OverrideCollision(OverrideFunction function)
+    {
+        m_collisionOverride = function;
+    }
+
+    /*
+    Description: Remove the collision override.
+    */
+    public void FreeCollisionOverride()
+    {
+        m_collisionOverride = null;
     }
 
     /*
@@ -593,7 +611,7 @@ public class PlayerController : MonoBehaviour
             m_cameraEffects.SetBobbingEnabled(false);
 
             // Run override behaviour and use it's velocity output.
-            m_v3Velocity = m_overrideFunction(this, fDeltaTime);
+            m_v3Velocity = m_movementOverride(this, fDeltaTime);
 
             return;
         }
@@ -732,6 +750,8 @@ public class PlayerController : MonoBehaviour
         // Movement updates.
 
         UpdateMovement(Time.deltaTime);
+        m_v3Velocity += m_v3CollisionImpulse;
+        m_v3CollisionImpulse = Vector3.zero;
 
         // ------------------------------------------------------------------------------------------------------
         // Mouse look
@@ -874,19 +894,24 @@ public class PlayerController : MonoBehaviour
             m_bJustResumed = false;
     }
 
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (m_collisionOverride != null)
+            m_v3CollisionImpulse = m_collisionOverride(this, 0.0f);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         // Killbox detection.
         if(other.tag == "Killbox")
         {
             // Begin screen fade and respawn once the screen is black.
-            //ScreenFade camScreenFade = m_cameraEffects.GetScreenFade();
-            //
-            //camScreenFade.SetCallback(RespawnLastCheckpoint);
-            //camScreenFade.SetFadeRate(3.5f);
-            //camScreenFade.BeginFade(ScreenFade.EFadeMode.FADE_IN);
+            ScreenFade camScreenFade = m_cameraEffects.GetScreenFade();
 
-            RespawnLastCheckpoint();
+            camScreenFade.SetCallback(RespawnLastCheckpoint);
+
+            camScreenFade.SetFadeRate(3.5f);
+            camScreenFade.BeginFade(ScreenFade.EFadeMode.FADE_IN);
         }
     }
 }

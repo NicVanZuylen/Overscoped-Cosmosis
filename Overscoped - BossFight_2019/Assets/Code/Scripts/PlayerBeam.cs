@@ -201,6 +201,9 @@ public class PlayerBeam : MonoBehaviour
         if(m_impactAudioLoop != null && m_impactAudioLoop.IsPlaying())
             m_impactAudioLoop.Stop();
 
+        // Stop hit VFX.
+        m_bossChestScript.StopHitVFX();
+
         // Stop SFX.
         m_stopSFX.PlayIndex(0);
 
@@ -288,7 +291,7 @@ public class PlayerBeam : MonoBehaviour
                     // Deal damage if the beam ray hits the force field.
                     if(m_beamHit.collider.tag == "BossChest")
                     {
-                        m_bossChestScript.DealBeamDamage();
+                        m_bossChestScript.DealBeamDamage(m_beamHit.point);
                     }
                 }
                 else
@@ -296,7 +299,10 @@ public class PlayerBeam : MonoBehaviour
                     // Stop impact effects.
                     if (m_impactParticles.IsPlaying())
                         m_impactParticles.Stop(ParticleSystemStopBehavior.StopEmitting);
-                    
+
+                    // Stop hit VFX.
+                    m_bossChestScript.StopHitVFX();
+
                     // Update volumetric beam particle positions.
                     UpdateParticlePositions(m_beamParticles, m_beamParticleRenderers, m_particles, m_beamOrigin.position, m_nBeamLength, m_fMeshLength, false);
 

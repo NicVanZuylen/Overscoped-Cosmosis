@@ -105,7 +105,7 @@ public class PlayerBeam : MonoBehaviour
         m_bBeamUnlocked = true;
 
 #if UNITY_EDITOR
-        m_fBeamCharge = 0.0f;
+        m_fBeamCharge = 1000.0f;
 #else
         m_fBeamCharge = 0.0f;
 #endif
@@ -207,9 +207,6 @@ public class PlayerBeam : MonoBehaviour
         // Stop animations.
         m_animator.SetBool("isBeamCasting", false);
         m_animator.SetBool("beamActive", false);
-
-        if (m_originParticles.IsPlaying())
-            m_originParticles.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     void LateUpdate()
@@ -224,6 +221,12 @@ public class PlayerBeam : MonoBehaviour
 
             // Tell the animator whether or not to play to beam casting animation.
             m_animator.SetBool("isBeamCasting", m_bCasting);
+
+            // Hand particles
+            if (m_bCanCast && !m_originParticles.IsPlaying())
+                m_originParticles.Play();
+            else if (!m_bCanCast && !m_bBeamEnabled && m_originParticles.IsPlaying())
+                m_originParticles.Stop(ParticleSystemStopBehavior.StopEmittingAndClear);
 
             // Release condition.
             if (m_bBeamEnabled && (!Input.GetMouseButton(1) || m_fBeamCharge <= 0.0f))
@@ -254,10 +257,6 @@ public class PlayerBeam : MonoBehaviour
                 // Apply camera shake.
                 m_camEffects.ApplyShake(0.1f, 0.3f);
                 m_camEffects.ApplyChromAbbShake(0.1f, 0.1f, 0.5f);
-
-                // Play origin effect.
-                if (!m_originParticles.IsPlaying())
-                    m_originParticles.Play();
 
                 // Play SFX loops.
                 if (!m_fireAudioLoop.IsPlaying())

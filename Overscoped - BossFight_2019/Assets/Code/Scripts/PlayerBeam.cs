@@ -105,7 +105,7 @@ public class PlayerBeam : MonoBehaviour
         m_bBeamUnlocked = true;
 
 #if UNITY_EDITOR
-        m_fBeamCharge = 100000.0f;
+        m_fBeamCharge = 0.0f;
 #else
         m_fBeamCharge = 0.0f;
 #endif

@@ -28880,7 +28880,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2ed15def9087cb4db2864bb7dda347f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_fChargeAmount: 15
+  m_fChargeAmount: 25
   m_pickupSFX:
     m_clips:
     - {fileID: 8300000, guid: fdb9d4557153f3f4d86d456161fb309a, type: 3}
@@ -28985,20 +28985,6 @@ Animation:
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
   m_CullingType: 0
---- !u!114 &1650904923
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735433698997803223}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0454e2b5c15f64344b53196459dd01a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_bDisableOnStop: 0
-  m_stopBehaviour: 0
 --- !u!82 &366220055841794283
 AudioSource:
   m_ObjectHideFlags: 0
@@ -29095,6 +29081,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1650904923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5735433698997803223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0454e2b5c15f64344b53196459dd01a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_bDisableOnStop: 0
+  m_stopBehaviour: 0
 --- !u!1001 &1151581550
 PrefabInstance:
   m_ObjectHideFlags: 0

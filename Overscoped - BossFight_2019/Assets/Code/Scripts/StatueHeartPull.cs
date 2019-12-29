@@ -9,6 +9,9 @@ public class StatueHeartPull : PullObject
     private GameObject[] m_rocks = null;
 
     [SerializeField]
+    private GameObject m_heartTendrils = null;
+
+    [SerializeField]
     private Collider[] m_rockColliders = null;
 
     [Tooltip("Rate in which the rocks will dissolve-in.")]
@@ -61,6 +64,10 @@ public class StatueHeartPull : PullObject
         // Enable rock colliders.
         for (int i = 0; i < m_rockColliders.Length; ++i)
             m_rockColliders[i].enabled = true;
+
+        // Disable heart tendrils.
+        if(m_heartTendrils)
+            m_heartTendrils.SetActive(false);
 
         // Enable this script for updates, the updates will dissolve in the rocks.
         enabled = true;

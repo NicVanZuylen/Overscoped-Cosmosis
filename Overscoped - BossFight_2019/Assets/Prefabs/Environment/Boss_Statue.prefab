@@ -511,7 +511,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.8
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &5679693493370393444
 Rigidbody:
@@ -547,6 +547,8 @@ MonoBehaviour:
   m_fShakeTime: 0.05
   m_fShakeSpeed: 10
   m_rocks: []
+  m_heartTendrils: {fileID: 0}
+  m_rockColliders: []
   m_fDissolveRate: 1
 --- !u!1001 &1956169273903783438
 PrefabInstance:

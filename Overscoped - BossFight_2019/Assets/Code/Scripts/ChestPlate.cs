@@ -33,6 +33,14 @@ public class ChestPlate : MonoBehaviour
     [SerializeField]
     private GameObject m_heart = null;
 
+    [Tooltip("VFX for when the force field is hit by the player's beam.")]
+    [SerializeField]
+    private ParticleObject m_hitVFX = new ParticleObject();
+
+    [Tooltip("VFX for when the force field is destroyed by the player's beam.")]
+    [SerializeField]
+    private ParticleObject m_destroyVFX = new ParticleObject();
+
     private PlayerBeam m_playerBeamScript; // Reference to the player beam controller script.
     private CameraEffects m_camEffects; // Reference to the camera FX controller script.
     private BossBehaviour m_bossScript; // Reference to the Boss AI script.
@@ -83,8 +91,10 @@ public class ChestPlate : MonoBehaviour
 
     /*
     Description: Deal damage from the beam to the chestplate, and destroy it if the health reaches zero. 
+    Param:
+       Vector3 v3HitPoint: The point in which the barrier was hit.
     */
-    public void DealBeamDamage()
+    public void DealBeamDamage(Vector3 v3HitPoint)
     {
         m_fHealth -= Time.deltaTime;
         m_bossScript.TakeHit(); 
@@ -98,6 +108,14 @@ public class ChestPlate : MonoBehaviour
         m_healthFillMat.SetFloat("_Resource", 1.0f - fHealthPercentage);
         m_healthFillMat.color = m_healthGradient.Evaluate(fHealthPercentage);
 
+        // Play hit VFX.
+        m_hitVFX.SetPosition(v3HitPoint);
+
+        if (!m_hitVFX.IsPlaying())
+        {
+            m_hitVFX.Play();
+        }
+
         if (m_fHealth <= 0.0f && !enabled)
         {
             // Remove chestplate & progress stage.
@@ -110,11 +128,28 @@ public class ChestPlate : MonoBehaviour
             // Begin health bar thumping.
             m_healthBarThumpMat.SetInt("_ThumpingSwitch", 1);
 
+            // Stop hit VFX.
+            if (m_hitVFX.IsPlaying())
+                m_hitVFX.Stop();
+
+            // Play explosion VFX.
+            if (!m_destroyVFX.IsPlaying())
+                m_destroyVFX.Play();
+
             // Reset heart layer to default.
             m_heart.layer = 0;
 
             // Disable player beam.
             m_playerBeamScript.UnlockBeam(false);
         }
+    }
+
+    /*
+    Description: Stop the VFX played when the boss barrier is under fire from the player's beam.
+    */
+    public void StopHitVFX()
+    {
+        if(m_hitVFX.IsPlaying())
+            m_hitVFX.Stop();
     }
 }

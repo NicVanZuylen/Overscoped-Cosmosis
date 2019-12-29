@@ -8,6 +8,10 @@ public class HeartPull : PullObject
     [SerializeField]
     private float m_fDissolveTime = 10.0f;
 
+    [Tooltip("Explosion VFX for when the heart is pull out.")]
+    [SerializeField]
+    private ParticleObject m_explosion = new ParticleObject();
+
     private GameObject m_player; // Player object reference.
     private CameraEffects m_camEffects; // Camera effects script reference.
     private PlayerBeam m_playerBeamScript; // Player beam constroller script reference.
@@ -33,7 +37,7 @@ public class HeartPull : PullObject
 
     new private void Update()
     {
-       m_fDissolveTime = Mathf.Max(m_fDissolveTime - Time.deltaTime, 0.0f);
+        m_fDissolveTime = Mathf.Max(m_fDissolveTime - Time.deltaTime, 0.0f);
 
         m_material.SetFloat("_Dissolve", Mathf.Min(m_fDissolveTime, 1.0f));
 
@@ -50,6 +54,10 @@ public class HeartPull : PullObject
         // Progress boss stage.
         if(m_bossScript)
             m_bossScript.KillBoss();
+
+        // Play explosion effect.
+        if(!m_explosion.IsPlaying())
+            m_explosion.Play();
 
         // Turn of fresnel.
         m_material.SetFloat("_FresnelOnOff", 0.0f);

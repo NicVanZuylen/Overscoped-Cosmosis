@@ -12,7 +12,16 @@ public class StatueHeartPull : PullObject
     private GameObject m_heartTendrils = null;
 
     [SerializeField]
+    private GameObject m_firstCrystal = null;
+
+    [SerializeField]
     private Collider[] m_rockColliders = null;
+
+    [SerializeField]
+    private ParticleObject m_triggerParticles = new ParticleObject();
+
+    [SerializeField]
+    private Material m_statueMaterial = null;
 
     [Tooltip("Rate in which the rocks will dissolve-in.")]
     [SerializeField]
@@ -40,9 +49,18 @@ public class StatueHeartPull : PullObject
         // Set initial dissolve value.
         m_fDissolve = 0.0f;
         m_rockMaterial.SetFloat("_Dissolve", m_fDissolve);
+        m_statueMaterial.SetFloat("_Dissolve", 1.0f - m_fDissolve);
+
+        // Disable first crystal.
+        m_firstCrystal.SetActive(false);
 
         // Disable to stop overhead when not needed.
         enabled = false;
+    }
+
+    private void OnDestroy()
+    {
+        m_statueMaterial.SetFloat("_Dissolve", 1.0f);
     }
 
     new private void Update()
@@ -51,6 +69,8 @@ public class StatueHeartPull : PullObject
         {
             m_fDissolve = Mathf.Max(m_fDissolve + (Time.deltaTime * m_fDissolveRate), 0.0f);
             m_rockMaterial.SetFloat("_Dissolve", m_fDissolve);
+
+            m_statueMaterial.SetFloat("_Dissolve", 1.0f - m_fDissolve);
         }
         else
             enabled = false; // Disable once dissolve is complete.
@@ -65,9 +85,15 @@ public class StatueHeartPull : PullObject
         for (int i = 0; i < m_rockColliders.Length; ++i)
             m_rockColliders[i].enabled = true;
 
+        // Play particle effect.
+        m_triggerParticles.Play();
+
         // Disable heart tendrils.
         if(m_heartTendrils)
             m_heartTendrils.SetActive(false);
+
+        // Enable first crystal.
+        m_firstCrystal.SetActive(true);
 
         // Enable this script for updates, the updates will dissolve in the rocks.
         enabled = true;

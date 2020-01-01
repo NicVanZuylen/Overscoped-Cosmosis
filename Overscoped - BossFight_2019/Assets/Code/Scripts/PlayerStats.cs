@@ -72,6 +72,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField]
     private AnimationCurve m_rewindCurve = null;
 
+    [Tooltip("Boss AI script reference")]
+    [SerializeField]
+    private BossBehaviour m_bossScript = null;
+
     [Tooltip("Checkpoint to restart at after dying.")]
     [SerializeField]
     private Transform m_checkpoint = null;
@@ -150,7 +154,6 @@ public class PlayerStats : MonoBehaviour
     private PlayerController m_controller; // Player controller script reference.
     private PlayerBeam m_beamScript; // Player beam controller script reference.
     private CameraEffects m_camEffects; // Camera FX script.
-    private BossBehaviour m_bossScript; // Boss AI script reference.
     private Transform m_camPivot; // Pivot in which the player camera is parented to.
     private ScreenFade m_fadeScript; // Script controller screen fade effects.
     private AudioLoop m_windAudioLoop; // Wind audio loop object.
@@ -183,7 +186,6 @@ public class PlayerStats : MonoBehaviour
         m_beamScript = GetComponent<PlayerBeam>();
         m_camEffects = GetComponentInChildren<CameraEffects>(false);
         m_camPivot = transform.Find("CameraPivot");
-        m_bossScript = GameObject.FindGameObjectWithTag("Boss").GetComponentInChildren<BossBehaviour>();
         m_fadeScript = FindObjectOfType<ScreenFade>();
         m_materials = m_camEffects.GetComponentInChildren<SkinnedMeshRenderer>().materials;
 
@@ -678,7 +680,7 @@ public class PlayerStats : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if(other.tag == "Pickup")
+        if(other != null && other.tag == "Pickup")
         {
             Debug.Log("Player near pickup.");
 
@@ -688,7 +690,7 @@ public class PlayerStats : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag == "Pickup")
+        if (other != null && other.tag == "Pickup")
         {
             m_bNearPickup = false;
         }

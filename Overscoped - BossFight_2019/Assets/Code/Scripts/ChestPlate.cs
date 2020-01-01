@@ -41,7 +41,10 @@ public class ChestPlate : MonoBehaviour
     [SerializeField]
     private ParticleObject m_destroyVFX = new ParticleObject();
 
-    private PlayerBeam m_playerBeamScript; // Reference to the player beam controller script.
+    [Tooltip("Player beam attack script reference.")]
+    [SerializeField]
+    private PlayerBeam m_playerBeamScript = null;
+
     private CameraEffects m_camEffects; // Reference to the camera FX controller script.
     private BossBehaviour m_bossScript; // Reference to the Boss AI script.
     private Material m_material; // Reference to the barrier material.
@@ -49,7 +52,6 @@ public class ChestPlate : MonoBehaviour
 
     private void Awake()
     {
-        m_playerBeamScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBeam>();
         m_camEffects = m_playerBeamScript.gameObject.GetComponentInChildren<CameraEffects>();
         m_bossScript = GetComponentInParent<BossBehaviour>();
         m_material = GetComponent<MeshRenderer>().sharedMaterial;

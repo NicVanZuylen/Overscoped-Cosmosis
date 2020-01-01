@@ -19,6 +19,9 @@ public class PlayerBeam : MonoBehaviour
     [SerializeField]
     private GameObject[] m_beamParticleObjects = null;
 
+    [SerializeField]
+    private ChestPlate m_bossChestScript = null;
+
     // -------------------------------------------------------------------------------------------------
     [Header("Beam Attack Properties")]
 
@@ -79,7 +82,6 @@ public class PlayerBeam : MonoBehaviour
     private Animator m_animator;
     private RaycastHit m_beamHit;
     private GameObject m_endObj;
-    private ChestPlate m_bossChestScript;
     private float m_fBeamCharge; // Actual current charge value.
     private float m_fCurrentMeterLevel; // Current charge as displayed on the HUD.
     private const int m_nRayMask = ~(1 << 2 | 1 << 9); // Layer bitmask includes every layer but: IgnoreRaycast, NoGrapple, Player.
@@ -129,8 +131,6 @@ public class PlayerBeam : MonoBehaviour
         m_fMeshLength = 10.0f;
 
         m_endObj = new GameObject("Player_Beam_End_Point");
-
-        m_bossChestScript = GameObject.FindGameObjectWithTag("Boss").GetComponentInChildren<ChestPlate>();
 
         if(m_fireLoopSFX)
             m_fireAudioLoop = new AudioLoop(m_fireLoopSFX, gameObject, ESpacialMode.AUDIO_SPACE_NONE);

@@ -9,13 +9,16 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Image[] m_bossHealthImages = null;
 
+    [Tooltip("Reference to the boss's AI script.")]
+    [SerializeField]
+    private BossBehaviour m_bossScript = null;
+
     [Tooltip("Push added to the player when spawning from the portal.")]
     [SerializeField]
     private float m_fExitPortalForce = 10.0f;
 
     private GameObject m_player;
     private Transform m_playerTransform;
-    private BossBehaviour m_bossScript;
     private Plane m_worldSplitPlane; // Separates the arena and tutorial areas.
     private MusicManager m_musicManager;
     private Settings m_settings;
@@ -26,7 +29,6 @@ public class GameManager : MonoBehaviour
     {
         m_player = GameObject.FindGameObjectWithTag("Player");
         m_playerTransform = m_player.transform;
-        m_bossScript = GameObject.FindGameObjectWithTag("Boss").GetComponent<BossBehaviour>();
         GameObject worldPlane = transform.GetChild(0).gameObject;
         m_musicManager = GetComponent<MusicManager>();
 

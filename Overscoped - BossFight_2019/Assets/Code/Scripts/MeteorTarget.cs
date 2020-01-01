@@ -23,7 +23,7 @@ public class MeteorTarget : MonoBehaviour
     private float m_fAOEDamagePerSec = 10.0f;
 
     [SerializeField]
-    private Renderer[] m_particlesToFade;
+    private Renderer[] m_particlesToFade = null;
 
     //private GameObject m_indicator;
     private Queue<MeteorTarget> m_targetPool;
